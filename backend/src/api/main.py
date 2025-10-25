@@ -6,7 +6,10 @@ from backend.src.infrastructure.database import get_db, init_db
 from backend.src.infrastructure.models import NewsItem, Source
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from shared.logging import get_logger
 from sqlalchemy.orm import Session
+
+logger = get_logger(__name__)
 
 app = FastAPI(
     title="Government Feed API",
@@ -27,7 +30,9 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     """Initialize database on startup."""
+    logger.info("Starting Government Feed API")
     init_db()
+    logger.info("Database initialized successfully")
 
 
 @app.get("/")
@@ -58,10 +63,12 @@ async def get_source(source_id: int, db: Session = Depends(get_db)):
 @app.post("/api/sources", response_model=schemas.SourceResponse, status_code=201)
 async def create_source(source: schemas.SourceCreate, db: Session = Depends(get_db)):
     """Create new source."""
+    logger.info(f"Creating new source: {source.name}")
     db_source = Source(**source.model_dump())
     db.add(db_source)
     db.commit()
     db.refresh(db_source)
+    logger.info(f"Source created successfully: ID={db_source.id}, name={db_source.name}")
     return db_source
 
 
@@ -72,13 +79,16 @@ async def update_source(
     """Update source."""
     db_source = db.query(Source).filter(Source.id == source_id).first()
     if not db_source:
+        logger.warning(f"Update failed: Source {source_id} not found")
         raise HTTPException(status_code=404, detail="Source not found")
 
+    logger.info(f"Updating source: ID={source_id}, name={db_source.name}")
     for key, value in source.model_dump().items():
         setattr(db_source, key, value)
 
     db.commit()
     db.refresh(db_source)
+    logger.info(f"Source updated successfully: ID={source_id}")
     return db_source
 
 
@@ -87,10 +97,13 @@ async def delete_source(source_id: int, db: Session = Depends(get_db)):
     """Delete source."""
     db_source = db.query(Source).filter(Source.id == source_id).first()
     if not db_source:
+        logger.warning(f"Delete failed: Source {source_id} not found")
         raise HTTPException(status_code=404, detail="Source not found")
 
+    logger.info(f"Deleting source: ID={source_id}, name={db_source.name}")
     db.delete(db_source)
     db.commit()
+    logger.info(f"Source deleted successfully: ID={source_id}")
     return None
 
 
@@ -101,17 +114,21 @@ async def process_feed(source_id: int, db: Session = Depends(get_db)):
 
     source = db.query(Source).filter(Source.id == source_id).first()
     if not source:
+        logger.warning(f"Process feed failed: Source {source_id} not found")
         raise HTTPException(status_code=404, detail="Source not found")
 
+    logger.info(f"Processing feed for source: ID={source_id}, name={source.name}")
     parser = FeedParserService(db)
     imported_count = parser.parse_and_import(source)
 
     if imported_count > 0:
+        logger.info(f"Feed processed successfully: {imported_count} news items imported from {source.name}")
         return {
             "success": True,
             "message": f"Feed importato con successo! {imported_count} notizie aggiunte.",
         }
     else:
+        logger.warning(f"Feed processing completed with no new items from {source.name}")
         return {"success": False, "message": "Nessuna nuova notizia trovata o errore nel parsing."}
 
 
@@ -150,7 +167,9 @@ async def update_settings(settings: dict):
     """Update application settings."""
     from backend.src.infrastructure.settings_store import save_settings
 
+    logger.info("Updating application settings")
     save_settings(settings)
+    logger.info("Settings updated successfully")
     return {"success": True, "message": "Impostazioni salvate"}
 
 
@@ -178,12 +197,15 @@ async def summarize_news(news_id: int, db: Session = Depends(get_db)):
 
     news = db.query(NewsItem).filter(NewsItem.id == news_id).first()
     if not news:
+        logger.warning(f"Summarize failed: News item {news_id} not found")
         raise HTTPException(status_code=404, detail="News item not found")
 
     settings = load_settings()
     if not settings.get("ai_enabled", False):
+        logger.warning(f"Summarize failed: AI is disabled in settings")
         raise HTTPException(status_code=400, detail="AI non abilitata nelle impostazioni")
 
+    logger.info(f"Generating AI summary for news item: ID={news_id}, title={news.title[:50]}...")
     ollama = OllamaService(
         endpoint=settings.get("ollama_endpoint", "http://localhost:11434"),
         model=settings.get("ollama_model", "deepseek-r1:7b"),
@@ -206,4 +228,5 @@ async def summarize_news(news_id: int, db: Session = Depends(get_db)):
     news.summary = summary
     db.commit()
 
+    logger.info(f"AI summary generated and saved for news item {news_id}")
     return {"success": True, "summary": summary}

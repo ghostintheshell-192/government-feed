@@ -83,6 +83,9 @@ models/
 # Personal notes
 .personal/
 
+# Working documents (migration tracking, etc.)
+docs/migration-status-report.md
+
 # Cache
 cache/
 .cache/

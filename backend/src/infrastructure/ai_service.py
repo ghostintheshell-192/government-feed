@@ -2,6 +2,9 @@
 
 import httpx
 from bs4 import BeautifulSoup
+from shared.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 class OllamaService:
@@ -14,6 +17,7 @@ class OllamaService:
     async def fetch_article_content(self, url: str) -> str:
         """Fetch and extract text content from article URL."""
         try:
+            logger.info(f"Fetching article content from URL: {url}")
             async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
                 response = await client.get(url)
                 response.raise_for_status()
@@ -46,11 +50,13 @@ class OllamaService:
 
         except Exception as e:
             # If scraping fails, return error message
+            logger.error(f"Error fetching article from {url}: {e}")
             return f"Impossibile recuperare il contenuto dall'URL: {str(e)}"
 
     async def summarize(self, content: str, max_length: int = 200) -> str:
         """Summarize content using Ollama."""
         try:
+            logger.info(f"Generating summary (max {max_length} words)")
             # Strip HTML tags from content
             content = self._strip_html(content)
 
@@ -82,11 +88,15 @@ Riassunto:"""
                     data = response.json()
                     raw_response = data.get("response", "").strip()
                     # Remove <think> blocks if present (DeepSeek reasoning)
-                    return self._extract_summary(raw_response)
+                    summary = self._extract_summary(raw_response)
+                    logger.info("Summary generated successfully")
+                    return summary
                 else:
+                    logger.error(f"AI service error: HTTP {response.status_code}")
                     return f"Errore AI: {response.status_code}"
 
         except Exception as e:
+            logger.error(f"Error calling AI service: {e}")
             return f"Errore nella chiamata AI: {str(e)}"
 
     def _strip_html(self, html_content: str) -> str:

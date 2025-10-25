@@ -6,7 +6,10 @@ from hashlib import sha256
 import feedparser
 from backend.src.infrastructure.models import NewsItem, Source
 from bs4 import BeautifulSoup
+from shared.logging import get_logger
 from sqlalchemy.orm import Session
+
+logger = get_logger(__name__)
 
 
 class FeedParserService:
@@ -18,9 +21,11 @@ class FeedParserService:
     def parse_and_import(self, source: Source) -> int:
         """Parse feed and import news items. Returns count of imported items."""
         try:
+            logger.info(f"Parsing feed from source: {source.name}")
             feed = feedparser.parse(source.feed_url)
 
             if feed.bozo:  # Feed parse error
+                logger.warning(f"Feed parse error for {source.name}: {feed.bozo_exception}")
                 return 0
 
             imported_count = 0
@@ -68,11 +73,12 @@ class FeedParserService:
             source.last_fetched = datetime.utcnow()
 
             self.db.commit()
+            logger.info(f"Imported {imported_count} news items from {source.name}")
             return imported_count
 
         except Exception as e:
             self.db.rollback()
-            print(f"Error parsing feed: {e}")
+            logger.error(f"Error parsing feed from {source.name}: {e}")
             return 0
 
     def _extract_content(self, entry) -> str:
