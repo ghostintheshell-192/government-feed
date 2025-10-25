@@ -1,14 +1,12 @@
 """FastAPI main application."""
 
-from datetime import datetime
-
-from fastapi import Depends, FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
 
 from backend.src.api import schemas
 from backend.src.infrastructure.database import get_db, init_db
 from backend.src.infrastructure.models import NewsItem, Source
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
 
 app = FastAPI(
     title="Government Feed API",
@@ -186,15 +184,23 @@ async def summarize_news(news_id: int, db: Session = Depends(get_db)):
     if not settings.get("ai_enabled", False):
         raise HTTPException(status_code=400, detail="AI non abilitata nelle impostazioni")
 
-    # Use content or title for summarization
-    text_to_summarize = news.content if news.content else news.title
-
     ollama = OllamaService(
         endpoint=settings.get("ollama_endpoint", "http://localhost:11434"),
         model=settings.get("ollama_model", "deepseek-r1:7b"),
     )
 
-    summary = await ollama.summarize(text_to_summarize)
+    # Fetch full article content from URL if available
+    text_to_summarize = ""
+    if news.external_id:
+        # Try web scraping first
+        text_to_summarize = await ollama.fetch_article_content(news.external_id)
+
+    # Fallback to feed content if scraping failed or no URL
+    if not text_to_summarize or text_to_summarize.startswith("Impossibile recuperare"):
+        text_to_summarize = news.content if news.content else news.title
+
+    max_words = settings.get("summary_max_words", 200)
+    summary = await ollama.summarize(text_to_summarize, max_length=max_words)
 
     # Save summary to database
     news.summary = summary

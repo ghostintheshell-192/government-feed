@@ -4,9 +4,9 @@ from datetime import datetime
 from hashlib import sha256
 
 import feedparser
-from sqlalchemy.orm import Session
-
 from backend.src.infrastructure.models import NewsItem, Source
+from bs4 import BeautifulSoup
+from sqlalchemy.orm import Session
 
 
 class FeedParserService:
@@ -78,13 +78,32 @@ class FeedParserService:
     def _extract_content(self, entry) -> str:
         """Extract content from feed entry."""
         # Try different content fields
+        content = ""
         if hasattr(entry, "content") and entry.content:
-            return entry.content[0].get("value", "")
-        if hasattr(entry, "description"):
-            return entry.description
-        if hasattr(entry, "summary"):
-            return entry.summary
-        return ""
+            content = entry.content[0].get("value", "")
+        elif hasattr(entry, "description"):
+            content = entry.description
+        elif hasattr(entry, "summary"):
+            content = entry.summary
+
+        # Strip HTML tags and return clean text
+        return self._strip_html(content) if content else ""
+
+    def _strip_html(self, html_content: str) -> str:
+        """Remove HTML tags and return clean text."""
+        if not html_content:
+            return ""
+
+        soup = BeautifulSoup(html_content, "html.parser")
+        # Remove script and style elements
+        for script in soup(["script", "style"]):
+            script.decompose()
+
+        # Get text and clean up whitespace
+        text = soup.get_text(separator=" ", strip=True)
+        # Collapse multiple spaces into one
+        text = " ".join(text.split())
+        return text
 
     def _parse_date(self, entry) -> datetime:
         """Parse date from feed entry."""

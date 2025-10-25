@@ -1,8 +1,9 @@
 """SQLAlchemy ORM models."""
 
 from datetime import datetime
-from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Text
+
 from backend.src.infrastructure.database import Base
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Text
 
 
 class Source(Base):

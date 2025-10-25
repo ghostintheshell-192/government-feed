@@ -9,6 +9,7 @@ DEFAULT_SETTINGS = {
     "ollama_endpoint": "http://localhost:11434",
     "ollama_model": "deepseek-r1:7b",
     "ai_enabled": True,
+    "summary_max_words": 200,
 }
 
 
