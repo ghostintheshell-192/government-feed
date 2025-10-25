@@ -2,8 +2,10 @@
 
 
 from backend.src.api import schemas
+from backend.src.api.dependencies import get_unit_of_work
 from backend.src.infrastructure.database import get_db, init_db
 from backend.src.infrastructure.models import NewsItem, Source
+from backend.src.infrastructure.unit_of_work import UnitOfWork
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from shared.logging import get_logger
@@ -45,39 +47,38 @@ async def root():
 
 
 @app.get("/api/sources", response_model=list[schemas.SourceResponse])
-async def get_sources(db: Session = Depends(get_db)):
+async def get_sources(uow: UnitOfWork = Depends(get_unit_of_work)):
     """Get all sources."""
-    sources = db.query(Source).all()
+    sources = uow.source_repository.get_all()
     return sources
 
 
 @app.get("/api/sources/{source_id}", response_model=schemas.SourceResponse)
-async def get_source(source_id: int, db: Session = Depends(get_db)):
+async def get_source(source_id: int, uow: UnitOfWork = Depends(get_unit_of_work)):
     """Get source by ID."""
-    source = db.query(Source).filter(Source.id == source_id).first()
+    source = uow.source_repository.get_by_id(source_id)
     if not source:
         raise HTTPException(status_code=404, detail="Source not found")
     return source
 
 
 @app.post("/api/sources", response_model=schemas.SourceResponse, status_code=201)
-async def create_source(source: schemas.SourceCreate, db: Session = Depends(get_db)):
+async def create_source(source: schemas.SourceCreate, uow: UnitOfWork = Depends(get_unit_of_work)):
     """Create new source."""
     logger.info(f"Creating new source: {source.name}")
     db_source = Source(**source.model_dump())
-    db.add(db_source)
-    db.commit()
-    db.refresh(db_source)
+    uow.source_repository.add(db_source)
+    uow.commit()
     logger.info(f"Source created successfully: ID={db_source.id}, name={db_source.name}")
     return db_source
 
 
 @app.put("/api/sources/{source_id}", response_model=schemas.SourceResponse)
 async def update_source(
-    source_id: int, source: schemas.SourceUpdate, db: Session = Depends(get_db)
+    source_id: int, source: schemas.SourceUpdate, uow: UnitOfWork = Depends(get_unit_of_work)
 ):
     """Update source."""
-    db_source = db.query(Source).filter(Source.id == source_id).first()
+    db_source = uow.source_repository.get_by_id(source_id)
     if not db_source:
         logger.warning(f"Update failed: Source {source_id} not found")
         raise HTTPException(status_code=404, detail="Source not found")
@@ -86,39 +87,40 @@ async def update_source(
     for key, value in source.model_dump().items():
         setattr(db_source, key, value)
 
-    db.commit()
-    db.refresh(db_source)
+    uow.source_repository.update(db_source)
+    uow.commit()
     logger.info(f"Source updated successfully: ID={source_id}")
     return db_source
 
 
 @app.delete("/api/sources/{source_id}", status_code=204)
-async def delete_source(source_id: int, db: Session = Depends(get_db)):
+async def delete_source(source_id: int, uow: UnitOfWork = Depends(get_unit_of_work)):
     """Delete source."""
-    db_source = db.query(Source).filter(Source.id == source_id).first()
+    db_source = uow.source_repository.get_by_id(source_id)
     if not db_source:
         logger.warning(f"Delete failed: Source {source_id} not found")
         raise HTTPException(status_code=404, detail="Source not found")
 
     logger.info(f"Deleting source: ID={source_id}, name={db_source.name}")
-    db.delete(db_source)
-    db.commit()
+    uow.source_repository.delete(db_source)
+    uow.commit()
     logger.info(f"Source deleted successfully: ID={source_id}")
     return None
 
 
 @app.post("/api/sources/{source_id}/process")
-async def process_feed(source_id: int, db: Session = Depends(get_db)):
+async def process_feed(source_id: int, uow: UnitOfWork = Depends(get_unit_of_work)):
     """Process feed and import news."""
     from backend.src.infrastructure.feed_parser import FeedParserService
 
-    source = db.query(Source).filter(Source.id == source_id).first()
+    source = uow.source_repository.get_by_id(source_id)
     if not source:
         logger.warning(f"Process feed failed: Source {source_id} not found")
         raise HTTPException(status_code=404, detail="Source not found")
 
     logger.info(f"Processing feed for source: ID={source_id}, name={source.name}")
-    parser = FeedParserService(db)
+    # Note: FeedParserService still uses db directly - will be refactored separately
+    parser = FeedParserService(uow._db)
     imported_count = parser.parse_and_import(source)
 
     if imported_count > 0:
@@ -136,16 +138,16 @@ async def process_feed(source_id: int, db: Session = Depends(get_db)):
 
 
 @app.get("/api/news", response_model=list[schemas.NewsItemResponse])
-async def get_news(limit: int = 50, db: Session = Depends(get_db)):
+async def get_news(limit: int = 50, uow: UnitOfWork = Depends(get_unit_of_work)):
     """Get recent news items."""
-    news = db.query(NewsItem).order_by(NewsItem.published_at.desc()).limit(limit).all()
+    news = uow.news_repository.get_recent(limit)
     return news
 
 
 @app.get("/api/news/{news_id}", response_model=schemas.NewsItemResponse)
-async def get_news_item(news_id: int, db: Session = Depends(get_db)):
+async def get_news_item(news_id: int, uow: UnitOfWork = Depends(get_unit_of_work)):
     """Get news item by ID."""
-    news = db.query(NewsItem).filter(NewsItem.id == news_id).first()
+    news = uow.news_repository.get_by_id(news_id)
     if not news:
         raise HTTPException(status_code=404, detail="News item not found")
     return news
@@ -190,12 +192,12 @@ async def get_features():
 
 
 @app.post("/api/news/{news_id}/summarize")
-async def summarize_news(news_id: int, db: Session = Depends(get_db)):
+async def summarize_news(news_id: int, uow: UnitOfWork = Depends(get_unit_of_work)):
     """Generate AI summary for news item."""
     from backend.src.infrastructure.ai_service import OllamaService
     from backend.src.infrastructure.settings_store import load_settings
 
-    news = db.query(NewsItem).filter(NewsItem.id == news_id).first()
+    news = uow.news_repository.get_by_id(news_id)
     if not news:
         logger.warning(f"Summarize failed: News item {news_id} not found")
         raise HTTPException(status_code=404, detail="News item not found")
@@ -226,7 +228,8 @@ async def summarize_news(news_id: int, db: Session = Depends(get_db)):
 
     # Save summary to database
     news.summary = summary
-    db.commit()
+    uow.news_repository.update(news)
+    uow.commit()
 
     logger.info(f"AI summary generated and saved for news item {news_id}")
     return {"success": True, "summary": summary}
