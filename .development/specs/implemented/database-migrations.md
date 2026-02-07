@@ -1,6 +1,6 @@
 # Database Migrations
 
-**Status**: planned
+**Status**: implemented
 **Milestone**: M2-Production
 **Priority**: should-have
 **Depends on**: [repository-pattern](../implemented/repository-pattern.md)
