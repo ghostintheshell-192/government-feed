@@ -1,14 +1,11 @@
 """Unit of Work pattern implementation for managing repositories and transactions."""
 
-from typing import Optional
-
-from shared.logging import get_logger
-from sqlalchemy.orm import Session
-
 from backend.src.core.repositories.news_repository import INewsRepository
 from backend.src.core.repositories.source_repository import ISourceRepository
 from backend.src.infrastructure.repositories.news_repository import NewsRepository
 from backend.src.infrastructure.repositories.source_repository import SourceRepository
+from shared.logging import get_logger
+from sqlalchemy.orm import Session
 
 logger = get_logger(__name__)
 
@@ -29,8 +26,8 @@ class UnitOfWork:
             db: SQLAlchemy database session
         """
         self._db = db
-        self._news_repository: Optional[INewsRepository] = None
-        self._source_repository: Optional[ISourceRepository] = None
+        self._news_repository: INewsRepository | None = None
+        self._source_repository: ISourceRepository | None = None
 
     @property
     def news_repository(self) -> INewsRepository:
