@@ -1,6 +1,7 @@
 export interface NewsItem {
   id: number
   source_id: number
+  external_id: string | null
   title: string
   content: string | null
   summary: string | null

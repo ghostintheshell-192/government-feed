@@ -271,6 +271,40 @@ async def get_news_item(news_id: int, uow: UnitOfWork = Depends(get_unit_of_work
     return news
 
 
+@app.post("/api/news/{news_id}/fetch-content")
+async def fetch_news_content(news_id: int, uow: UnitOfWork = Depends(get_unit_of_work)):
+    """Fetch full article content from source URL."""
+    from backend.src.infrastructure.content_scraper import ContentScraper
+
+    news = uow.news_repository.get_by_id(news_id)
+    if not news:
+        raise HTTPException(status_code=404, detail="News item not found")
+
+    if not news.external_id:
+        raise HTTPException(status_code=400, detail="Nessun URL disponibile per questo articolo")
+
+    # If we already have substantial content, return it without re-scraping
+    if news.content and len(news.content) > 500:
+        return {"success": True, "content": news.content}
+
+    scraper = ContentScraper()
+    content = await scraper.fetch_article_content(news.external_id)
+
+    if not content or content.startswith("Impossibile") or content.startswith("Servizio"):
+        return {"success": False, "message": content or "Impossibile recuperare il contenuto"}
+
+    # Save scraped content to database
+    news.content = content
+    uow.news_repository.update(news)
+    uow.commit()
+
+    if _cache:
+        _cache.delete(f"news:{news_id}")
+        _cache.delete("news:*")
+
+    return {"success": True, "content": content}
+
+
 # ==================== SETTINGS ENDPOINTS ====================
 
 

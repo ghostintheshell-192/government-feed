@@ -46,6 +46,7 @@ class NewsItemResponse(BaseModel):
 
     id: int
     source_id: int
+    external_id: str | None
     title: str
     content: str | None
     summary: str | None

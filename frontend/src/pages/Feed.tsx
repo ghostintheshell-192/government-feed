@@ -49,7 +49,7 @@ export default function Feed() {
 
   const sourceMap = new Map(sources.map((s) => [s.id, s.name]))
 
-  const handleSummaryUpdate = (id: number, summary: string) => {
+  const updateNewsItem = (id: number, updates: Record<string, string>) => {
     queryClient.setQueryData(
       ['news', debouncedFilters],
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -60,12 +60,20 @@ export default function Feed() {
           pages: old.pages.map((page: (typeof data)['pages'][number]) => ({
             ...page,
             items: page.items.map((item) =>
-              item.id === id ? { ...item, summary } : item,
+              item.id === id ? { ...item, ...updates } : item,
             ),
           })),
         }
       },
     )
+  }
+
+  const handleSummaryUpdate = (id: number, summary: string) => {
+    updateNewsItem(id, { summary })
+  }
+
+  const handleContentUpdate = (id: number, content: string) => {
+    updateNewsItem(id, { content })
   }
 
   return (
@@ -126,6 +134,7 @@ export default function Feed() {
                 aiEnabled={features?.ai_enabled ?? false}
                 onRead={markAsRead}
                 onSummaryUpdate={handleSummaryUpdate}
+                onContentUpdate={handleContentUpdate}
               />
             ))}
           </div>

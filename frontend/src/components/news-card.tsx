@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { summarizeNews } from '@/lib/api'
+import { Separator } from '@/components/ui/separator'
+import { fetchNewsContent, summarizeNews } from '@/lib/api'
 import type { NewsItem } from '@/lib/types'
 
 interface NewsCardProps {
@@ -12,6 +13,7 @@ interface NewsCardProps {
   aiEnabled: boolean
   onRead: (id: number) => void
   onSummaryUpdate: (id: number, summary: string) => void
+  onContentUpdate: (id: number, content: string) => void
 }
 
 export function NewsCard({
@@ -21,8 +23,11 @@ export function NewsCard({
   aiEnabled,
   onRead,
   onSummaryUpdate,
+  onContentUpdate,
 }: NewsCardProps) {
   const [summarizing, setSummarizing] = useState(false)
+  const [fetchingContent, setFetchingContent] = useState(false)
+  const [expanded, setExpanded] = useState(false)
 
   const handleClick = () => {
     if (!isRead) onRead(item.id)
@@ -45,6 +50,32 @@ export function NewsCard({
     }
   }
 
+  const handleShowContent = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+
+    // If we already have full content, just toggle
+    if (item.content && item.content.length > 500) {
+      setExpanded(!expanded)
+      return
+    }
+
+    setFetchingContent(true)
+    try {
+      const data = await fetchNewsContent(item.id)
+      if (data.success && data.content) {
+        onContentUpdate(item.id, data.content)
+        setExpanded(true)
+      } else {
+        alert(data.message || 'Impossibile recuperare il contenuto')
+      }
+    } catch {
+      alert('Errore nel recupero del contenuto')
+    } finally {
+      setFetchingContent(false)
+    }
+  }
+
+  const hasFullContent = item.content && item.content.length > 500
   const preview = item.summary || (item.content ? item.content.slice(0, 200) + (item.content.length > 200 ? '...' : '') : null)
 
   return (
@@ -72,26 +103,63 @@ export function NewsCard({
           </div>
         </div>
       </CardHeader>
-      {(preview || (aiEnabled && !item.summary)) && (
-        <CardContent className="pt-0">
-          {preview && (
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              {preview}
+      <CardContent className="pt-0">
+        {!expanded && preview && (
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {preview}
+          </p>
+        )}
+
+        {expanded && item.content && (
+          <>
+            <Separator className="my-3" />
+            <p className="whitespace-pre-line text-sm leading-relaxed">
+              {item.content}
             </p>
-          )}
+          </>
+        )}
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleShowContent}
+            disabled={fetchingContent}
+          >
+            {fetchingContent
+              ? 'Caricamento...'
+              : expanded
+                ? 'Nascondi articolo'
+                : hasFullContent
+                  ? 'Mostra articolo'
+                  : 'Scarica articolo'}
+          </Button>
+
           {aiEnabled && !item.summary && (
             <Button
               variant="outline"
               size="sm"
-              className="mt-3"
               onClick={handleSummarize}
               disabled={summarizing}
             >
               {summarizing ? 'Generando...' : 'Riassumi con AI'}
             </Button>
           )}
-        </CardContent>
-      )}
+
+          {item.external_id && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation()
+                window.open(item.external_id!, '_blank')
+              }}
+            >
+              Apri originale
+            </Button>
+          )}
+        </div>
+      </CardContent>
     </Card>
   )
 }

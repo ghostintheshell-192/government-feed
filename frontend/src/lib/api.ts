@@ -60,3 +60,13 @@ export async function summarizeNews(id: number): Promise<SummarizeResponse> {
   }
   return res.json()
 }
+
+export async function fetchNewsContent(
+  id: number,
+): Promise<{ success: boolean; content?: string; message?: string }> {
+  const res = await fetch(`/api/news/${id}/fetch-content`, { method: 'POST' })
+  if (!res.ok) {
+    throw new Error(`Failed to fetch content: ${res.status}`)
+  }
+  return res.json()
+}
