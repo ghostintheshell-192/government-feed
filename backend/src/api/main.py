@@ -1,20 +1,23 @@
 """FastAPI main application."""
 
+import json
 
 from backend.src.api import schemas
 from backend.src.api.dependencies import get_unit_of_work
-from backend.src.infrastructure.database import get_db, init_db
-from backend.src.infrastructure.models import NewsItem, Source
+from backend.src.infrastructure.cache import RedisCache
+from backend.src.infrastructure.database import init_db
+from backend.src.infrastructure.models import Source
 from backend.src.infrastructure.scheduler import FeedScheduler
 from backend.src.infrastructure.settings_store import load_settings
 from backend.src.infrastructure.unit_of_work import UnitOfWork
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from shared.logging import get_logger
-from sqlalchemy.orm import Session
 
 logger = get_logger(__name__)
 _scheduler: FeedScheduler | None = None
+_cache: RedisCache | None = None
 
 app = FastAPI(
     title="Government Feed API",
@@ -34,13 +37,21 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    """Initialize database and start scheduler on startup."""
-    global _scheduler
+    """Initialize database, cache, and scheduler on startup."""
+    global _scheduler, _cache
     logger.info("Starting Government Feed API")
     init_db()
     logger.info("Database initialized successfully")
 
     settings = load_settings()
+
+    redis_url = settings.get("redis_url", "redis://localhost:6379")
+    _cache = RedisCache(url=redis_url)
+    if _cache.is_available():
+        logger.info("Redis cache enabled")
+    else:
+        logger.info("Redis cache not available, running without cache")
+
     if settings.get("scheduler_enabled", True):
         _scheduler = FeedScheduler()
         _scheduler.start()
@@ -69,16 +80,37 @@ async def root():
 @app.get("/api/sources", response_model=list[schemas.SourceResponse])
 async def get_sources(uow: UnitOfWork = Depends(get_unit_of_work)):
     """Get all sources."""
+    if _cache:
+        cached = _cache.get("sources:all")
+        if cached:
+            return JSONResponse(content=json.loads(cached))
+
     sources = uow.source_repository.get_all()
-    return sources
+    result = [schemas.SourceResponse.model_validate(s).model_dump(mode="json") for s in sources]
+
+    if _cache:
+        _cache.set("sources:all", json.dumps(result), ttl=3600)
+
+    return result
 
 
 @app.get("/api/sources/{source_id}", response_model=schemas.SourceResponse)
 async def get_source(source_id: int, uow: UnitOfWork = Depends(get_unit_of_work)):
     """Get source by ID."""
+    if _cache:
+        cached = _cache.get(f"source:{source_id}")
+        if cached:
+            return JSONResponse(content=json.loads(cached))
+
     source = uow.source_repository.get_by_id(source_id)
     if not source:
         raise HTTPException(status_code=404, detail="Source not found")
+
+    result = schemas.SourceResponse.model_validate(source).model_dump(mode="json")
+
+    if _cache:
+        _cache.set(f"source:{source_id}", json.dumps(result), ttl=3600)
+
     return source
 
 
@@ -90,6 +122,10 @@ async def create_source(source: schemas.SourceCreate, uow: UnitOfWork = Depends(
     uow.source_repository.add(db_source)
     uow.commit()
     logger.info(f"Source created successfully: ID={db_source.id}, name={db_source.name}")
+
+    if _cache:
+        _cache.delete("sources:all")
+
     return db_source
 
 
@@ -110,6 +146,11 @@ async def update_source(
     uow.source_repository.update(db_source)
     uow.commit()
     logger.info(f"Source updated successfully: ID={source_id}")
+
+    if _cache:
+        _cache.delete(f"source:{source_id}")
+        _cache.delete("sources:all")
+
     return db_source
 
 
@@ -125,6 +166,11 @@ async def delete_source(source_id: int, uow: UnitOfWork = Depends(get_unit_of_wo
     uow.source_repository.delete(db_source)
     uow.commit()
     logger.info(f"Source deleted successfully: ID={source_id}")
+
+    if _cache:
+        _cache.delete(f"source:{source_id}")
+        _cache.delete("sources:all")
+
     return None
 
 
@@ -145,6 +191,10 @@ async def process_feed(source_id: int, uow: UnitOfWork = Depends(get_unit_of_wor
 
     if imported_count > 0:
         logger.info(f"Feed processed successfully: {imported_count} news items imported from {source.name}")
+
+        if _cache:
+            _cache.delete("news:recent:*")
+
         return {
             "success": True,
             "message": f"Feed importato con successo! {imported_count} notizie aggiunte.",
@@ -160,16 +210,39 @@ async def process_feed(source_id: int, uow: UnitOfWork = Depends(get_unit_of_wor
 @app.get("/api/news", response_model=list[schemas.NewsItemResponse])
 async def get_news(limit: int = 50, uow: UnitOfWork = Depends(get_unit_of_work)):
     """Get recent news items."""
+    cache_key = f"news:recent:{limit}"
+
+    if _cache:
+        cached = _cache.get(cache_key)
+        if cached:
+            return JSONResponse(content=json.loads(cached))
+
     news = uow.news_repository.get_recent(limit)
-    return news
+    result = [schemas.NewsItemResponse.model_validate(n).model_dump(mode="json") for n in news]
+
+    if _cache:
+        _cache.set(cache_key, json.dumps(result), ttl=300)
+
+    return result
 
 
 @app.get("/api/news/{news_id}", response_model=schemas.NewsItemResponse)
 async def get_news_item(news_id: int, uow: UnitOfWork = Depends(get_unit_of_work)):
     """Get news item by ID."""
+    if _cache:
+        cached = _cache.get(f"news:{news_id}")
+        if cached:
+            return JSONResponse(content=json.loads(cached))
+
     news = uow.news_repository.get_by_id(news_id)
     if not news:
         raise HTTPException(status_code=404, detail="News item not found")
+
+    result = schemas.NewsItemResponse.model_validate(news).model_dump(mode="json")
+
+    if _cache:
+        _cache.set(f"news:{news_id}", json.dumps(result), ttl=300)
+
     return news
 
 
@@ -244,7 +317,7 @@ async def summarize_news(news_id: int, uow: UnitOfWork = Depends(get_unit_of_wor
 
     settings = load_settings()
     if not settings.get("ai_enabled", False):
-        logger.warning(f"Summarize failed: AI is disabled in settings")
+        logger.warning("Summarize failed: AI is disabled in settings")
         raise HTTPException(status_code=400, detail="AI non abilitata nelle impostazioni")
 
     logger.info(f"Generating AI summary for news item: ID={news_id}, title={news.title[:50]}...")
@@ -274,9 +347,26 @@ async def summarize_news(news_id: int, uow: UnitOfWork = Depends(get_unit_of_wor
     uow.news_repository.update(news)
     uow.commit()
 
+    if _cache:
+        _cache.delete(f"news:{news_id}")
+
     if is_error:
         logger.warning(f"AI summary failed for news item {news_id}: {summary}")
         return {"success": False, "summary": summary, "message": summary}
 
     logger.info(f"AI summary generated and saved for news item {news_id}")
     return {"success": True, "summary": summary}
+
+
+# ==================== CACHE ENDPOINTS ====================
+
+
+@app.get("/api/cache/status")
+async def get_cache_status():
+    """Get Redis cache status."""
+    if _cache is None:
+        return {"available": False, "message": "Cache not initialized"}
+    return {
+        "available": _cache.is_available(),
+        "message": "Cache is operational" if _cache.is_available() else "Cache is unavailable",
+    }

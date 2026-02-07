@@ -12,6 +12,7 @@ DEFAULT_SETTINGS = {
     "summary_max_words": 200,
     "scheduler_enabled": True,
     "news_retention_days": 30,
+    "redis_url": "redis://localhost:6379",
 }
 
 
