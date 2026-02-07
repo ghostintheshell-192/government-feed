@@ -86,6 +86,9 @@ cd backend && pip install -e ".[dev]" && cd ..
 # Frontend
 cd frontend && pnpm install && cd ..
 
+# Git hooks (security checks, tests on push)
+git config core.hooksPath .githooks
+
 # Services (Redis + Ollama)
 docker-compose up -d
 
@@ -136,6 +139,7 @@ government-feed/
 │   └── tests/              # Unit and integration tests
 ├── frontend/               # React + TypeScript SPA
 ├── shared/                 # Cross-cutting concerns (logging)
+├── .githooks/              # Git hooks (pre-commit, pre-push, post-checkout)
 ├── docs/                   # Vision, concept, roadmap, architecture
 └── docker-compose.yml      # Redis + Ollama services
 ```
@@ -144,10 +148,15 @@ government-feed/
 
 Contributions are welcome. The project uses feature branches (`feature/*`, `fix/*`) merged into `develop`.
 
+Setup:
+- Run `git config core.hooksPath .githooks` to enable project hooks
+
 Before submitting:
 - Run `ruff check backend/src` (zero errors)
 - Run `mypy backend/src --ignore-missing-imports --no-namespace-packages`
 - Run `pytest backend/tests/` (all passing)
+
+The pre-push hook runs the test suite automatically. Pre-commit hooks check for secrets and update auto-generated files.
 
 ## License
 
