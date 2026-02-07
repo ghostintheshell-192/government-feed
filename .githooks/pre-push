@@ -1,0 +1,53 @@
+#!/bin/bash
+# Git Pre-Push Hook - Test Runner
+# Runs pytest before pushing to remote
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${BLUE}  Pre-Push Tests${NC}"
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo ""
+
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+
+# Check if this is a Python project with tests
+if [[ ! -d "$PROJECT_ROOT/backend/tests" ]]; then
+    echo -e "${YELLOW}ℹ No test directory found, skipping tests${NC}"
+    exit 0
+fi
+
+# Find python in venv
+PYTHON="$PROJECT_ROOT/.venv/bin/python"
+if [[ ! -x "$PYTHON" ]]; then
+    echo -e "${YELLOW}ℹ No .venv found, skipping tests${NC}"
+    exit 0
+fi
+
+echo -e "${GREEN}[Pre-Push]${NC} Running tests..."
+echo ""
+
+"$PYTHON" -m pytest "$PROJECT_ROOT/backend/tests/" -q --tb=short 2>&1
+TEST_EXIT_CODE=$?
+
+echo ""
+
+if [ $TEST_EXIT_CODE -ne 0 ]; then
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${RED}✗ Tests FAILED - Push blocked${NC}"
+    echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "${YELLOW}Fix the failing tests before pushing.${NC}"
+    echo -e "${YELLOW}To bypass: git push --no-verify${NC}"
+    echo ""
+    exit 1
+else
+    echo -e "${GREEN}✓ All tests passed${NC}"
+    echo ""
+    exit 0
+fi

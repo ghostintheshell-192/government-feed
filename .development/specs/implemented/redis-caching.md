@@ -1,6 +1,6 @@
 # Redis Caching
 
-**Status**: planned
+**Status**: implemented
 **Milestone**: M2-Production
 **Priority**: should-have
 **Depends on**: [rest-api](../implemented/rest-api.md)
