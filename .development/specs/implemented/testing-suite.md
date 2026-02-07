@@ -1,6 +1,6 @@
 # Testing Suite
 
-**Status**: planned
+**Status**: implemented
 **Milestone**: M2-Production
 **Priority**: must-have
 **Depends on**: [repository-pattern](../implemented/repository-pattern.md), [rest-api](../implemented/rest-api.md)
