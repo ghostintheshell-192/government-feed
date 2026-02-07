@@ -43,6 +43,7 @@ For detailed documentation, see `docs/architecture.md`.
 - `database.py` — Database configuration and session management.
 - `feed_parser.py` — Service for parsing RSS/Atom feeds.
 - `models.py` — Source model for database.
+- `resilience.py` — Raised when a call is attempted on an open circuit breaker.
 - `settings_store.py` — Simple settings storage.
 - `unit_of_work.py` — Unit of Work pattern implementation.
 

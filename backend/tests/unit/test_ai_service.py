@@ -2,9 +2,18 @@
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import httpx
 import pytest
 
+from backend.src.infrastructure import ai_service
 from backend.src.infrastructure.ai_service import OllamaService
+
+
+@pytest.fixture(autouse=True)
+def _reset_circuit_breakers():
+    """Reset circuit breakers before each test."""
+    ai_service._cb_ollama.reset()
+    ai_service._cb_scraping.reset()
 
 
 class TestExtractSummary:
@@ -95,8 +104,10 @@ class TestSummarize:
     async def test_summarize_error_status(self):
         service = OllamaService("http://localhost:11434", "test-model")
 
+        mock_request = MagicMock()
         mock_response = MagicMock()
         mock_response.status_code = 500
+        mock_response.request = mock_request
 
         mock_client = AsyncMock()
         mock_client.__aenter__ = AsyncMock(return_value=mock_client)
@@ -106,7 +117,7 @@ class TestSummarize:
         with patch("backend.src.infrastructure.ai_service.httpx.AsyncClient", return_value=mock_client):
             result = await service.summarize("content")
 
-        assert "Errore AI" in result
+        assert "Errore" in result
 
     @pytest.mark.asyncio
     async def test_summarize_exception(self):
@@ -121,6 +132,49 @@ class TestSummarize:
             result = await service.summarize("content")
 
         assert "Errore nella chiamata AI" in result
+
+    @pytest.mark.asyncio
+    async def test_summarize_retries_on_connect_error(self):
+        """Verify retry on transient connection errors."""
+        service = OllamaService("http://localhost:11434", "test-model")
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"response": "Success after retry."}
+
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=False)
+        # First call fails with ConnectError, second succeeds
+        mock_client.post = AsyncMock(
+            side_effect=[httpx.ConnectError("refused"), mock_response]
+        )
+
+        with patch("backend.src.infrastructure.ai_service.httpx.AsyncClient", return_value=mock_client):
+            result = await service.summarize("content")
+
+        assert result == "Success after retry."
+        assert mock_client.post.call_count == 2
+
+    @pytest.mark.asyncio
+    async def test_summarize_cb_opens_after_failures(self):
+        """Circuit breaker opens after repeated failures."""
+        service = OllamaService("http://localhost:11434", "test-model")
+
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=False)
+        mock_client.post = AsyncMock(side_effect=Exception("always fails"))
+
+        with patch("backend.src.infrastructure.ai_service.httpx.AsyncClient", return_value=mock_client):
+            # Fail 5 times to open the circuit breaker
+            for _ in range(5):
+                await service.summarize("content")
+
+            # Next call should be rejected by CB
+            result = await service.summarize("content")
+
+        assert "temporaneamente non disponibile" in result
 
 
 class TestFetchArticleContent:
@@ -158,3 +212,44 @@ class TestFetchArticleContent:
             result = await service.fetch_article_content("https://example.com/fail")
 
         assert "Impossibile recuperare" in result
+
+    @pytest.mark.asyncio
+    async def test_fetch_retries_on_timeout(self):
+        """Verify retry on timeout errors."""
+        service = OllamaService("http://localhost:11434", "test-model")
+
+        html = "<html><body><p>Recovered content</p></body></html>"
+        mock_response = MagicMock()
+        mock_response.text = html
+        mock_response.raise_for_status = MagicMock()
+
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=False)
+        mock_client.get = AsyncMock(
+            side_effect=[httpx.TimeoutException("read timeout"), mock_response]
+        )
+
+        with patch("backend.src.infrastructure.ai_service.httpx.AsyncClient", return_value=mock_client):
+            result = await service.fetch_article_content("https://example.com/article")
+
+        assert "Recovered content" in result
+        assert mock_client.get.call_count == 2
+
+    @pytest.mark.asyncio
+    async def test_fetch_cb_opens_after_failures(self):
+        """Circuit breaker opens after repeated scraping failures."""
+        service = OllamaService("http://localhost:11434", "test-model")
+
+        mock_client = AsyncMock()
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=False)
+        mock_client.get = AsyncMock(side_effect=Exception("always fails"))
+
+        with patch("backend.src.infrastructure.ai_service.httpx.AsyncClient", return_value=mock_client):
+            for _ in range(5):
+                await service.fetch_article_content("https://example.com/fail")
+
+            result = await service.fetch_article_content("https://example.com/fail")
+
+        assert "temporaneamente non disponibile" in result

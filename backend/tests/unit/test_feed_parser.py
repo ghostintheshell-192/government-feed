@@ -4,8 +4,18 @@ from datetime import datetime
 from time import struct_time
 from unittest.mock import MagicMock, patch
 
+import httpx
+import pytest
+
+from backend.src.infrastructure import feed_parser as feed_parser_module
 from backend.src.infrastructure.feed_parser import FeedParserService
 from backend.tests.conftest import sample_source
+
+
+@pytest.fixture(autouse=True)
+def _reset_circuit_breaker():
+    """Reset feed fetch circuit breaker before each test."""
+    feed_parser_module._cb_feed_fetch.reset()
 
 
 class TestStripHtml:
@@ -70,10 +80,6 @@ class TestParseDate:
 
     def test_updated_parsed_fallback(self, db_session):
         parser = FeedParserService(db_session)
-        entry = MagicMock(spec=[])
-        entry.published_parsed = None
-        entry.updated_parsed = struct_time((2025, 6, 1, 8, 0, 0, 0, 0, 0))
-        # Make hasattr work
         entry = type("Entry", (), {
             "published_parsed": None,
             "updated_parsed": struct_time((2025, 6, 1, 8, 0, 0, 0, 0, 0)),
@@ -93,7 +99,18 @@ class TestParseAndImport:
     """Tests for parse_and_import method."""
 
     @patch("backend.src.infrastructure.feed_parser.feedparser.parse")
-    def test_imports_new_items(self, mock_parse, db_session):
+    @patch("backend.src.infrastructure.feed_parser.httpx.Client")
+    def test_imports_new_items(self, mock_httpx_client_cls, mock_parse, db_session):
+        # Setup httpx mock
+        mock_response = MagicMock()
+        mock_response.text = "<rss>mock feed xml</rss>"
+        mock_response.raise_for_status = MagicMock()
+        mock_client = MagicMock()
+        mock_client.__enter__ = MagicMock(return_value=mock_client)
+        mock_client.__exit__ = MagicMock(return_value=False)
+        mock_client.get = MagicMock(return_value=mock_response)
+        mock_httpx_client_cls.return_value = mock_client
+
         # Add a source first
         source = sample_source(name="Feed Source")
         db_session.add(source)
@@ -120,7 +137,18 @@ class TestParseAndImport:
         assert count == 1
 
     @patch("backend.src.infrastructure.feed_parser.feedparser.parse")
-    def test_skips_duplicates(self, mock_parse, db_session):
+    @patch("backend.src.infrastructure.feed_parser.httpx.Client")
+    def test_skips_duplicates(self, mock_httpx_client_cls, mock_parse, db_session):
+        # Setup httpx mock
+        mock_response = MagicMock()
+        mock_response.text = "<rss>mock</rss>"
+        mock_response.raise_for_status = MagicMock()
+        mock_client = MagicMock()
+        mock_client.__enter__ = MagicMock(return_value=mock_client)
+        mock_client.__exit__ = MagicMock(return_value=False)
+        mock_client.get = MagicMock(return_value=mock_response)
+        mock_httpx_client_cls.return_value = mock_client
+
         source = sample_source(name="Dup Source")
         db_session.add(source)
         db_session.flush()
@@ -145,7 +173,18 @@ class TestParseAndImport:
         assert count == 0
 
     @patch("backend.src.infrastructure.feed_parser.feedparser.parse")
-    def test_bozo_feed_returns_zero(self, mock_parse, db_session):
+    @patch("backend.src.infrastructure.feed_parser.httpx.Client")
+    def test_bozo_feed_returns_zero(self, mock_httpx_client_cls, mock_parse, db_session):
+        # Setup httpx mock
+        mock_response = MagicMock()
+        mock_response.text = "<rss>bad xml</rss>"
+        mock_response.raise_for_status = MagicMock()
+        mock_client = MagicMock()
+        mock_client.__enter__ = MagicMock(return_value=mock_client)
+        mock_client.__exit__ = MagicMock(return_value=False)
+        mock_client.get = MagicMock(return_value=mock_response)
+        mock_httpx_client_cls.return_value = mock_client
+
         source = sample_source(name="Bozo Source")
         db_session.add(source)
         db_session.flush()
@@ -156,5 +195,57 @@ class TestParseAndImport:
         )
 
         parser = FeedParserService(db_session)
+        count = parser.parse_and_import(source)
+        assert count == 0
+
+    @patch("backend.src.infrastructure.feed_parser.httpx.Client")
+    def test_retries_on_connect_error(self, mock_httpx_client_cls, db_session):
+        """Verify retry on transient connection errors."""
+        mock_response = MagicMock()
+        mock_response.text = "<rss>recovered</rss>"
+        mock_response.raise_for_status = MagicMock()
+
+        mock_client = MagicMock()
+        mock_client.__enter__ = MagicMock(return_value=mock_client)
+        mock_client.__exit__ = MagicMock(return_value=False)
+        # First call fails, second succeeds
+        mock_client.get = MagicMock(
+            side_effect=[httpx.ConnectError("refused"), mock_response]
+        )
+        mock_httpx_client_cls.return_value = mock_client
+
+        source = sample_source(name="Retry Source")
+        db_session.add(source)
+        db_session.flush()
+
+        parser = FeedParserService(db_session)
+
+        with patch("backend.src.infrastructure.feed_parser.feedparser.parse") as mock_parse:
+            mock_parse.return_value = MagicMock(bozo=False, entries=[])
+            count = parser.parse_and_import(source)
+
+        assert count == 0  # no entries, but no crash
+        assert mock_client.get.call_count == 2
+
+    @patch("backend.src.infrastructure.feed_parser.httpx.Client")
+    def test_cb_opens_after_repeated_failures(self, mock_httpx_client_cls, db_session):
+        """Circuit breaker opens after repeated fetch failures."""
+        mock_client = MagicMock()
+        mock_client.__enter__ = MagicMock(return_value=mock_client)
+        mock_client.__exit__ = MagicMock(return_value=False)
+        mock_client.get = MagicMock(side_effect=Exception("always fails"))
+        mock_httpx_client_cls.return_value = mock_client
+
+        source = sample_source(name="CB Source")
+        db_session.add(source)
+        db_session.flush()
+
+        parser = FeedParserService(db_session)
+
+        # Fail 5 times to open CB
+        for _ in range(5):
+            parser.parse_and_import(source)
+
+        # Next call should be rejected by CB immediately
         count = parser.parse_and_import(source)
         assert count == 0

@@ -226,10 +226,17 @@ async def summarize_news(news_id: int, uow: UnitOfWork = Depends(get_unit_of_wor
     max_words = settings.get("summary_max_words", 200)
     summary = await ollama.summarize(text_to_summarize, max_length=max_words)
 
-    # Save summary to database
-    news.summary = summary
+    # Check if summary is an error message
+    is_error = summary.startswith("Errore") or summary.startswith("Servizio")
+
+    # Save summary to database (even error messages, so we know it was attempted)
+    news.summary = summary if not is_error else None
     uow.news_repository.update(news)
     uow.commit()
+
+    if is_error:
+        logger.warning(f"AI summary failed for news item {news_id}: {summary}")
+        return {"success": False, "summary": summary, "message": summary}
 
     logger.info(f"AI summary generated and saved for news item {news_id}")
     return {"success": True, "summary": summary}
