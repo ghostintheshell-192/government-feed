@@ -5,6 +5,8 @@ from backend.src.api import schemas
 from backend.src.api.dependencies import get_unit_of_work
 from backend.src.infrastructure.database import get_db, init_db
 from backend.src.infrastructure.models import NewsItem, Source
+from backend.src.infrastructure.scheduler import FeedScheduler
+from backend.src.infrastructure.settings_store import load_settings
 from backend.src.infrastructure.unit_of_work import UnitOfWork
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +14,7 @@ from shared.logging import get_logger
 from sqlalchemy.orm import Session
 
 logger = get_logger(__name__)
+_scheduler: FeedScheduler | None = None
 
 app = FastAPI(
     title="Government Feed API",
@@ -31,10 +34,27 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    """Initialize database on startup."""
+    """Initialize database and start scheduler on startup."""
+    global _scheduler
     logger.info("Starting Government Feed API")
     init_db()
     logger.info("Database initialized successfully")
+
+    settings = load_settings()
+    if settings.get("scheduler_enabled", True):
+        _scheduler = FeedScheduler()
+        _scheduler.start()
+        logger.info("Background scheduler started")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Shutdown scheduler gracefully."""
+    global _scheduler
+    if _scheduler is not None:
+        _scheduler.shutdown()
+        _scheduler = None
+        logger.info("Background scheduler stopped")
 
 
 @app.get("/")
@@ -186,6 +206,26 @@ async def get_features():
         "verification_enabled": False,
         "blockchain_enabled": False,
     }
+
+
+# ==================== SCHEDULER ENDPOINTS ====================
+
+
+@app.get("/api/scheduler/status")
+async def get_scheduler_status():
+    """Get background scheduler status."""
+    if _scheduler is None:
+        return {"running": False, "jobs": []}
+    return _scheduler.get_status()
+
+
+@app.post("/api/scheduler/trigger")
+async def trigger_poll():
+    """Manually trigger feed polling."""
+    if _scheduler is None:
+        raise HTTPException(status_code=503, detail="Scheduler not running")
+    _scheduler.trigger_poll_now()
+    return {"success": True, "message": "Feed polling triggered"}
 
 
 # ==================== AI ENDPOINTS ====================

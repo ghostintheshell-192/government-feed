@@ -10,6 +10,8 @@ DEFAULT_SETTINGS = {
     "ollama_model": "deepseek-r1:7b",
     "ai_enabled": True,
     "summary_max_words": 200,
+    "scheduler_enabled": True,
+    "news_retention_days": 30,
 }
 
 

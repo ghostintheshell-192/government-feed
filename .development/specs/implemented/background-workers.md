@@ -1,6 +1,6 @@
 # Background Workers
 
-**Status**: planned
+**Status**: implemented
 **Milestone**: M2-Production
 **Priority**: must-have
 **Depends on**: [feed-parsing](../implemented/feed-parsing.md)
@@ -19,12 +19,12 @@ Job scheduling system for automatic feed polling, periodic cleanup, and health c
 
 ### Functional
 
-- [ ] Automatic feed polling on configurable schedule per source
-- [ ] Periodic cleanup of old news items (configurable retention)
-- [ ] Automatic health checks for feed sources (detect broken feeds)
-- [ ] Job status visibility (last run, next run, success/failure)
-- [ ] Manual trigger override (run job immediately)
-- [ ] Graceful shutdown (complete current job before stopping)
+- [x] Automatic feed polling on configurable schedule per source
+- [x] Periodic cleanup of old news items (configurable retention)
+- [x] Automatic health checks for feed sources (detect broken feeds)
+- [x] Job status visibility (last run, next run, success/failure)
+- [x] Manual trigger override (run job immediately)
+- [x] Graceful shutdown (complete current job before stopping)
 
 ### Non-Functional
 
@@ -51,8 +51,8 @@ Job scheduling system for automatic feed polling, periodic cleanup, and health c
 
 ## Acceptance Criteria
 
-- [ ] Feeds are polled automatically at configured intervals
-- [ ] Old news items are cleaned up based on retention policy
-- [ ] Broken feed sources are detected and flagged
-- [ ] Background jobs don't block API endpoints
-- [ ] Job status is visible via API or logs
+- [x] Feeds are polled automatically at configured intervals
+- [x] Old news items are cleaned up based on retention policy
+- [x] Broken feed sources are detected and flagged
+- [x] Background jobs don't block API endpoints
+- [x] Job status is visible via API or logs
