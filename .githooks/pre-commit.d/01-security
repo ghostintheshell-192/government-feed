@@ -93,10 +93,10 @@ for file in $(git diff --cached --name-only --diff-filter=ACM); do
     # Skip binary files
     if file "$file" | grep -q "text"; then
         for pattern in "${SECRET_PATTERNS[@]}"; do
-            if git diff --cached "$file" | grep -qE "$pattern"; then
+            if git diff --cached "$file" | grep -qE -- "$pattern"; then
                 echo -e "${RED}✗ BLOCKED:${NC} $file contains potential secret (pattern: ${pattern:0:30}...)"
                 echo -e "${YELLOW}  Matched line:${NC}"
-                git diff --cached "$file" | grep -E "$pattern" | head -3 | sed 's/^/    /'
+                git diff --cached "$file" | grep -E -- "$pattern" | head -3 | sed 's/^/    /'
                 BLOCKED=1
             fi
         done
