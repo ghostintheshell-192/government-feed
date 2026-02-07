@@ -1,10 +1,9 @@
 """Dependency injection helpers for FastAPI."""
 
-from fastapi import Depends
-from sqlalchemy.orm import Session
-
 from backend.src.infrastructure.database import get_db
 from backend.src.infrastructure.unit_of_work import UnitOfWork
+from fastapi import Depends
+from sqlalchemy.orm import Session
 
 
 def get_unit_of_work(db: Session = Depends(get_db)) -> UnitOfWork:

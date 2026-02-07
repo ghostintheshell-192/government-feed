@@ -1,13 +1,11 @@
 """Concrete implementation of NewsItem repository."""
 
 from datetime import datetime
-from typing import Optional
-
-from shared.logging import get_logger
-from sqlalchemy.orm import Session
 
 from backend.src.core.repositories.news_repository import INewsRepository
 from backend.src.infrastructure.models import NewsItem
+from shared.logging import get_logger
+from sqlalchemy.orm import Session
 
 logger = get_logger(__name__)
 
@@ -19,11 +17,11 @@ class NewsRepository(INewsRepository):
         """Initialize repository with database session."""
         self._db = db
 
-    def get_by_id(self, id: int) -> Optional[NewsItem]:
+    def get_by_id(self, id: int) -> NewsItem | None:
         """Get news item by ID."""
         return self._db.query(NewsItem).filter(NewsItem.id == id).first()
 
-    def get_by_content_hash(self, content_hash: str) -> Optional[NewsItem]:
+    def get_by_content_hash(self, content_hash: str) -> NewsItem | None:
         """Get news item by content hash (for deduplication)."""
         if not content_hash:
             raise ValueError("Content hash cannot be empty")

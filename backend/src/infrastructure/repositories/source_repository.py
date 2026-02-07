@@ -1,12 +1,9 @@
 """Concrete implementation of Source repository."""
 
-from typing import Optional
-
-from shared.logging import get_logger
-from sqlalchemy.orm import Session
-
 from backend.src.core.repositories.source_repository import ISourceRepository
 from backend.src.infrastructure.models import Source
+from shared.logging import get_logger
+from sqlalchemy.orm import Session
 
 logger = get_logger(__name__)
 
@@ -18,7 +15,7 @@ class SourceRepository(ISourceRepository):
         """Initialize repository with database session."""
         self._db = db
 
-    def get_by_id(self, id: int) -> Optional[Source]:
+    def get_by_id(self, id: int) -> Source | None:
         """Get source by ID."""
         return self._db.query(Source).filter(Source.id == id).first()
 
@@ -28,7 +25,7 @@ class SourceRepository(ISourceRepository):
 
     def get_active_sources(self) -> list[Source]:
         """Get only active sources ordered by name."""
-        return self._db.query(Source).filter(Source.is_active == True).order_by(Source.name).all()
+        return self._db.query(Source).filter(Source.is_active == True).order_by(Source.name).all()  # noqa: E712
 
     def add(self, source: Source) -> Source:
         """Add a new source."""
