@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import './Sources.css'
 
 interface Source {
@@ -24,6 +25,7 @@ interface SourceFormData {
 }
 
 export default function Sources() {
+  const queryClient = useQueryClient()
   const [sources, setSources] = useState<Source[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -135,6 +137,9 @@ export default function Sources() {
     const data = await res.json()
     setProcessing(null)
     alert(data.message)
+    if (data.success) {
+      queryClient.invalidateQueries({ queryKey: ['news'] })
+    }
     await loadSources()
   }
 
@@ -207,11 +212,11 @@ export default function Sources() {
                     <div className="actions">
                       {source.is_active && (
                         <button
-                          className="btn btn-sm"
+                          className="btn btn-sm btn-primary"
                           onClick={() => processFeed(source.id)}
                           disabled={processing === source.id}
                         >
-                          {processing === source.id ? 'Importando...' : 'Importa'}
+                          {processing === source.id ? 'Importando...' : 'Importa Notizie'}
                         </button>
                       )}
                       <button

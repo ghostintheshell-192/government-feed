@@ -11,9 +11,9 @@ from backend.tests.conftest import sample_news_item, sample_source
 class TestNewsRepository:
     """Tests for NewsRepository with in-memory SQLite."""
 
-    def _add_source(self, db_session):
+    def _add_source(self, db_session, name="Test Source for News"):
         """Helper: add a source and return its ID."""
-        source = sample_source(name="Test Source for News")
+        source = sample_source(name=name)
         db_session.add(source)
         db_session.flush()
         return source.id
@@ -75,10 +75,11 @@ class TestNewsRepository:
         ))
         db_session.flush()
 
-        results = repo.get_recent(limit=10)
-        assert len(results) >= 2
-        assert results[0].title == "Newer"
-        assert results[1].title == "Older"
+        items, total = repo.get_recent(limit=10)
+        assert total >= 2
+        assert len(items) >= 2
+        assert items[0].title == "Newer"
+        assert items[1].title == "Older"
 
     def test_get_recent_respects_limit(self, db_session):
         source_id = self._add_source(db_session)
@@ -92,13 +93,162 @@ class TestNewsRepository:
             ))
         db_session.flush()
 
-        results = repo.get_recent(limit=2)
-        assert len(results) == 2
+        items, total = repo.get_recent(limit=2)
+        assert len(items) == 2
+        assert total >= 5
 
     def test_get_recent_invalid_limit_raises(self, db_session):
         repo = NewsRepository(db_session)
         with pytest.raises(ValueError, match="Limit must be greater than zero"):
             repo.get_recent(limit=0)
+
+    def test_get_recent_with_offset(self, db_session):
+        source_id = self._add_source(db_session)
+        repo = NewsRepository(db_session)
+
+        for i in range(5):
+            repo.add(sample_news_item(
+                source_id=source_id,
+                title=f"Offset Item {i}",
+                content_hash=f"offset_test_{i}",
+                published_at=datetime(2025, 1, i + 1),
+            ))
+        db_session.flush()
+
+        items_page1, total1 = repo.get_recent(limit=2, offset=0)
+        items_page2, total2 = repo.get_recent(limit=2, offset=2)
+
+        assert total1 == total2
+        assert len(items_page1) == 2
+        assert len(items_page2) == 2
+        # Pages should not overlap
+        page1_ids = {item.id for item in items_page1}
+        page2_ids = {item.id for item in items_page2}
+        assert page1_ids.isdisjoint(page2_ids)
+
+    def test_get_recent_negative_offset_raises(self, db_session):
+        repo = NewsRepository(db_session)
+        with pytest.raises(ValueError, match="Offset must be non-negative"):
+            repo.get_recent(offset=-1)
+
+    def test_get_recent_total_count(self, db_session):
+        source_id = self._add_source(db_session)
+        repo = NewsRepository(db_session)
+
+        for i in range(3):
+            repo.add(sample_news_item(
+                source_id=source_id,
+                title=f"Count Item {i}",
+                content_hash=f"count_test_{i}",
+            ))
+        db_session.flush()
+
+        items, total = repo.get_recent(limit=1)
+        assert len(items) == 1
+        assert total >= 3
+
+    def test_get_recent_filter_by_source(self, db_session):
+        source_id_a = self._add_source(db_session, name="Source A")
+        source_id_b = self._add_source(db_session, name="Source B")
+        repo = NewsRepository(db_session)
+
+        repo.add(sample_news_item(
+            source_id=source_id_a,
+            title="From Source A",
+            content_hash="source_filter_a",
+        ))
+        repo.add(sample_news_item(
+            source_id=source_id_b,
+            title="From Source B",
+            content_hash="source_filter_b",
+        ))
+        db_session.flush()
+
+        items, total = repo.get_recent(source_ids=[source_id_a])
+        titles = [item.title for item in items]
+        assert "From Source A" in titles
+        assert "From Source B" not in titles
+        assert total >= 1
+
+    def test_get_recent_filter_by_search(self, db_session):
+        source_id = self._add_source(db_session)
+        repo = NewsRepository(db_session)
+
+        repo.add(sample_news_item(
+            source_id=source_id,
+            title="Government Budget Report",
+            content_hash="search_filter_1",
+        ))
+        repo.add(sample_news_item(
+            source_id=source_id,
+            title="Weather Forecast",
+            content_hash="search_filter_2",
+        ))
+        db_session.flush()
+
+        items, total = repo.get_recent(search="budget")
+        assert total >= 1
+        assert all("Budget" in item.title or "budget" in (item.content or "") for item in items)
+
+    def test_get_recent_filter_by_date_range(self, db_session):
+        source_id = self._add_source(db_session)
+        repo = NewsRepository(db_session)
+
+        repo.add(sample_news_item(
+            source_id=source_id,
+            title="January News",
+            content_hash="date_filter_1",
+            published_at=datetime(2025, 1, 15),
+        ))
+        repo.add(sample_news_item(
+            source_id=source_id,
+            title="June News",
+            content_hash="date_filter_2",
+            published_at=datetime(2025, 6, 15),
+        ))
+        db_session.flush()
+
+        items, total = repo.get_recent(
+            date_from=datetime(2025, 5, 1),
+            date_to=datetime(2025, 7, 1),
+        )
+        titles = [item.title for item in items]
+        assert "June News" in titles
+        assert "January News" not in titles
+
+    def test_get_recent_combined_filters(self, db_session):
+        source_id_a = self._add_source(db_session, name="Source Combined A")
+        source_id_b = self._add_source(db_session, name="Source Combined B")
+        repo = NewsRepository(db_session)
+
+        repo.add(sample_news_item(
+            source_id=source_id_a,
+            title="Budget Report January",
+            content_hash="combined_1",
+            published_at=datetime(2025, 1, 15),
+        ))
+        repo.add(sample_news_item(
+            source_id=source_id_a,
+            title="Budget Report June",
+            content_hash="combined_2",
+            published_at=datetime(2025, 6, 15),
+        ))
+        repo.add(sample_news_item(
+            source_id=source_id_b,
+            title="Budget Report June B",
+            content_hash="combined_3",
+            published_at=datetime(2025, 6, 15),
+        ))
+        db_session.flush()
+
+        items, total = repo.get_recent(
+            source_ids=[source_id_a],
+            search="budget",
+            date_from=datetime(2025, 5, 1),
+            date_to=datetime(2025, 7, 1),
+        )
+        assert total == 1
+        assert items[0].title == "Budget Report June"
 
     def test_get_by_date_range(self, db_session):
         source_id = self._add_source(db_session)

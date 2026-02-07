@@ -1,5 +1,6 @@
 """Integration tests for FastAPI API endpoints."""
 
+from datetime import datetime
 from unittest.mock import patch
 
 from backend.tests.conftest import sample_news_item, sample_source
@@ -98,7 +99,10 @@ class TestNewsEndpoints:
     def test_list_news_empty(self, test_client):
         response = test_client.get("/api/news")
         assert response.status_code == 200
-        assert response.json() == []
+        data = response.json()
+        assert data["items"] == []
+        assert data["pagination"]["total"] == 0
+        assert data["pagination"]["has_more"] is False
 
     def test_list_news_with_data(self, test_client, db_session):
         source = sample_source(name="News Source")
@@ -112,7 +116,89 @@ class TestNewsEndpoints:
         response = test_client.get("/api/news")
         assert response.status_code == 200
         data = response.json()
-        assert len(data) >= 1
+        assert len(data["items"]) >= 1
+        assert data["pagination"]["total"] >= 1
+
+    def test_list_news_pagination_params(self, test_client, db_session):
+        source = sample_source(name="Pagination Source")
+        db_session.add(source)
+        db_session.flush()
+
+        for i in range(5):
+            db_session.add(sample_news_item(
+                source_id=source.id,
+                content_hash=f"pagination_api_{i}",
+                title=f"Pagination Item {i}",
+            ))
+        db_session.flush()
+
+        response = test_client.get("/api/news?limit=2&offset=0")
+        data = response.json()
+        assert len(data["items"]) == 2
+        assert data["pagination"]["limit"] == 2
+        assert data["pagination"]["offset"] == 0
+        assert data["pagination"]["has_more"] is True
+
+    def test_list_news_source_filter(self, test_client, db_session):
+        source_a = sample_source(name="Filter Source A")
+        source_b = sample_source(name="Filter Source B", feed_url="https://b.com/feed.xml")
+        db_session.add(source_a)
+        db_session.add(source_b)
+        db_session.flush()
+
+        db_session.add(sample_news_item(
+            source_id=source_a.id, content_hash="filter_api_a", title="From A",
+        ))
+        db_session.add(sample_news_item(
+            source_id=source_b.id, content_hash="filter_api_b", title="From B",
+        ))
+        db_session.flush()
+
+        response = test_client.get(f"/api/news?source_id={source_a.id}")
+        data = response.json()
+        titles = [item["title"] for item in data["items"]]
+        assert "From A" in titles
+        assert "From B" not in titles
+
+    def test_list_news_search_filter(self, test_client, db_session):
+        source = sample_source(name="Search API Source")
+        db_session.add(source)
+        db_session.flush()
+
+        db_session.add(sample_news_item(
+            source_id=source.id, content_hash="search_api_1", title="Budget Report 2025",
+        ))
+        db_session.add(sample_news_item(
+            source_id=source.id, content_hash="search_api_2", title="Weather Update",
+        ))
+        db_session.flush()
+
+        response = test_client.get("/api/news?search=budget")
+        data = response.json()
+        assert data["pagination"]["total"] >= 1
+        assert all("Budget" in item["title"] or "budget" in (item["content"] or "")
+                    for item in data["items"])
+
+    def test_list_news_date_range_filter(self, test_client, db_session):
+        source = sample_source(name="Date API Source")
+        db_session.add(source)
+        db_session.flush()
+
+        db_session.add(sample_news_item(
+            source_id=source.id, content_hash="date_api_1",
+            title="Old News", published_at=datetime(2024, 1, 1),
+        ))
+        db_session.add(sample_news_item(
+            source_id=source.id, content_hash="date_api_2",
+            title="Recent News", published_at=datetime(2025, 6, 1),
+        ))
+        db_session.flush()
+
+        response = test_client.get("/api/news?date_from=2025-01-01T00:00:00&date_to=2025-12-31T23:59:59")
+        data = response.json()
+        titles = [item["title"] for item in data["items"]]
+        assert "Recent News" in titles
+        assert "Old News" not in titles
 
     def test_get_news_item_not_found(self, test_client):
         response = test_client.get("/api/news/9999")

@@ -28,17 +28,62 @@ class NewsRepository(INewsRepository):
 
         return self._db.query(NewsItem).filter(NewsItem.content_hash == content_hash).first()
 
-    def get_recent(self, limit: int = 50) -> list[NewsItem]:
-        """Get recent news items ordered by published date."""
+    def _build_filtered_query(
+        self,
+        source_ids: list[int] | None = None,
+        search: str | None = None,
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
+    ):
+        """Build a query with optional filters applied."""
+        query = self._db.query(NewsItem)
+
+        if source_ids:
+            query = query.filter(NewsItem.source_id.in_(source_ids))
+
+        if search and search.strip():
+            search_lower = search.lower()
+            query = query.filter(
+                (NewsItem.title.ilike(f"%{search_lower}%"))
+                | (NewsItem.content.ilike(f"%{search_lower}%"))
+            )
+
+        if date_from is not None:
+            query = query.filter(NewsItem.published_at >= date_from)
+
+        if date_to is not None:
+            query = query.filter(NewsItem.published_at <= date_to)
+
+        return query
+
+    def get_recent(
+        self,
+        limit: int = 20,
+        offset: int = 0,
+        source_ids: list[int] | None = None,
+        search: str | None = None,
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
+    ) -> tuple[list[NewsItem], int]:
+        """Get recent news items with pagination and filters."""
         if limit <= 0:
             raise ValueError("Limit must be greater than zero")
+        if offset < 0:
+            raise ValueError("Offset must be non-negative")
 
-        return (
-            self._db.query(NewsItem)
+        query = self._build_filtered_query(source_ids, search, date_from, date_to)
+
+        total = query.count()
+
+        items = (
+            query
             .order_by(NewsItem.published_at.desc())
+            .offset(offset)
             .limit(limit)
             .all()
         )
+
+        return items, total
 
     def get_by_date_range(self, start_date: datetime, end_date: datetime) -> list[NewsItem]:
         """Get news items within a date range."""

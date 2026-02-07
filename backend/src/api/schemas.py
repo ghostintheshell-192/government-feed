@@ -56,3 +56,19 @@ class NewsItemResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class PaginationMeta(BaseModel):
+    """Pagination metadata for paginated responses."""
+
+    total: int
+    limit: int
+    offset: int
+    has_more: bool
+
+
+class PaginatedNewsResponse(BaseModel):
+    """Paginated response for news items."""
+
+    items: list[NewsItemResponse]
+    pagination: PaginationMeta

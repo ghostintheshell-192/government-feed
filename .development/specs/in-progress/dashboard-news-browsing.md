@@ -1,6 +1,6 @@
 # Dashboard & News Browsing
 
-**Status**: backlog
+**Status**: in-progress
 **Milestone**: M3-Frontend
 **Priority**: must-have
 **Depends on**: [frontend-base](../implemented/frontend-base.md), [rest-api](../implemented/rest-api.md)

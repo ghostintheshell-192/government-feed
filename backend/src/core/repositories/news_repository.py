@@ -22,8 +22,19 @@ class INewsRepository(ABC):
         pass
 
     @abstractmethod
-    def get_recent(self, limit: int = 50) -> list["NewsItem"]:
-        """Get recent news items ordered by published date."""
+    def get_recent(
+        self,
+        limit: int = 20,
+        offset: int = 0,
+        source_ids: list[int] | None = None,
+        search: str | None = None,
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
+    ) -> tuple[list["NewsItem"], int]:
+        """Get recent news items with pagination and filters.
+
+        Returns a tuple of (items, total_count).
+        """
         pass
 
     @abstractmethod
