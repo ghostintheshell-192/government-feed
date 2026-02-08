@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom'
 import Sources from './pages/Sources'
 import Feed from './pages/Feed'
+import NewsDetail from './pages/NewsDetail'
 import Settings from './pages/Settings'
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Feed />} />
             <Route path="/feed" element={<Navigate to="/" replace />} />
+            <Route path="/news/:id" element={<NewsDetail />} />
             <Route path="/sources" element={<Sources />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>

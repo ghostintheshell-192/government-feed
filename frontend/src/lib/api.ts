@@ -1,6 +1,7 @@
 import type {
   FeatureFlags,
   NewsFilters,
+  NewsItem,
   PaginatedNewsResponse,
   Source,
   SummarizeResponse,
@@ -33,6 +34,14 @@ export async function fetchNews(
   const res = await fetch(`/api/news?${params.toString()}`)
   if (!res.ok) {
     throw new Error(`Failed to fetch news: ${res.status}`)
+  }
+  return res.json()
+}
+
+export async function fetchNewsById(id: number): Promise<NewsItem> {
+  const res = await fetch(`/api/news/${id}`)
+  if (!res.ok) {
+    throw new Error(`Failed to fetch news item: ${res.status}`)
   }
   return res.json()
 }

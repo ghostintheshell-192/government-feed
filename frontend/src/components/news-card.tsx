@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -89,7 +90,14 @@ export function NewsCard({
             <span className="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-blue-500" />
           )}
           <div className="flex-1 space-y-1.5">
-            <CardTitle className="text-lg leading-snug">{item.title}</CardTitle>
+            <CardTitle className="text-lg leading-snug">
+              <Link
+                to={`/news/${item.id}`}
+                className="transition-colors hover:text-blue-600 hover:underline"
+              >
+                {item.title}
+              </Link>
+            </CardTitle>
             <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               {sourceName && <Badge variant="secondary">{sourceName}</Badge>}
               <span>
