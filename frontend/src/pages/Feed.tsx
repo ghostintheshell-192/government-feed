@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query'
+import { X } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { FilterBar } from '@/components/filter-bar'
@@ -8,6 +10,8 @@ import { fetchFeatures, fetchNews, fetchSources } from '@/lib/api'
 import type { NewsFilters } from '@/lib/types'
 import { useDebounce } from '@/lib/use-debounce'
 import { useReadStatus } from '@/lib/use-read-status'
+import { useRecentSearches } from '@/lib/use-recent-searches'
+import { useSavedSearches } from '@/lib/use-saved-searches'
 
 const PAGE_SIZE = 20
 
@@ -16,6 +20,18 @@ export default function Feed() {
   const debouncedFilters = useDebounce(filters, 300)
   const { isRead, markAsRead } = useReadStatus()
   const queryClient = useQueryClient()
+  const { searches: recentSearches, addSearch } = useRecentSearches()
+  const { savedSearches, saveSearch, removeSearch } = useSavedSearches()
+
+  // Track debounced search to add to recent searches
+  const prevSearchRef = useRef<string | undefined>()
+  useEffect(() => {
+    const current = debouncedFilters.search
+    if (current && current !== prevSearchRef.current) {
+      addSearch(current)
+    }
+    prevSearchRef.current = current
+  }, [debouncedFilters.search, addSearch])
 
   const { data: features } = useQuery({
     queryKey: ['features'],
@@ -76,6 +92,30 @@ export default function Feed() {
     updateNewsItem(id, { content })
   }
 
+  const handleSaveSearch = () => {
+    const name = prompt('Nome per questa ricerca:')
+    if (name) {
+      saveSearch(name, filters)
+    }
+  }
+
+  const applySavedSearch = (searchFilters: NewsFilters) => {
+    setFilters(searchFilters)
+  }
+
+  const describeSavedFilters = (f: NewsFilters): string => {
+    const parts: string[] = []
+    if (f.search) parts.push(`"${f.search}"`)
+    if (f.source_id?.length) {
+      const names = f.source_id
+        .map((id) => sourceMap.get(id))
+        .filter(Boolean)
+      if (names.length) parts.push(names.join(', '))
+    }
+    if (f.date_from || f.date_to) parts.push('date range')
+    return parts.length ? parts.join(' + ') : 'tutti i filtri'
+  }
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-6 md:px-6">
       <div className="mb-6">
@@ -85,9 +125,43 @@ export default function Feed() {
         </p>
       </div>
 
-      <div className="mb-6">
-        <FilterBar filters={filters} sources={sources} onChange={setFilters} />
+      <div className="mb-4">
+        <FilterBar
+          filters={filters}
+          sources={sources}
+          recentSearches={recentSearches}
+          onChange={setFilters}
+          onSaveSearch={handleSaveSearch}
+        />
       </div>
+
+      {savedSearches.length > 0 && (
+        <div className="mb-6 flex flex-wrap items-center gap-2">
+          <span className="text-xs text-muted-foreground">Salvate:</span>
+          {savedSearches.map((saved) => (
+            <Badge
+              key={saved.id}
+              variant="secondary"
+              className="cursor-pointer gap-1 pr-1"
+              title={describeSavedFilters(saved.filters)}
+              onClick={() => applySavedSearch(saved.filters)}
+            >
+              {saved.name}
+              <button
+                type="button"
+                className="ml-0.5 rounded-full p-0.5 hover:bg-muted-foreground/20"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  removeSearch(saved.id)
+                }}
+                aria-label={`Rimuovi ${saved.name}`}
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </Badge>
+          ))}
+        </div>
+      )}
 
       {isLoading ? (
         <div className="space-y-4">
