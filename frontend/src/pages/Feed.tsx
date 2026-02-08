@@ -77,7 +77,7 @@ export default function Feed() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl p-6">
+    <div className="mx-auto max-w-4xl px-4 py-6 md:px-6">
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <p className="mt-1 text-muted-foreground">

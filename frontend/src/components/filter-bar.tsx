@@ -30,7 +30,7 @@ export function FilterBar({ filters, sources, onChange }: FilterBarProps) {
 
   return (
     <div className="flex flex-wrap items-end gap-3">
-      <div className="min-w-[200px] flex-1">
+      <div className="w-full flex-1 sm:min-w-[200px]">
         <label className="mb-1 block text-sm font-medium">Cerca</label>
         <Input
           type="text"
@@ -40,7 +40,7 @@ export function FilterBar({ filters, sources, onChange }: FilterBarProps) {
         />
       </div>
 
-      <div className="min-w-[180px]">
+      <div className="w-full sm:w-auto sm:min-w-[180px]">
         <label className="mb-1 block text-sm font-medium">Fonte</label>
         <select
           className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
@@ -59,7 +59,7 @@ export function FilterBar({ filters, sources, onChange }: FilterBarProps) {
         </select>
       </div>
 
-      <div className="min-w-[150px]">
+      <div className="min-w-0 flex-1 sm:min-w-[150px] sm:flex-none">
         <label className="mb-1 block text-sm font-medium">Da</label>
         <Input
           type="date"
@@ -73,7 +73,7 @@ export function FilterBar({ filters, sources, onChange }: FilterBarProps) {
         />
       </div>
 
-      <div className="min-w-[150px]">
+      <div className="min-w-0 flex-1 sm:min-w-[150px] sm:flex-none">
         <label className="mb-1 block text-sm font-medium">A</label>
         <Input
           type="date"

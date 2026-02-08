@@ -99,7 +99,7 @@ export default function NewsDetail() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-4xl p-6">
+      <div className="mx-auto max-w-4xl px-4 py-6 md:px-6">
         <Skeleton className="mb-6 h-8 w-48" />
         <Skeleton className="mb-4 h-10 w-3/4" />
         <Skeleton className="mb-2 h-5 w-1/4" />
@@ -110,7 +110,7 @@ export default function NewsDetail() {
 
   if (error || !item) {
     return (
-      <div className="mx-auto max-w-4xl p-6">
+      <div className="mx-auto max-w-4xl px-4 py-6 md:px-6">
         <Button variant="ghost" onClick={() => navigate('/')}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Torna alla dashboard
@@ -130,7 +130,7 @@ export default function NewsDetail() {
   const hasFullContent = item.content && item.content.length > 500
 
   return (
-    <div className="mx-auto max-w-4xl p-6">
+    <div className="mx-auto max-w-4xl px-4 py-6 md:px-6">
       <Button
         variant="ghost"
         className="mb-6"

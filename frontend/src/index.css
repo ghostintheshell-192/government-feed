@@ -7,31 +7,6 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Compatibility layer for pages not yet migrated to Tailwind.
- * Sources.css and Settings.css rely on default button/input styles
- * that Tailwind's preflight resets. This layer restores them.
- */
-@layer base {
-  .sources-page button,
-  .settings-page button {
-    cursor: pointer;
-  }
-
-  .sources-page input,
-  .sources-page textarea,
-  .sources-page select,
-  .settings-page input,
-  .settings-page select {
-    border: 1px solid #ddd;
-    padding: 0.5rem;
-    border-radius: 4px;
-    font-size: 1rem;
-    font-family: inherit;
-    color: inherit;
-    background-color: white;
-  }
-}
-/*
  ---break---
  */
 @theme inline {
