@@ -73,3 +73,26 @@ class PaginatedNewsResponse(BaseModel):
 
     items: list[NewsItemResponse]
     pagination: PaginationMeta
+
+
+class FeedDiscoveryRequest(BaseModel):
+    """Request schema for feed discovery."""
+
+    query: str = Field(..., min_length=1, max_length=500)
+
+
+class DiscoveredFeedResponse(BaseModel):
+    """Schema for a discovered feed."""
+
+    url: str
+    title: str
+    feed_type: str
+    site_url: str
+    entry_count: int
+
+
+class FeedDiscoveryResponse(BaseModel):
+    """Response schema for feed discovery."""
+
+    feeds: list[DiscoveredFeedResponse]
+    searched_sites: list[str]

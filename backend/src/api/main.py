@@ -175,6 +175,31 @@ async def delete_source(source_id: int, uow: UnitOfWork = Depends(get_unit_of_wo
     return None
 
 
+@app.post("/api/sources/discover", response_model=schemas.FeedDiscoveryResponse)
+async def discover_feeds(request: schemas.FeedDiscoveryRequest):
+    """Discover RSS/Atom feeds from a URL or search query."""
+    from backend.src.infrastructure.feed_discovery import FeedDiscoveryService
+
+    logger.info("Feed discovery requested for: %s", request.query)
+    service = FeedDiscoveryService()
+    feeds, searched_sites = await service.discover(request.query)
+
+    logger.info("Feed discovery found %d feeds from %d sites", len(feeds), len(searched_sites))
+    return schemas.FeedDiscoveryResponse(
+        feeds=[
+            schemas.DiscoveredFeedResponse(
+                url=f.url,
+                title=f.title,
+                feed_type=f.feed_type,
+                site_url=f.site_url,
+                entry_count=f.entry_count,
+            )
+            for f in feeds
+        ],
+        searched_sites=searched_sites,
+    )
+
+
 @app.post("/api/sources/{source_id}/process")
 async def process_feed(source_id: int, uow: UnitOfWork = Depends(get_unit_of_work)):
     """Process feed and import news."""

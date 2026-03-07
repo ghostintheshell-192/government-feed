@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
+import { discoverFeeds, type DiscoveredFeed } from '@/lib/api'
 
 interface Source {
   id: number
@@ -49,6 +50,12 @@ export default function Sources() {
   const [processing, setProcessing] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [formData, setFormData] = useState<SourceFormData>({ ...emptyForm })
+  const [discoveryQuery, setDiscoveryQuery] = useState('')
+  const [discovering, setDiscovering] = useState(false)
+  const [discoveredFeeds, setDiscoveredFeeds] = useState<DiscoveredFeed[]>([])
+  const [searchedSites, setSearchedSites] = useState<string[]>([])
+  const [discoveryDone, setDiscoveryDone] = useState(false)
+  const [addingFeed, setAddingFeed] = useState<string | null>(null)
 
   useEffect(() => {
     loadSources()
@@ -144,6 +151,49 @@ export default function Sources() {
     }
   }
 
+  const handleDiscover = async () => {
+    if (!discoveryQuery.trim()) return
+    setDiscovering(true)
+    setDiscoveredFeeds([])
+    setSearchedSites([])
+    setDiscoveryDone(false)
+    try {
+      const result = await discoverFeeds(discoveryQuery.trim())
+      setDiscoveredFeeds(result.feeds)
+      setSearchedSites(result.searched_sites)
+      setDiscoveryDone(true)
+    } catch {
+      alert('Errore nella ricerca dei feed.')
+    } finally {
+      setDiscovering(false)
+    }
+  }
+
+  const addDiscoveredFeed = async (feed: DiscoveredFeed) => {
+    setAddingFeed(feed.url)
+    try {
+      const res = await fetch('/api/sources', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: feed.title,
+          feed_url: feed.url,
+          source_type: feed.feed_type,
+          description: `Scoperto da: ${feed.site_url}`,
+          update_frequency_minutes: 60,
+        }),
+      })
+      if (!res.ok) throw new Error(`Errore ${res.status}`)
+      await loadSources()
+      queryClient.invalidateQueries({ queryKey: ['news'] })
+      setDiscoveredFeeds((prev) => prev.filter((f) => f.url !== feed.url))
+    } catch {
+      alert("Errore nell'aggiunta del feed.")
+    } finally {
+      setAddingFeed(null)
+    }
+  }
+
   const processFeed = async (id: number) => {
     setProcessing(id)
     try {
@@ -170,6 +220,77 @@ export default function Sources() {
           Configura e gestisci i feed istituzionali
         </p>
       </div>
+
+      <Card className="mb-6">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">Scopri Feed</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Inserisci il nome di un&apos;istituzione o l&apos;URL di un sito per trovare i feed disponibili
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-2">
+            <Input
+              value={discoveryQuery}
+              onChange={(e) => setDiscoveryQuery(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleDiscover()}
+              placeholder="Nome istituzione o URL del sito..."
+              className="flex-1"
+              disabled={discovering}
+            />
+            <Button onClick={handleDiscover} disabled={discovering || !discoveryQuery.trim()}>
+              {discovering ? 'Ricerca in corso...' : 'Cerca Feed'}
+            </Button>
+          </div>
+
+          {discovering && (
+            <div className="mt-4 space-y-2">
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+            </div>
+          )}
+
+          {discoveryDone && !discovering && discoveredFeeds.length === 0 && (
+            <p className="mt-4 text-sm text-muted-foreground">
+              Nessun feed trovato. Prova con un altro termine o un URL diretto.
+            </p>
+          )}
+
+          {discoveredFeeds.length > 0 && (
+            <div className="mt-4 space-y-3">
+              {searchedSites.length > 1 && (
+                <p className="text-xs text-muted-foreground">
+                  Siti analizzati: {searchedSites.length}
+                </p>
+              )}
+              {discoveredFeeds.map((feed) => (
+                <div
+                  key={feed.url}
+                  className="flex items-center justify-between gap-4 rounded-lg border p-3"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="truncate font-medium">{feed.title}</p>
+                      <Badge variant="outline">{feed.feed_type}</Badge>
+                      <Badge variant="secondary">{feed.entry_count} articoli</Badge>
+                    </div>
+                    <p className="mt-0.5 truncate font-mono text-xs text-muted-foreground">
+                      {feed.url}
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => addDiscoveredFeed(feed)}
+                    disabled={addingFeed === feed.url}
+                  >
+                    {addingFeed === feed.url ? 'Aggiunta...' : 'Aggiungi'}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-lg font-semibold">

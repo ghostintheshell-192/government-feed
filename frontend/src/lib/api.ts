@@ -70,6 +70,33 @@ export async function summarizeNews(id: number): Promise<SummarizeResponse> {
   return res.json()
 }
 
+export interface DiscoveredFeed {
+  url: string
+  title: string
+  feed_type: string
+  site_url: string
+  entry_count: number
+}
+
+export interface FeedDiscoveryResponse {
+  feeds: DiscoveredFeed[]
+  searched_sites: string[]
+}
+
+export async function discoverFeeds(
+  query: string,
+): Promise<FeedDiscoveryResponse> {
+  const res = await fetch('/api/sources/discover', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query }),
+  })
+  if (!res.ok) {
+    throw new Error(`Failed to discover feeds: ${res.status}`)
+  }
+  return res.json()
+}
+
 export async function fetchNewsContent(
   id: number,
 ): Promise<{ success: boolean; content?: string; message?: string }> {
