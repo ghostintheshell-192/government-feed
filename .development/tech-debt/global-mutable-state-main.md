@@ -1,7 +1,7 @@
 ---
 type: refactor
 priority: low
-status: open
+status: partially-resolved
 discovered: 2026-03-07
 related: [feedparser-bypasses-uow.md]
 related_decision: 001-clean-architecture.md
