@@ -1,6 +1,6 @@
 # Dashboard & News Browsing
 
-**Status**: in-progress
+**Status**: implemented
 **Milestone**: M3-Frontend
 **Priority**: must-have
 **Depends on**: [frontend-base](../implemented/frontend-base.md), [rest-api](../implemented/rest-api.md)
@@ -20,13 +20,13 @@ Main dashboard with infinite scroll news feed, filtering by source/date/keyword,
 
 ### Functional
 
-- [ ] Infinite scroll or load-more pagination for news list
-- [ ] Filter by source (single or multiple)
-- [ ] Filter by date range (from/to)
-- [ ] Filter by keyword (free text search on title)
-- [ ] Visual indicators for new/unread items
-- [ ] Summary preview in list view
-- [ ] Responsive layout (desktop and tablet)
+- [x] Load-more pagination for news list ("Carica altre notizie" button)
+- [x] Filter by source (single or multiple)
+- [x] Filter by date range (from/to)
+- [x] Filter by keyword (free text search on title)
+- [x] Visual indicators for new/unread items (blue dot, localStorage)
+- [x] Summary preview in list view
+- [x] Responsive layout (desktop and tablet)
 
 ### Non-Functional
 
@@ -44,8 +44,8 @@ Main dashboard with infinite scroll news feed, filtering by source/date/keyword,
 
 ## Acceptance Criteria
 
-- [ ] News feed loads and displays correctly
-- [ ] Infinite scroll loads additional items seamlessly
-- [ ] All filters work correctly and can be combined
-- [ ] Read/unread state is visually distinct
-- [ ] Page is responsive on desktop and tablet
+- [x] News feed loads and displays correctly
+- [x] Load-more pagination loads additional items
+- [x] All filters work correctly and can be combined
+- [x] Read/unread state is visually distinct
+- [x] Page is responsive on desktop and tablet

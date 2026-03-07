@@ -13,9 +13,9 @@ Government sources (central banks, ministries, regulatory agencies) publish info
 
 ✅ **Production-Ready Backend** (5/5 features)
 
-🔧 **Frontend** (0/3 features)
-- [ ] Dashboard & News Browsing
-- [ ] News Detail View
+🔧 **Frontend** (2/3 features)
+- [x] Dashboard & News Browsing
+- [x] News Detail View
 - [ ] Search & Discovery
 
 📋 **Advanced Features** (0/8 features)
@@ -42,7 +42,7 @@ Government sources (central banks, ministries, regulatory agencies) publish info
 <!-- AUTO:ROADMAP -->
 | ✅ M1-MVP | MVP Backend | 9/9 |
 | ✅ M2-Production | Production-Ready Backend | 5/5 |
-| 🔧 M3-Frontend | Frontend | 0/3 |
+| 🔧 M3-Frontend | Frontend | 2/3 |
 | 📋 M4-Advanced | Advanced Features | 0/8 |
 | 📋 M5-Scaling | Scaling & Multi-User | 0/1 |
 <!-- /AUTO:ROADMAP -->
@@ -59,7 +59,8 @@ See [docs/vision.md](docs/vision.md) for the full project vision and [docs/roadm
 | **Migrations** | Alembic | Schema version control |
 | **Cache** | Redis 7 | Response caching with graceful fallback |
 | **AI** | Ollama (DeepSeek-R1) | Local summarization, no cloud |
-| **Quality** | ruff + mypy (strict) + pytest | Linting, type checking, 166 tests |
+| **UI** | Tailwind CSS + shadcn/ui | Component library with dark mode |
+| **Quality** | ruff + mypy (strict) + pytest | Linting, type checking, 177 tests |
 
 **Architecture**: Clean Architecture with Repository Pattern and Unit of Work. Dependencies flow inward: API → Infrastructure → Core.
 
@@ -68,7 +69,7 @@ See [docs/vision.md](docs/vision.md) for the full project vision and [docs/roadm
 ### Prerequisites
 
 - Python 3.13+
-- Node.js 18+ with pnpm
+- Node.js 18+ with npm
 - Docker and Docker Compose (for Redis and Ollama)
 
 ### Installation
@@ -84,7 +85,7 @@ source .venv/bin/activate
 cd backend && pip install -e ".[dev]" && cd ..
 
 # Frontend
-cd frontend && pnpm install && cd ..
+cd frontend && npm install && cd ..
 
 # Git hooks (security checks, tests on push)
 git config core.hooksPath .githooks
@@ -103,7 +104,7 @@ docker exec government-feed-ollama ollama pull deepseek-r1:7b
 cd backend && uvicorn backend.src.api.main:app --reload
 
 # Frontend (separate terminal)
-cd frontend && pnpm dev
+cd frontend && npm run dev
 ```
 
 - Backend API: http://localhost:8000
