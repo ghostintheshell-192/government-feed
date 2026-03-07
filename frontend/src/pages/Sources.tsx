@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react'
-import './Sources.css'
+import { useQueryClient } from '@tanstack/react-query'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
+import { discoverFeeds, type DiscoveredFeed } from '@/lib/api'
 
 interface Source {
   id: number
@@ -23,22 +30,32 @@ interface SourceFormData {
   is_active: boolean
 }
 
+const emptyForm: SourceFormData = {
+  name: '',
+  description: '',
+  feed_url: '',
+  source_type: 'RSS',
+  category: '',
+  update_frequency_minutes: 60,
+  is_active: true,
+}
+
 export default function Sources() {
+  const queryClient = useQueryClient()
   const [sources, setSources] = useState<Source[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [editMode, setEditMode] = useState(false)
   const [editId, setEditId] = useState<number | null>(null)
   const [processing, setProcessing] = useState<number | null>(null)
-  const [formData, setFormData] = useState<SourceFormData>({
-    name: '',
-    description: '',
-    feed_url: '',
-    source_type: 'RSS',
-    category: '',
-    update_frequency_minutes: 60,
-    is_active: true,
-  })
+  const [error, setError] = useState<string | null>(null)
+  const [formData, setFormData] = useState<SourceFormData>({ ...emptyForm })
+  const [discoveryQuery, setDiscoveryQuery] = useState('')
+  const [discovering, setDiscovering] = useState(false)
+  const [discoveredFeeds, setDiscoveredFeeds] = useState<DiscoveredFeed[]>([])
+  const [searchedSites, setSearchedSites] = useState<string[]>([])
+  const [discoveryDone, setDiscoveryDone] = useState(false)
+  const [addingFeed, setAddingFeed] = useState<string | null>(null)
 
   useEffect(() => {
     loadSources()
@@ -46,24 +63,23 @@ export default function Sources() {
 
   const loadSources = async () => {
     setLoading(true)
-    const res = await fetch('/api/sources')
-    const data = await res.json()
-    setSources(data)
-    setLoading(false)
+    setError(null)
+    try {
+      const res = await fetch('/api/sources')
+      if (!res.ok) throw new Error(`Errore ${res.status}`)
+      const data = await res.json()
+      setSources(data)
+    } catch {
+      setError('Impossibile caricare i feed. Verifica che il backend sia attivo.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const openAddModal = () => {
     setEditMode(false)
     setEditId(null)
-    setFormData({
-      name: '',
-      description: '',
-      feed_url: '',
-      source_type: 'RSS',
-      category: '',
-      update_frequency_minutes: 60,
-      is_active: true,
-    })
+    setFormData({ ...emptyForm })
     setShowModal(true)
   }
 
@@ -84,15 +100,7 @@ export default function Sources() {
 
   const closeModal = () => {
     setShowModal(false)
-    setFormData({
-      name: '',
-      description: '',
-      feed_url: '',
-      source_type: 'RSS',
-      category: '',
-      update_frequency_minutes: 60,
-      is_active: true,
-    })
+    setFormData({ ...emptyForm })
   }
 
   const saveSource = async () => {
@@ -104,168 +112,355 @@ export default function Sources() {
     const url = editMode ? `/api/sources/${editId}` : '/api/sources'
     const method = editMode ? 'PUT' : 'POST'
 
-    await fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    })
-
-    await loadSources()
-    closeModal()
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+      if (!res.ok) throw new Error(`Errore ${res.status}`)
+      await loadSources()
+      closeModal()
+    } catch {
+      alert('Errore nel salvataggio del feed.')
+    }
   }
 
   const deleteSource = async (id: number) => {
     if (!confirm('Eliminare questo feed?')) return
-    await fetch(`/api/sources/${id}`, { method: 'DELETE' })
-    await loadSources()
+    try {
+      const res = await fetch(`/api/sources/${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error(`Errore ${res.status}`)
+      await loadSources()
+    } catch {
+      alert("Errore nell'eliminazione del feed.")
+    }
   }
 
   const toggleActive = async (source: Source) => {
-    await fetch(`/api/sources/${source.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...source, is_active: !source.is_active }),
-    })
-    await loadSources()
+    try {
+      const res = await fetch(`/api/sources/${source.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...source, is_active: !source.is_active }),
+      })
+      if (!res.ok) throw new Error(`Errore ${res.status}`)
+      await loadSources()
+    } catch {
+      alert('Errore nel cambio di stato del feed.')
+    }
+  }
+
+  const handleDiscover = async () => {
+    if (!discoveryQuery.trim()) return
+    setDiscovering(true)
+    setDiscoveredFeeds([])
+    setSearchedSites([])
+    setDiscoveryDone(false)
+    try {
+      const result = await discoverFeeds(discoveryQuery.trim())
+      setDiscoveredFeeds(result.feeds)
+      setSearchedSites(result.searched_sites)
+      setDiscoveryDone(true)
+    } catch {
+      alert('Errore nella ricerca dei feed.')
+    } finally {
+      setDiscovering(false)
+    }
+  }
+
+  const addDiscoveredFeed = async (feed: DiscoveredFeed) => {
+    setAddingFeed(feed.url)
+    try {
+      const res = await fetch('/api/sources', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: feed.title,
+          feed_url: feed.url,
+          source_type: feed.feed_type,
+          description: `Scoperto da: ${feed.site_url}`,
+          update_frequency_minutes: 60,
+        }),
+      })
+      if (!res.ok) throw new Error(`Errore ${res.status}`)
+      await loadSources()
+      queryClient.invalidateQueries({ queryKey: ['news'] })
+      setDiscoveredFeeds((prev) => prev.filter((f) => f.url !== feed.url))
+    } catch {
+      alert("Errore nell'aggiunta del feed.")
+    } finally {
+      setAddingFeed(null)
+    }
   }
 
   const processFeed = async (id: number) => {
     setProcessing(id)
-    const res = await fetch(`/api/sources/${id}/process`, { method: 'POST' })
-    const data = await res.json()
-    setProcessing(null)
-    alert(data.message)
-    await loadSources()
+    try {
+      const res = await fetch(`/api/sources/${id}/process`, { method: 'POST' })
+      if (!res.ok) throw new Error(`Errore ${res.status}`)
+      const data = await res.json()
+      alert(data.message)
+      if (data.success) {
+        queryClient.invalidateQueries({ queryKey: ['news'] })
+      }
+      await loadSources()
+    } catch {
+      alert("Errore nell'importazione delle notizie.")
+    } finally {
+      setProcessing(null)
+    }
   }
 
   return (
-    <div className="sources-page">
-      <div className="page-header">
-        <div>
-          <h1>Gestione Sources</h1>
-          <p className="subtitle">Configura e gestisci i feed istituzionali</p>
-        </div>
+    <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">Gestione Sources</h1>
+        <p className="mt-1 text-muted-foreground">
+          Configura e gestisci i feed istituzionali
+        </p>
       </div>
 
-      <div className="card">
-        <div className="card-header">
-          <h2>Feed Attivi</h2>
-          <button className="btn btn-primary" onClick={openAddModal}>
-            + Aggiungi Feed
-          </button>
-        </div>
-
-        {loading ? (
-          <div className="loading">Loading...</div>
-        ) : sources.length === 0 ? (
-          <div className="empty">
-            Nessun feed configurato. Aggiungi il tuo primo feed per iniziare.
+      <Card className="mb-6">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">Scopri Feed</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Inserisci il nome di un&apos;istituzione o l&apos;URL di un sito per trovare i feed disponibili
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-2">
+            <Input
+              value={discoveryQuery}
+              onChange={(e) => setDiscoveryQuery(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleDiscover()}
+              placeholder="Nome istituzione o URL del sito..."
+              className="flex-1"
+              disabled={discovering}
+            />
+            <Button onClick={handleDiscover} disabled={discovering || !discoveryQuery.trim()}>
+              {discovering ? 'Ricerca in corso...' : 'Cerca Feed'}
+            </Button>
           </div>
-        ) : (
-          <table className="sources-table">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>URL</th>
-                <th>Tipo</th>
-                <th>Frequenza</th>
-                <th>Ultima Fetch</th>
-                <th>Stato</th>
-                <th>Azioni</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sources.map((source) => (
-                <tr key={source.id}>
-                  <td>
-                    <strong>{source.name}</strong>
-                    {source.description && (
-                      <>
-                        <br />
-                        <small style={{ color: '#666' }}>{source.description}</small>
-                      </>
-                    )}
-                  </td>
-                  <td style={{ fontSize: '0.85rem', wordBreak: 'break-all' }}>
-                    {source.feed_url}
-                  </td>
-                  <td>
-                    <span className="badge">{source.source_type}</span>
-                  </td>
-                  <td>{source.update_frequency_minutes} min</td>
-                  <td>
-                    {source.last_fetched
-                      ? new Date(source.last_fetched).toLocaleString('it-IT')
-                      : 'Mai'}
-                  </td>
-                  <td>
-                    <span className={`badge ${source.is_active ? 'active' : 'inactive'}`}>
-                      {source.is_active ? 'Attivo' : 'Inattivo'}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="actions">
-                      {source.is_active && (
-                        <button
-                          className="btn btn-sm"
-                          onClick={() => processFeed(source.id)}
-                          disabled={processing === source.id}
-                        >
-                          {processing === source.id ? 'Importando...' : 'Importa'}
-                        </button>
-                      )}
-                      <button
-                        className="btn btn-sm"
-                        onClick={() => openEditModal(source)}
-                      >
-                        Modifica
-                      </button>
-                      <button
-                        className="btn btn-sm"
-                        onClick={() => toggleActive(source)}
-                      >
-                        {source.is_active ? 'Disattiva' : 'Attiva'}
-                      </button>
-                      {!source.is_active && (
-                        <button
-                          className="btn btn-sm btn-danger"
-                          onClick={() => deleteSource(source.id)}
-                        >
-                          Elimina
-                        </button>
-                      )}
+
+          {discovering && (
+            <div className="mt-4 space-y-2">
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+            </div>
+          )}
+
+          {discoveryDone && !discovering && discoveredFeeds.length === 0 && (
+            <p className="mt-4 text-sm text-muted-foreground">
+              Nessun feed trovato. Prova con un altro termine o un URL diretto.
+            </p>
+          )}
+
+          {discoveredFeeds.length > 0 && (
+            <div className="mt-4 space-y-3">
+              {searchedSites.length > 1 && (
+                <p className="text-xs text-muted-foreground">
+                  Siti analizzati: {searchedSites.length}
+                </p>
+              )}
+              {discoveredFeeds.map((feed) => (
+                <div
+                  key={feed.url}
+                  className="flex items-center justify-between gap-4 rounded-lg border p-3"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="truncate font-medium">{feed.title}</p>
+                      <Badge variant="outline">{feed.feed_type}</Badge>
+                      <Badge variant="secondary">{feed.entry_count} articoli</Badge>
                     </div>
-                  </td>
-                </tr>
+                    <p className="mt-0.5 truncate font-mono text-xs text-muted-foreground">
+                      {feed.url}
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => addDiscoveredFeed(feed)}
+                    disabled={addingFeed === feed.url}
+                  >
+                    {addingFeed === feed.url ? 'Aggiunta...' : 'Aggiungi'}
+                  </Button>
+                </div>
               ))}
-            </tbody>
-          </table>
-        )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-lg font-semibold">
+          Feed {!loading && !error && `(${sources.length})`}
+        </h2>
+        <Button onClick={openAddModal}>+ Aggiungi Feed</Button>
       </div>
+
+      {loading ? (
+        <div className="space-y-4">
+          {[1, 2].map((i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-5 w-48" />
+                <Skeleton className="mt-2 h-4 w-32" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-4 w-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : error ? (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <p className="text-destructive">{error}</p>
+            <Button variant="outline" className="mt-4" onClick={loadSources}>
+              Riprova
+            </Button>
+          </CardContent>
+        </Card>
+      ) : sources.length === 0 ? (
+        <Card>
+          <CardContent className="py-12 text-center text-muted-foreground">
+            Nessun feed configurato. Aggiungi il tuo primo feed per iniziare.
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="space-y-4">
+          {sources.map((source) => (
+            <Card key={source.id}>
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <CardTitle className="text-lg">{source.name}</CardTitle>
+                    {source.description && (
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {source.description}
+                      </p>
+                    )}
+                  </div>
+                  <Badge
+                    variant={source.is_active ? 'default' : 'secondary'}
+                  >
+                    {source.is_active ? 'Attivo' : 'Inattivo'}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
+                  <div className="col-span-2 min-w-0">
+                    <span className="text-muted-foreground">URL</span>
+                    <p className="mt-0.5 truncate font-mono text-xs">
+                      {source.feed_url}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Tipo</span>
+                    <p className="mt-0.5">
+                      <Badge variant="outline">{source.source_type}</Badge>
+                    </p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Frequenza</span>
+                    <p className="mt-0.5">{source.update_frequency_minutes} min</p>
+                  </div>
+                  <div>
+                    <span className="text-muted-foreground">Ultima fetch</span>
+                    <p className="mt-0.5">
+                      {source.last_fetched
+                        ? new Date(source.last_fetched).toLocaleString('it-IT')
+                        : 'Mai'}
+                    </p>
+                  </div>
+                </div>
+
+                <Separator className="my-4" />
+
+                <div className="flex flex-wrap gap-2">
+                  {source.is_active && (
+                    <Button
+                      size="sm"
+                      onClick={() => processFeed(source.id)}
+                      disabled={processing === source.id}
+                    >
+                      {processing === source.id
+                        ? 'Importando...'
+                        : 'Importa Notizie'}
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openEditModal(source)}
+                  >
+                    Modifica
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => toggleActive(source)}
+                  >
+                    {source.is_active ? 'Disattiva' : 'Attiva'}
+                  </Button>
+                  {!source.is_active && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => deleteSource(source.id)}
+                    >
+                      Elimina
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {showModal && (
-        <div className="modal-backdrop" onClick={closeModal}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{editMode ? 'Modifica Feed' : 'Aggiungi Nuovo Feed'}</h3>
-              <button className="close-btn" onClick={closeModal}>
-                ×
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="form-group">
-                <label>Nome *</label>
-                <input
-                  type="text"
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          onClick={closeModal}
+        >
+          <Card
+            className="w-full max-w-lg max-h-[90vh] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>
+                  {editMode ? 'Modifica Feed' : 'Aggiungi Nuovo Feed'}
+                </CardTitle>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={closeModal}
+                  aria-label="Chiudi"
+                >
+                  &times;
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Nome *</label>
+                <Input
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   placeholder="Es: Governo Italiano"
                 />
               </div>
 
-              <div className="form-group">
-                <label>Descrizione</label>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Descrizione</label>
                 <textarea
+                  className="flex min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   value={formData.description}
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
@@ -274,9 +469,9 @@ export default function Sources() {
                 />
               </div>
 
-              <div className="form-group">
-                <label>URL Feed *</label>
-                <input
+              <div className="space-y-2">
+                <label className="text-sm font-medium">URL Feed *</label>
+                <Input
                   type="url"
                   value={formData.feed_url}
                   onChange={(e) =>
@@ -286,9 +481,10 @@ export default function Sources() {
                 />
               </div>
 
-              <div className="form-group">
-                <label>Tipo *</label>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Tipo *</label>
                 <select
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                   value={formData.source_type}
                   onChange={(e) =>
                     setFormData({ ...formData, source_type: e.target.value })
@@ -301,10 +497,9 @@ export default function Sources() {
                 </select>
               </div>
 
-              <div className="form-group">
-                <label>Categoria</label>
-                <input
-                  type="text"
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Categoria</label>
+                <Input
                   value={formData.category}
                   onChange={(e) =>
                     setFormData({ ...formData, category: e.target.value })
@@ -313,15 +508,17 @@ export default function Sources() {
                 />
               </div>
 
-              <div className="form-group">
-                <label>Frequenza Aggiornamento (minuti) *</label>
-                <input
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Frequenza Aggiornamento (minuti) *
+                </label>
+                <Input
                   type="number"
                   value={formData.update_frequency_minutes}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      update_frequency_minutes: parseInt(e.target.value),
+                      update_frequency_minutes: parseInt(e.target.value) || 60,
                     })
                   }
                   min="1"
@@ -329,29 +526,34 @@ export default function Sources() {
               </div>
 
               {editMode && (
-                <div className="form-group">
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={formData.is_active}
-                      onChange={(e) =>
-                        setFormData({ ...formData, is_active: e.target.checked })
-                      }
-                    />
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="is-active"
+                    checked={formData.is_active}
+                    onChange={(e) =>
+                      setFormData({ ...formData, is_active: e.target.checked })
+                    }
+                    className="h-4 w-4 rounded border-input"
+                  />
+                  <label htmlFor="is-active" className="text-sm font-medium">
                     Feed Attivo
                   </label>
                 </div>
               )}
-            </div>
-            <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={closeModal}>
-                Annulla
-              </button>
-              <button className="btn btn-primary" onClick={saveSource}>
-                {editMode ? 'Aggiorna' : 'Aggiungi'}
-              </button>
-            </div>
-          </div>
+
+              <Separator />
+
+              <div className="flex justify-end gap-3">
+                <Button variant="outline" onClick={closeModal}>
+                  Annulla
+                </Button>
+                <Button onClick={saveSource}>
+                  {editMode ? 'Aggiorna' : 'Aggiungi'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>

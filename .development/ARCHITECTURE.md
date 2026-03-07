@@ -41,7 +41,9 @@ For detailed documentation, see `docs/architecture.md`.
 ### backend/src/infrastructure
 - `ai_service.py` — Service for interacting with Ollama API.
 - `cache.py` — Redis caching layer with graceful fallback.
+- `content_scraper.py` — Service for fetching and extracting article content from URLs.
 - `database.py` — Database configuration and session management.
+- `feed_discovery.py` — A discovered feed with metadata.
 - `feed_parser.py` — Service for parsing RSS/Atom feeds.
 - `models.py` — Source model for database.
 - `resilience.py` — Raised when a call is attempted on an open circuit breaker.

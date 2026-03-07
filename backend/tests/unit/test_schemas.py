@@ -81,6 +81,7 @@ class TestNewsItemResponse:
         data = {
             "id": 1,
             "source_id": 1,
+            "external_id": "https://example.com/article/1",
             "title": "Test News",
             "content": "Some content",
             "summary": None,

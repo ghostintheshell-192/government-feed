@@ -1,31 +1,34 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
-import Home from './pages/Home'
+import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom'
+import { ThemeToggle } from './components/theme-toggle'
 import Sources from './pages/Sources'
 import Feed from './pages/Feed'
+import NewsDetail from './pages/NewsDetail'
 import Settings from './pages/Settings'
-import './App.css'
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="app">
-        <nav className="navbar">
-          <div className="nav-brand">
-            <Link to="/">Government Feed</Link>
-          </div>
-          <div className="nav-links">
-            <Link to="/">Home</Link>
-            <Link to="/sources">Gestione Sources</Link>
-            <Link to="/feed">Feed Reader</Link>
-            <Link to="/settings">Impostazioni</Link>
+      <div className="flex min-h-screen flex-col">
+        <nav className="border-b bg-background px-4 py-3 shadow-sm md:px-6 md:py-4">
+          <div className="flex items-center justify-between">
+            <Link to="/" className="text-lg font-bold text-primary no-underline md:text-xl">
+              Government Feed
+            </Link>
+            <div className="flex items-center gap-3 md:gap-6">
+              <Link to="/" className="text-sm font-medium text-muted-foreground no-underline transition-colors hover:text-primary md:text-base">Dashboard</Link>
+              <Link to="/sources" className="text-sm font-medium text-muted-foreground no-underline transition-colors hover:text-primary md:text-base">Sources</Link>
+              <Link to="/settings" className="text-sm font-medium text-muted-foreground no-underline transition-colors hover:text-primary md:text-base">Impostazioni</Link>
+              <ThemeToggle />
+            </div>
           </div>
         </nav>
 
-        <main className="main">
+        <main className="flex-1 bg-muted/30">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Feed />} />
+            <Route path="/feed" element={<Navigate to="/" replace />} />
+            <Route path="/news/:id" element={<NewsDetail />} />
             <Route path="/sources" element={<Sources />} />
-            <Route path="/feed" element={<Feed />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </main>

@@ -1,6 +1,7 @@
 """FastAPI main application."""
 
 import json
+from datetime import datetime
 
 from backend.src.api import schemas
 from backend.src.api.dependencies import get_unit_of_work
@@ -10,7 +11,7 @@ from backend.src.infrastructure.models import Source
 from backend.src.infrastructure.scheduler import FeedScheduler
 from backend.src.infrastructure.settings_store import load_settings
 from backend.src.infrastructure.unit_of_work import UnitOfWork
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from shared.logging import get_logger
@@ -174,6 +175,31 @@ async def delete_source(source_id: int, uow: UnitOfWork = Depends(get_unit_of_wo
     return None
 
 
+@app.post("/api/sources/discover", response_model=schemas.FeedDiscoveryResponse)
+async def discover_feeds(request: schemas.FeedDiscoveryRequest):
+    """Discover RSS/Atom feeds from a URL or search query."""
+    from backend.src.infrastructure.feed_discovery import FeedDiscoveryService
+
+    logger.info("Feed discovery requested for: %s", request.query)
+    service = FeedDiscoveryService()
+    feeds, searched_sites = await service.discover(request.query)
+
+    logger.info("Feed discovery found %d feeds from %d sites", len(feeds), len(searched_sites))
+    return schemas.FeedDiscoveryResponse(
+        feeds=[
+            schemas.DiscoveredFeedResponse(
+                url=f.url,
+                title=f.title,
+                feed_type=f.feed_type,
+                site_url=f.site_url,
+                entry_count=f.entry_count,
+            )
+            for f in feeds
+        ],
+        searched_sites=searched_sites,
+    )
+
+
 @app.post("/api/sources/{source_id}/process")
 async def process_feed(source_id: int, uow: UnitOfWork = Depends(get_unit_of_work)):
     """Process feed and import news."""
@@ -193,7 +219,7 @@ async def process_feed(source_id: int, uow: UnitOfWork = Depends(get_unit_of_wor
         logger.info(f"Feed processed successfully: {imported_count} news items imported from {source.name}")
 
         if _cache:
-            _cache.delete("news:recent:*")
+            _cache.delete("news:*")
 
         return {
             "success": True,
@@ -207,21 +233,45 @@ async def process_feed(source_id: int, uow: UnitOfWork = Depends(get_unit_of_wor
 # ==================== NEWS ENDPOINTS ====================
 
 
-@app.get("/api/news", response_model=list[schemas.NewsItemResponse])
-async def get_news(limit: int = 50, uow: UnitOfWork = Depends(get_unit_of_work)):
-    """Get recent news items."""
-    cache_key = f"news:recent:{limit}"
+@app.get("/api/news", response_model=schemas.PaginatedNewsResponse)
+async def get_news(
+    limit: int = 20,
+    offset: int = 0,
+    source_id: list[int] | None = Query(None),
+    search: str | None = None,
+    date_from: datetime | None = None,
+    date_to: datetime | None = None,
+    uow: UnitOfWork = Depends(get_unit_of_work),
+):
+    """Get recent news items with pagination and filters."""
+    cache_key = f"news:{limit}:{offset}:{source_id}:{search}:{date_from}:{date_to}"
 
     if _cache:
         cached = _cache.get(cache_key)
         if cached:
             return JSONResponse(content=json.loads(cached))
 
-    news = uow.news_repository.get_recent(limit)
-    result = [schemas.NewsItemResponse.model_validate(n).model_dump(mode="json") for n in news]
+    items, total = uow.news_repository.get_recent(
+        limit=limit,
+        offset=offset,
+        source_ids=source_id,
+        search=search,
+        date_from=date_from,
+        date_to=date_to,
+    )
+
+    result = schemas.PaginatedNewsResponse(
+        items=[schemas.NewsItemResponse.model_validate(n) for n in items],
+        pagination=schemas.PaginationMeta(
+            total=total,
+            limit=limit,
+            offset=offset,
+            has_more=(offset + limit) < total,
+        ),
+    )
 
     if _cache:
-        _cache.set(cache_key, json.dumps(result), ttl=300)
+        _cache.set(cache_key, result.model_dump_json(), ttl=300)
 
     return result
 
@@ -244,6 +294,40 @@ async def get_news_item(news_id: int, uow: UnitOfWork = Depends(get_unit_of_work
         _cache.set(f"news:{news_id}", json.dumps(result), ttl=300)
 
     return news
+
+
+@app.post("/api/news/{news_id}/fetch-content")
+async def fetch_news_content(news_id: int, uow: UnitOfWork = Depends(get_unit_of_work)):
+    """Fetch full article content from source URL."""
+    from backend.src.infrastructure.content_scraper import ContentScraper
+
+    news = uow.news_repository.get_by_id(news_id)
+    if not news:
+        raise HTTPException(status_code=404, detail="News item not found")
+
+    if not news.external_id:
+        raise HTTPException(status_code=400, detail="Nessun URL disponibile per questo articolo")
+
+    # If we already have substantial content, return it without re-scraping
+    if news.content and len(news.content) > 500:
+        return {"success": True, "content": news.content}
+
+    scraper = ContentScraper()
+    content = await scraper.fetch_article_content(news.external_id)
+
+    if not content or content.startswith("Impossibile") or content.startswith("Servizio"):
+        return {"success": False, "message": content or "Impossibile recuperare il contenuto"}
+
+    # Save scraped content to database
+    news.content = content
+    uow.news_repository.update(news)
+    uow.commit()
+
+    if _cache:
+        _cache.delete(f"news:{news_id}")
+        _cache.delete("news:*")
+
+    return {"success": True, "content": content}
 
 
 # ==================== SETTINGS ENDPOINTS ====================
