@@ -123,9 +123,9 @@ class TestNewsItem:
             item.mark_as_verified("")
 
     def test_mark_as_verified_updates_timestamp(self):
-        from datetime import datetime
+        from datetime import UTC, datetime
 
-        old_time = datetime(2020, 1, 1)
+        old_time = datetime(2020, 1, 1, tzinfo=UTC)
         item = NewsItem(updated_at=old_time)
         item.mark_as_verified("cert")
         assert item.updated_at > old_time

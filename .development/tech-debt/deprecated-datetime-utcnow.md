@@ -1,7 +1,7 @@
 ---
 type: code-quality
 priority: high
-status: open
+status: resolved
 discovered: 2026-03-07
 related: []
 related_decision: null

@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class SourceBase(BaseModel):
@@ -31,18 +31,19 @@ class SourceUpdate(SourceBase):
 class SourceResponse(SourceBase):
     """Schema for Source response."""
 
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     is_active: bool
     last_fetched: datetime | None
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
-
 
 class NewsItemResponse(BaseModel):
     """Schema for NewsItem response."""
+
+    model_config = ConfigDict(from_attributes=True)
 
     id: int
     source_id: int
@@ -54,9 +55,6 @@ class NewsItemResponse(BaseModel):
     fetched_at: datetime
     relevance_score: float | None
     verification_status: str
-
-    class Config:
-        from_attributes = True
 
 
 class PaginationMeta(BaseModel):

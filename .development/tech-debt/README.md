@@ -52,19 +52,19 @@ report: null  # Optional: link to archive/analysis/YYYY-MM-DD_report_agent-name.
 
 *Updated: 2026-03-07*
 
-**High Priority:**
-- `deprecated-datetime-utcnow.md` — 77 deprecation warnings from `datetime.utcnow()`
+**Resolved:**
+- ~~`deprecated-datetime-utcnow.md`~~ — Fixed: replaced with `datetime.now(UTC)`
+- ~~`deprecated-fastapi-pydantic-apis.md`~~ — Fixed: lifespan, ConfigDict, DeclarativeBase
 
 **Medium Priority:**
 - `feedparser-bypasses-uow.md` — FeedParserService bypasses Unit of Work pattern
-- `deprecated-fastapi-pydantic-apis.md` — Deprecated FastAPI, Pydantic, SQLAlchemy APIs
 - `missing-foreign-key-constraint.md` — No FK from news_items to sources
 - `newscard-summary-hidden-on-expand.md` — AI summary hidden when article content is expanded
 
 **Low Priority:**
 - `pre-commit-grep-regex.md` — grep doesn't support `\s+` regex in pre-commit hook
 - `duplicated-html-stripping.md` — Same HTML stripping logic in 3 services
-- `global-mutable-state-main.md` — Module-level mutable state in main.py
+- `global-mutable-state-main.md` — Partially resolved (lifespan pattern adopted, globals remain)
 
 ## Integration with Reference Documentation
 
