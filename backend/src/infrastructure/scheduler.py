@@ -1,6 +1,6 @@
 """Background job scheduler for feed processing."""
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 import httpx
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -77,7 +77,7 @@ class FeedScheduler:
             sources = db.query(Source).filter(Source.is_active == True).all()  # noqa: E712
             for source in sources:
                 if source.last_fetched is not None:
-                    elapsed = (datetime.utcnow() - source.last_fetched).total_seconds() / 60
+                    elapsed = (datetime.now(UTC) - source.last_fetched).total_seconds() / 60
                     if elapsed < source.update_frequency_minutes:
                         continue
                 parser = FeedParserService(db)
@@ -96,7 +96,7 @@ class FeedScheduler:
         try:
             settings = load_settings()
             retention_days = settings.get("news_retention_days", 30)
-            cutoff = datetime.utcnow() - timedelta(days=retention_days)
+            cutoff = datetime.now(UTC) - timedelta(days=retention_days)
             deleted = db.query(NewsItem).filter(NewsItem.fetched_at < cutoff).delete()
             db.commit()
             self._logger.info("Cleaned up %d old news items", deleted)

@@ -1,6 +1,6 @@
 """Unit tests for FeedScheduler."""
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -106,7 +106,7 @@ class TestPollAllFeeds:
 
         source = MagicMock()
         source.name = "Due Feed"
-        source.last_fetched = datetime.utcnow() - timedelta(minutes=120)
+        source.last_fetched = datetime.now(UTC) - timedelta(minutes=120)
         source.update_frequency_minutes = 60
 
         mock_db.query.return_value.filter.return_value.all.return_value = [source]
@@ -132,7 +132,7 @@ class TestPollAllFeeds:
 
         source = MagicMock()
         source.name = "Recent Feed"
-        source.last_fetched = datetime.utcnow() - timedelta(minutes=5)
+        source.last_fetched = datetime.now(UTC) - timedelta(minutes=5)
         source.update_frequency_minutes = 60
 
         mock_db.query.return_value.filter.return_value.all.return_value = [source]
@@ -160,7 +160,7 @@ class TestPollAllFeeds:
 
         source_recent = MagicMock()
         source_recent.name = "Recent"
-        source_recent.last_fetched = datetime.utcnow() - timedelta(minutes=5)
+        source_recent.last_fetched = datetime.now(UTC) - timedelta(minutes=5)
         source_recent.update_frequency_minutes = 60
 
         mock_db.query.return_value.filter.return_value.all.return_value = [

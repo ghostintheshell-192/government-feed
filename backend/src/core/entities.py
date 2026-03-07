@@ -1,7 +1,7 @@
 """Domain entities for Government Feed."""
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from hashlib import sha256
 
@@ -25,8 +25,8 @@ class Source:
     is_active: bool = True
     country: str = "IT"
     category: str = "government"
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    updated_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 @dataclass
@@ -49,14 +49,14 @@ class NewsItem:
     title: str = ""
     content: str | None = None
     summary: str | None = None
-    published_at: datetime = field(default_factory=datetime.utcnow)
-    fetched_at: datetime = field(default_factory=datetime.utcnow)
+    published_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    fetched_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     content_hash: str = ""
     relevance_score: float | None = None
     verification_status: VerificationStatus = VerificationStatus.PENDING
     blockchain_certificate: str | None = None
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    updated_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     # Relations (loaded separately)
     source: Source | None = None
@@ -73,4 +73,4 @@ class NewsItem:
             raise ValueError("Certificate cannot be empty")
         self.blockchain_certificate = certificate
         self.verification_status = VerificationStatus.VERIFIED
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)

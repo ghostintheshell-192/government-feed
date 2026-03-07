@@ -1,6 +1,8 @@
 """FastAPI main application."""
 
 import json
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from datetime import datetime
 
 from backend.src.api import schemas
@@ -20,25 +22,10 @@ logger = get_logger(__name__)
 _scheduler: FeedScheduler | None = None
 _cache: RedisCache | None = None
 
-app = FastAPI(
-    title="Government Feed API",
-    description="Aggregator for institutional news and government communications",
-    version="0.1.0",
-)
 
-# CORS for development
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Initialize database, cache, and scheduler on startup."""
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    """Initialize and cleanup application resources."""
     global _scheduler, _cache
     logger.info("Starting Government Feed API")
     init_db()
@@ -58,15 +45,29 @@ async def startup_event():
         _scheduler.start()
         logger.info("Background scheduler started")
 
+    yield
 
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Shutdown scheduler gracefully."""
-    global _scheduler
     if _scheduler is not None:
         _scheduler.shutdown()
         _scheduler = None
         logger.info("Background scheduler stopped")
+
+
+app = FastAPI(
+    title="Government Feed API",
+    description="Aggregator for institutional news and government communications",
+    version="0.1.0",
+    lifespan=lifespan,
+)
+
+# CORS for development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")

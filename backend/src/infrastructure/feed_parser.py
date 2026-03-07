@@ -1,6 +1,6 @@
 """Feed parsing service for RSS/Atom feeds."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 from hashlib import sha256
 
 import feedparser
@@ -80,7 +80,7 @@ class FeedParserService:
                     content=content,
                     summary=summary if summary else None,
                     published_at=published_at,
-                    fetched_at=datetime.utcnow(),
+                    fetched_at=datetime.now(UTC),
                     content_hash=content_hash,
                     verification_status="pending",
                 )
@@ -89,7 +89,7 @@ class FeedParserService:
                 imported_count += 1
 
             # Update source last_fetched
-            source.last_fetched = datetime.utcnow()
+            source.last_fetched = datetime.now(UTC)
 
             self.db.commit()
             logger.info("Imported %d news items from %s", imported_count, source.name)
@@ -145,7 +145,7 @@ class FeedParserService:
             return datetime(*entry.published_parsed[:6])  # type: ignore[union-attr]
         if hasattr(entry, "updated_parsed") and entry.updated_parsed:  # type: ignore[union-attr]
             return datetime(*entry.updated_parsed[:6])  # type: ignore[union-attr]
-        return datetime.utcnow()
+        return datetime.now(UTC)
 
     def _create_hash(self, title: str, content: str, source_id: int, published_at: datetime) -> str:
         """Create content hash for deduplication."""

@@ -1,6 +1,6 @@
 """Unit tests for FeedParserService."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 from time import struct_time
 from unittest.mock import MagicMock, patch
 
@@ -92,7 +92,7 @@ class TestParseDate:
         entry = type("Entry", (), {})()
         result = parser._parse_date(entry)
         # Should be close to now
-        assert (datetime.utcnow() - result).total_seconds() < 5
+        assert (datetime.now(UTC) - result).total_seconds() < 5
 
 
 class TestParseAndImport:
