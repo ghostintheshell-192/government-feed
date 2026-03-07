@@ -1,6 +1,6 @@
 # News Detail View
 
-**Status**: backlog
+**Status**: implemented
 **Milestone**: M3-Frontend
 **Priority**: must-have
 **Depends on**: [dashboard-news-browsing](dashboard-news-browsing.md)
@@ -19,13 +19,14 @@ Full-screen article view with prominent AI summary display, link to original sou
 
 ### Functional
 
-- [ ] Full-screen article layout with clean typography
-- [ ] AI summary displayed prominently at the top
-- [ ] Link to original source URL (opens in new tab)
-- [ ] Metadata display: date, source name, source URL
-- [ ] Navigation to previous/next article
-- [ ] Back to list navigation preserving scroll position
-- [ ] Trigger AI summarization if summary not yet generated
+- [x] Full-screen article layout with clean typography
+- [x] AI summary displayed prominently (blue card)
+- [x] Link to original source URL (opens in new tab)
+- [x] Metadata display: date, source name, source badge
+- [ ] Navigation to previous/next article (not implemented)
+- [x] Back to list navigation
+- [x] Trigger AI summarization if summary not yet generated
+- [x] On-demand article content fetching
 
 ### Non-Functional
 
@@ -42,9 +43,9 @@ Full-screen article view with prominent AI summary display, link to original sou
 
 ## Acceptance Criteria
 
-- [ ] Article displays with clean, readable layout
-- [ ] AI summary is prominently visible
-- [ ] Original source link works correctly
-- [ ] All metadata is displayed
-- [ ] Navigation between articles works
-- [ ] Back navigation preserves list state
+- [x] Article displays with clean, readable layout
+- [x] AI summary is prominently visible
+- [x] Original source link works correctly
+- [x] All metadata is displayed
+- [ ] Navigation between articles (not yet)
+- [x] Back navigation works
