@@ -12,6 +12,9 @@ interface SettingsData {
   ollama_endpoint: string
   ollama_model: string
   ai_enabled: boolean
+  summary_max_words: number
+  scheduler_enabled: boolean
+  news_retention_days: number
 }
 
 type Theme = 'light' | 'dark' | 'system'
@@ -24,6 +27,9 @@ export default function Settings() {
     ollama_endpoint: 'http://localhost:11434',
     ollama_model: 'deepseek-r1:7b',
     ai_enabled: true,
+    summary_max_words: 200,
+    scheduler_enabled: true,
+    news_retention_days: 30,
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -186,6 +192,94 @@ export default function Settings() {
                 <p className="text-sm text-muted-foreground">
                   Nome del modello Ollama installato. Esempi: deepseek-r1:7b,
                   llama3.2, mistral
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Lunghezza massima riassunto (parole)
+                </label>
+                <Input
+                  type="number"
+                  min={50}
+                  max={1000}
+                  value={settings.summary_max_words}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      summary_max_words: Number(e.target.value) || 200,
+                    })
+                  }
+                />
+                <p className="text-sm text-muted-foreground">
+                  Numero massimo di parole per i riassunti generati. Predefinito: 200
+                </p>
+              </div>
+
+              <Button onClick={saveSettings} disabled={saving}>
+                {saving ? 'Salvataggio...' : 'Salva Impostazioni'}
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Feed & Scheduler */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Feed e Aggiornamenti</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <div className="space-y-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ) : error ? null : (
+            <div className="space-y-5">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="scheduler-enabled"
+                  checked={settings.scheduler_enabled}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      scheduler_enabled: e.target.checked,
+                    })
+                  }
+                  className="h-4 w-4 rounded border-input"
+                />
+                <label htmlFor="scheduler-enabled" className="text-sm font-medium">
+                  Aggiornamento automatico dei feed
+                </label>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Quando attivo, i feed vengono aggiornati automaticamente ogni 15
+                minuti.
+              </p>
+
+              <Separator />
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  Conservazione notizie (giorni)
+                </label>
+                <Input
+                  type="number"
+                  min={7}
+                  max={365}
+                  value={settings.news_retention_days}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      news_retention_days: Number(e.target.value) || 30,
+                    })
+                  }
+                />
+                <p className="text-sm text-muted-foreground">
+                  Le notizie più vecchie di questo periodo vengono rimosse
+                  automaticamente. Predefinito: 30 giorni
                 </p>
               </div>
 
