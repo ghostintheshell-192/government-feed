@@ -1,7 +1,7 @@
 # Architecture Reference
 
 Quick reference for navigating the Government Feed codebase.
-For detailed documentation, see `docs/architecture.md`.
+For detailed documentation, see `docs/`.
 
 ## Layer Overview
 

@@ -54,9 +54,9 @@ See `tech-debt/` for tracked issues. Key items:
 
 | Issue | Priority | File |
 |-------|----------|------|
-| `datetime.utcnow()` deprecation (77 warnings) | High | `deprecated-datetime-utcnow.md` |
+| ~~`datetime.utcnow()` deprecation~~ | ~~High~~ | ~~`deprecated-datetime-utcnow.md`~~ (resolved) |
 | FeedParserService bypasses UnitOfWork | Medium | `feedparser-bypasses-uow.md` |
-| Deprecated FastAPI/Pydantic/SQLAlchemy APIs | Medium | `deprecated-fastapi-pydantic-apis.md` |
+| ~~Deprecated FastAPI/Pydantic/SQLAlchemy APIs~~ | ~~Medium~~ | ~~`deprecated-fastapi-pydantic-apis.md`~~ (resolved) |
 | Missing FK constraint news_items → sources | Medium | `missing-foreign-key-constraint.md` |
 | NewsCard summary hidden on expand | Medium | `newscard-summary-hidden-on-expand.md` |
 | Pre-commit grep regex | Low | `pre-commit-grep-regex.md` |
