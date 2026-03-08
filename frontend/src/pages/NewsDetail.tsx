@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { ArrowLeft } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -20,7 +20,6 @@ import { useReadStatus } from '@/lib/use-read-status'
 
 export default function NewsDetail() {
   const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
   const newsId = Number(id)
   const { markAsRead } = useReadStatus()
   const queryClient = useQueryClient()
@@ -112,12 +111,8 @@ export default function NewsDetail() {
   if (error || !item) {
     return (
       <div className="mx-auto max-w-4xl px-4 py-6 md:px-6">
-        <Button variant="ghost" onClick={() => navigate('/')}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Torna alla dashboard
-        </Button>
         <div className="py-16 text-center">
-          <h2 className="text-xl font-semibold text-muted-foreground">
+          <h2 className="font-serif text-xl font-semibold text-muted-foreground">
             Articolo non trovato
           </h2>
           <p className="mt-2 text-muted-foreground">
@@ -132,17 +127,8 @@ export default function NewsDetail() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-6 md:px-6">
-      <Button
-        variant="ghost"
-        className="mb-6"
-        onClick={() => navigate('/')}
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Torna alla dashboard
-      </Button>
-
       <article>
-        <h1 className="text-3xl font-bold leading-tight">{item.title}</h1>
+        <h1 className="font-serif text-3xl font-bold leading-tight">{item.title}</h1>
 
         <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
           {sourceName && <Badge variant="secondary">{sourceName}</Badge>}

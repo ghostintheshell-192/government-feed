@@ -1,38 +1,131 @@
-import { BrowserRouter, Routes, Route, Link, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Link, Navigate, useLocation, useParams } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { ChevronRight } from 'lucide-react'
 import { ThemeToggle } from './components/theme-toggle'
+import { fetchNewsById } from './lib/api'
 import Sources from './pages/Sources'
 import Feed from './pages/Feed'
 import NewsDetail from './pages/NewsDetail'
 import Settings from './pages/Settings'
 
+function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
+  const { pathname } = useLocation()
+  const isActive = to === '/' ? pathname === '/' : pathname.startsWith(to)
+
+  return (
+    <Link
+      to={to}
+      className={`text-sm font-medium no-underline transition-colors md:text-base ${
+        isActive
+          ? 'text-primary'
+          : 'text-muted-foreground hover:text-primary'
+      }`}
+    >
+      {children}
+    </Link>
+  )
+}
+
+function ArticleCrumb() {
+  const { id } = useParams<{ id: string }>()
+  const { data: item } = useQuery({
+    queryKey: ['news-detail', Number(id)],
+    queryFn: () => fetchNewsById(Number(id)),
+    enabled: !!id,
+  })
+
+  if (!item) return null
+
+  const truncated =
+    item.title.length > 60 ? item.title.slice(0, 60) + '…' : item.title
+
+  return (
+    <>
+      <ChevronRight className="h-3 w-3 shrink-0" />
+      <span className="truncate">{truncated}</span>
+    </>
+  )
+}
+
+function Breadcrumb() {
+  const { pathname } = useLocation()
+
+  const segments: { label: string; to?: string }[] = []
+
+  if (pathname === '/') {
+    segments.push({ label: 'Dashboard' })
+  } else if (pathname.startsWith('/news/')) {
+    segments.push({ label: 'Dashboard', to: '/' })
+  } else if (pathname === '/sources') {
+    segments.push({ label: 'Sources' })
+  } else if (pathname === '/settings') {
+    segments.push({ label: 'Impostazioni' })
+  }
+
+  return (
+    <div className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur-sm">
+      <div className="mx-auto flex max-w-5xl items-center gap-1.5 px-4 py-2 text-xs text-muted-foreground md:px-6">
+        {segments.map((seg, i) => (
+          <span key={i} className="flex items-center gap-1.5">
+            {i > 0 && <ChevronRight className="h-3 w-3 shrink-0" />}
+            {seg.to ? (
+              <Link
+                to={seg.to}
+                className="no-underline transition-colors hover:text-primary"
+              >
+                {seg.label}
+              </Link>
+            ) : (
+              <span>{seg.label}</span>
+            )}
+          </span>
+        ))}
+        {pathname.startsWith('/news/') && (
+          <Routes>
+            <Route path="/news/:id" element={<ArticleCrumb />} />
+          </Routes>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function AppLayout() {
+  return (
+    <div className="flex min-h-screen flex-col">
+      <nav className="border-b bg-background px-4 py-3 shadow-sm md:px-6 md:py-4">
+        <div className="flex items-center justify-between">
+          <Link to="/" className="font-serif text-xl font-bold tracking-tight text-primary no-underline md:text-2xl">
+            Government Feed
+          </Link>
+          <div className="flex items-center gap-3 md:gap-6">
+            <NavLink to="/">Dashboard</NavLink>
+            <NavLink to="/sources">Sources</NavLink>
+            <NavLink to="/settings">Impostazioni</NavLink>
+            <ThemeToggle />
+          </div>
+        </div>
+      </nav>
+
+      <Breadcrumb />
+
+      <main className="flex-1 bg-muted/30">
+        <Routes>
+          <Route path="/" element={<Feed />} />
+          <Route path="/feed" element={<Navigate to="/" replace />} />
+          <Route path="/news/:id" element={<NewsDetail />} />
+          <Route path="/sources" element={<Sources />} />
+          <Route path="/settings" element={<Settings />} />
+        </Routes>
+      </main>
+    </div>
+  )
+}
+
 function App() {
   return (
     <BrowserRouter>
-      <div className="flex min-h-screen flex-col">
-        <nav className="border-b bg-background px-4 py-3 shadow-sm md:px-6 md:py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="text-lg font-bold text-primary no-underline md:text-xl">
-              Government Feed
-            </Link>
-            <div className="flex items-center gap-3 md:gap-6">
-              <Link to="/" className="text-sm font-medium text-muted-foreground no-underline transition-colors hover:text-primary md:text-base">Dashboard</Link>
-              <Link to="/sources" className="text-sm font-medium text-muted-foreground no-underline transition-colors hover:text-primary md:text-base">Sources</Link>
-              <Link to="/settings" className="text-sm font-medium text-muted-foreground no-underline transition-colors hover:text-primary md:text-base">Impostazioni</Link>
-              <ThemeToggle />
-            </div>
-          </div>
-        </nav>
-
-        <main className="flex-1 bg-muted/30">
-          <Routes>
-            <Route path="/" element={<Feed />} />
-            <Route path="/feed" element={<Navigate to="/" replace />} />
-            <Route path="/news/:id" element={<NewsDetail />} />
-            <Route path="/sources" element={<Sources />} />
-            <Route path="/settings" element={<Settings />} />
-          </Routes>
-        </main>
-      </div>
+      <AppLayout />
     </BrowserRouter>
   )
 }

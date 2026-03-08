@@ -215,7 +215,7 @@ export default function Sources() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 md:px-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Gestione Sources</h1>
+        <h1 className="font-serif text-3xl font-bold">Gestione Sources</h1>
         <p className="mt-1 text-muted-foreground">
           Configura e gestisci i feed istituzionali
         </p>
