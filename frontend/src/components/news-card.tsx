@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { ArticleContent } from '@/components/article-content'
 import { summarizeNews } from '@/lib/api'
 import { highlightMatches } from '@/lib/highlight'
 import { extractSnippet } from '@/lib/search-snippet'
@@ -61,10 +62,10 @@ export function NewsCard({
   const contentSnippet = plainContent
     ? extractSnippet(plainContent, searchTerm)
     : null
-  const preview =
-    searchTerm && contentSnippet
-      ? contentSnippet
-      : item.summary || contentSnippet
+  // When searching, show a text snippet centered on the match (with highlight)
+  const searchPreview = searchTerm && contentSnippet ? contentSnippet : null
+  // Otherwise, prefer summary then full content for structured rendering
+  const richPreview = item.summary || item.content || null
 
   return (
     <Card
@@ -99,11 +100,15 @@ export function NewsCard({
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        {preview && (
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            {highlightMatches(preview, searchTerm)}
+        {searchPreview ? (
+          <p className="text-justify text-sm leading-relaxed text-muted-foreground">
+            {highlightMatches(searchPreview, searchTerm)}
           </p>
-        )}
+        ) : richPreview ? (
+          <div className="line-clamp-5 text-sm text-muted-foreground [&_.prose_*]:!text-muted-foreground">
+            <ArticleContent content={richPreview} className="prose-sm prose-p:my-1" />
+          </div>
+        ) : null}
 
         <div className="mt-3 flex flex-wrap gap-2">
           <Button variant="outline" size="sm" asChild>
