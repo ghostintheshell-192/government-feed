@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { NewsFilters, Source } from '@/lib/types'
@@ -7,7 +7,7 @@ interface FilterBarProps {
   filters: NewsFilters
   sources: Source[]
   recentSearches: string[]
-  onChange: (filters: NewsFilters) => void
+  onChange: React.Dispatch<React.SetStateAction<NewsFilters>>
   onSaveSearch: () => void
 }
 
@@ -26,7 +26,7 @@ export function FilterBar({
     key: K,
     value: NewsFilters[K],
   ) => {
-    onChange({ ...filters, [key]: value })
+    onChange((prev) => ({ ...prev, [key]: value }))
   }
 
   const clearFilters = () => {
@@ -40,7 +40,7 @@ export function FilterBar({
     (filters.source_id && filters.source_id.length > 0)
 
   const applyRecentSearch = (query: string) => {
-    onChange({ ...filters, search: query })
+    onChange((prev) => ({ ...prev, search: query }))
     setShowRecent(false)
   }
 

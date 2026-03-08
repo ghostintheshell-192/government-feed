@@ -206,6 +206,7 @@ export default function Feed() {
                 sourceName={sourceMap.get(item.source_id)}
                 isRead={isRead(item.id)}
                 aiEnabled={features?.ai_enabled ?? false}
+                searchTerm={debouncedFilters.search}
                 onRead={markAsRead}
                 onSummaryUpdate={handleSummaryUpdate}
                 onContentUpdate={handleContentUpdate}

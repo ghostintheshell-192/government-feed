@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { fetchNewsContent, summarizeNews } from '@/lib/api'
+import { highlightMatches } from '@/lib/highlight'
+import { extractSnippet } from '@/lib/search-snippet'
 import type { NewsItem } from '@/lib/types'
 
 interface NewsCardProps {
@@ -12,6 +14,7 @@ interface NewsCardProps {
   sourceName?: string
   isRead: boolean
   aiEnabled: boolean
+  searchTerm?: string
   onRead: (id: number) => void
   onSummaryUpdate: (id: number, summary: string) => void
   onContentUpdate: (id: number, content: string) => void
@@ -22,6 +25,7 @@ export function NewsCard({
   sourceName,
   isRead,
   aiEnabled,
+  searchTerm,
   onRead,
   onSummaryUpdate,
   onContentUpdate,
@@ -77,7 +81,8 @@ export function NewsCard({
   }
 
   const hasFullContent = item.content && item.content.length > 500
-  const preview = item.summary || (item.content ? item.content.slice(0, 200) + (item.content.length > 200 ? '...' : '') : null)
+  const contentSnippet = item.content ? extractSnippet(item.content, searchTerm) : null
+  const preview = searchTerm && contentSnippet ? contentSnippet : (item.summary || contentSnippet)
 
   return (
     <Card
@@ -95,7 +100,7 @@ export function NewsCard({
                 to={`/news/${item.id}`}
                 className="transition-colors hover:text-blue-600 hover:underline"
               >
-                {item.title}
+                {highlightMatches(item.title, searchTerm)}
               </Link>
             </CardTitle>
             <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
@@ -114,7 +119,7 @@ export function NewsCard({
       <CardContent className="pt-0">
         {!expanded && preview && (
           <p className="text-sm leading-relaxed text-muted-foreground">
-            {preview}
+            {highlightMatches(preview, searchTerm)}
           </p>
         )}
 
@@ -122,7 +127,7 @@ export function NewsCard({
           <>
             <Separator className="my-3" />
             <p className="whitespace-pre-line text-sm leading-relaxed">
-              {item.content}
+              {highlightMatches(item.content, searchTerm)}
             </p>
           </>
         )}
