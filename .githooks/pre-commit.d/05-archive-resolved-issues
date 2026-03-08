@@ -1,0 +1,89 @@
+#!/bin/bash
+# Archive Resolved Tech Debt Issues
+# Automatically moves resolved/closed/rejected issues from tech-debt/ to archive/completed/
+# Part of pre-commit hook chain
+#
+# Supports two status formats:
+#   YAML frontmatter:  status: resolved
+#   Markdown bold:     **Status**: Resolved
+
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+TECH_DEBT_DIR="$REPO_ROOT/.development/tech-debt"
+ARCHIVE_DIR="$REPO_ROOT/.development/archive/completed"
+CURRENT_DATE=$(date +%Y-%m-%d)
+
+# Check if tech-debt directory exists
+if [ ! -d "$TECH_DEBT_DIR" ]; then
+    exit 0
+fi
+
+# Get list of staged tech-debt files (only check files being committed)
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=AM | grep "^\.development/tech-debt/.*\.md$" || true)
+
+if [ -z "$STAGED_FILES" ]; then
+    exit 0
+fi
+
+echo -e "${BLUE}[05] Archive Resolved Issues${NC}"
+
+MOVED_COUNT=0
+
+while IFS= read -r file; do
+    FULL_PATH="$REPO_ROOT/$file"
+    FILENAME=$(basename "$file")
+
+    # Skip template and README
+    if [ "$FILENAME" = "_TEMPLATE.md" ] || [ "$FILENAME" = "README.md" ]; then
+        continue
+    fi
+
+    # Extract status — try YAML frontmatter first, then markdown bold format
+    STATUS=""
+
+    # Format 1: YAML frontmatter (status: resolved)
+    STATUS=$(grep -m 1 "^status:" "$FULL_PATH" 2>/dev/null | sed 's/status: *//' | tr -d ' \r\n')
+
+    # Format 2: Markdown bold (**Status**: Resolved)
+    if [ -z "$STATUS" ]; then
+        STATUS=$(grep -m 1 '^\*\*Status\*\*:' "$FULL_PATH" 2>/dev/null | sed 's/\*\*Status\*\*: *//' | tr -d ' \r\n')
+    fi
+
+    # Normalize to lowercase
+    STATUS=$(echo "$STATUS" | tr '[:upper:]' '[:lower:]')
+
+    if [ "$STATUS" = "resolved" ] || [ "$STATUS" = "closed" ] || [ "$STATUS" = "rejected" ]; then
+        # Add date prefix if not already present
+        if [[ ! "$FILENAME" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}_ ]]; then
+            NEW_FILENAME="${CURRENT_DATE}_${FILENAME}"
+        else
+            NEW_FILENAME="$FILENAME"
+        fi
+
+        NEW_PATH="$ARCHIVE_DIR/$NEW_FILENAME"
+
+        # Create archive directory if needed
+        mkdir -p "$ARCHIVE_DIR"
+
+        # Move the file
+        mv "$FULL_PATH" "$NEW_PATH"
+
+        # Update git staging: remove old path, add new path
+        git reset HEAD "$file" 2>/dev/null || true
+        git add "$NEW_PATH"
+
+        MOVED_COUNT=$((MOVED_COUNT + 1))
+        echo -e "  ${BLUE}↪${NC} Archived: $FILENAME → archive/completed/${NEW_FILENAME}"
+    fi
+done <<< "$STAGED_FILES"
+
+if [ $MOVED_COUNT -gt 0 ]; then
+    echo -e "  ${GREEN}✓${NC} Archived $MOVED_COUNT resolved issue(s)"
+else
+    echo -e "  ${GREEN}✓${NC} No resolved issues to archive"
+fi
+
+exit 0
