@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
+import { ArticleContent } from '@/components/article-content'
 import { fetchNewsContent, summarizeNews } from '@/lib/api'
 import { highlightMatches } from '@/lib/highlight'
 import { extractSnippet } from '@/lib/search-snippet'
@@ -126,9 +127,12 @@ export function NewsCard({
         {expanded && item.content && (
           <>
             <Separator className="my-3" />
-            <p className="whitespace-pre-line text-sm leading-relaxed">
-              {highlightMatches(item.content, searchTerm)}
-            </p>
+            <ArticleContent
+              content={item.content}
+              searchTerm={searchTerm}
+              highlighter={highlightMatches}
+              className="text-sm"
+            />
           </>
         )}
 

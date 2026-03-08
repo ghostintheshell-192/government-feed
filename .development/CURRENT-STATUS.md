@@ -1,10 +1,10 @@
 # Government Feed - Current Status
 
-*Last updated: 2026-03-07*
+*Last updated: 2026-03-08*
 
 ## Project Phase
 
-**Current milestone**: M3-Frontend (mostly complete)
+**Current milestone**: M3.1-Admin-API
 **Next milestone**: M4a-Feed-Infrastructure (health monitoring, automated discovery, starter packs, export)
 
 ## Completed
@@ -31,7 +31,7 @@ See: `specs/implemented/` for completed specifications.
 - Database Migrations: Alembic configured (not yet actively used)
 - Error Resilience: Retry decorators (tenacity) + custom circuit breaker pattern
 
-### M3 — Frontend (in progress)
+### M3 — Frontend (complete)
 
 - Dashboard & News Browsing: paginated feed, filters (source, date, keyword), read/unread tracking (localStorage), "Carica altri" pagination
 - News Detail Page: full article view, on-demand content fetching, AI summarization
@@ -40,13 +40,13 @@ See: `specs/implemented/` for completed specifications.
 - Recent & Saved Searches: localStorage-based with debounce
 - Feed Discovery: URL-based feed detection (HTML link tags + common paths + feedparser validation)
 - Sources Management: CRUD UI with modal form, import trigger, toggle active
+- Frontend Tests: 73 Vitest tests
 
 ## Partially Complete / Known Gaps
 
-- **Feed Discovery text search**: DuckDuckGo integration not returning results — URL discovery works, text search blocked
+- **Feed Discovery text search**: DuckDuckGo integration not returning results — URL discovery works, text search blocked (moved to M4a)
 - **Database migrations**: Alembic configured but never used — no FK constraints enforced
-- **Frontend tests**: 0 test coverage on frontend
-- **Accessibility**: No aria labels, no keyboard navigation on modals, no error boundaries
+- **Accessibility**: Moved to M5 (not needed for single-user)
 
 ## Tech Debt
 

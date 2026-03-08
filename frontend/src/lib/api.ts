@@ -99,8 +99,12 @@ export async function discoverFeeds(
 
 export async function fetchNewsContent(
   id: number,
+  force: boolean = false,
 ): Promise<{ success: boolean; content?: string; message?: string }> {
-  const res = await fetch(`/api/news/${id}/fetch-content`, { method: 'POST' })
+  const params = force ? '?force=true' : ''
+  const res = await fetch(`/api/news/${id}/fetch-content${params}`, {
+    method: 'POST',
+  })
   if (!res.ok) {
     throw new Error(`Failed to fetch content: ${res.status}`)
   }

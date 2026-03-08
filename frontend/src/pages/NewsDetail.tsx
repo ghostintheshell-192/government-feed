@@ -15,6 +15,7 @@ import {
   summarizeNews,
 } from '@/lib/api'
 import type { NewsItem } from '@/lib/types'
+import { ArticleContent } from '@/components/article-content'
 import { useReadStatus } from '@/lib/use-read-status'
 
 export default function NewsDetail() {
@@ -63,11 +64,11 @@ export default function NewsDetail() {
     queryClient.invalidateQueries({ queryKey: ['news'] })
   }
 
-  const handleFetchContent = async () => {
+  const handleFetchContent = async (force: boolean = false) => {
     if (!item) return
     setFetchingContent(true)
     try {
-      const data = await fetchNewsContent(item.id)
+      const data = await fetchNewsContent(item.id, force)
       if (data.success && data.content) {
         updateItem({ content: data.content })
       } else {
@@ -158,12 +159,14 @@ export default function NewsDetail() {
         </div>
 
         {item.summary && (
-          <Card className="mt-6 border-blue-200 bg-blue-50">
+          <Card className="mt-6 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/50">
             <CardContent className="pt-6">
-              <p className="mb-2 text-sm font-semibold text-blue-700">
+              <p className="mb-2 text-sm font-semibold text-blue-700 dark:text-blue-300">
                 Riassunto AI
               </p>
-              <p className="leading-relaxed text-blue-900">{item.summary}</p>
+              <p className="leading-relaxed text-blue-900 dark:text-blue-100">
+                {item.summary}
+              </p>
             </CardContent>
           </Card>
         )}
@@ -171,9 +174,7 @@ export default function NewsDetail() {
         <Separator className="my-6" />
 
         {hasFullContent ? (
-          <div className="whitespace-pre-line leading-relaxed">
-            {item.content}
-          </div>
+          <ArticleContent content={item.content!} />
         ) : item.content ? (
           <div>
             <p className="leading-relaxed text-muted-foreground">
@@ -196,13 +197,21 @@ export default function NewsDetail() {
         <Separator className="my-6" />
 
         <div className="flex flex-wrap gap-3">
-          {!hasFullContent && (
+          {!hasFullContent ? (
             <Button
               variant="outline"
-              onClick={handleFetchContent}
+              onClick={() => handleFetchContent()}
               disabled={fetchingContent}
             >
               {fetchingContent ? 'Caricamento...' : 'Scarica contenuto'}
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              onClick={() => handleFetchContent(true)}
+              disabled={fetchingContent}
+            >
+              {fetchingContent ? 'Caricamento...' : 'Aggiorna contenuto'}
             </Button>
           )}
 

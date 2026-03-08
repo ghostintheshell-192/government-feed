@@ -247,5 +247,8 @@ class TestFetchArticleContent:
             scraper = ContentScraper()
             result = await scraper.fetch_article_content("https://example.com/article")
 
-        # Paragraphs should be separated by double newlines
-        assert "\n\n" in result
+        # Content should preserve semantic HTML paragraph tags
+        assert "<p>" in result
+        assert "First paragraph." in result
+        assert "Second paragraph." in result
+        assert "Third paragraph." in result

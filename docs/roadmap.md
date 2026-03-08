@@ -30,8 +30,10 @@ For current status details, see [`.development/CURRENT-STATUS.md`](../.developme
 ### Remaining
 
 - Feed discovery text search (moves to M4a — depends on search provider integration)
-- Frontend test coverage
-- Accessibility improvements
+- ~~Frontend test coverage~~ — Done (73 Vitest tests)
+- Accessibility improvements (moved to M5 — not needed for single-user)
+
+**Status: Complete** (remaining items moved to later milestones)
 
 ---
 
@@ -126,6 +128,13 @@ AI/ML-powered features — depends on Ollama and local model infrastructure.
 - Kubernetes deployment (optional)
 - Prometheus + Grafana monitoring
 - Automated backups
+
+### Accessibility
+
+- Aria labels for interactive elements
+- Keyboard navigation (modals, menus)
+- Error boundaries (React)
+- WCAG compliance audit
 
 ### Public API
 

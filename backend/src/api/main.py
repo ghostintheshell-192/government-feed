@@ -298,7 +298,9 @@ async def get_news_item(news_id: int, uow: UnitOfWork = Depends(get_unit_of_work
 
 
 @app.post("/api/news/{news_id}/fetch-content")
-async def fetch_news_content(news_id: int, uow: UnitOfWork = Depends(get_unit_of_work)):
+async def fetch_news_content(
+    news_id: int, force: bool = False, uow: UnitOfWork = Depends(get_unit_of_work)
+):
     """Fetch full article content from source URL."""
     from backend.src.infrastructure.content_scraper import ContentScraper
 
@@ -310,7 +312,7 @@ async def fetch_news_content(news_id: int, uow: UnitOfWork = Depends(get_unit_of
         raise HTTPException(status_code=400, detail="Nessun URL disponibile per questo articolo")
 
     # If we already have substantial content, return it without re-scraping
-    if news.content and len(news.content) > 500:
+    if not force and news.content and len(news.content) > 500:
         return {"success": True, "content": news.content}
 
     scraper = ContentScraper()
