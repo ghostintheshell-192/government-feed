@@ -13,10 +13,7 @@ Government sources (central banks, ministries, regulatory agencies) publish info
 
 ✅ **Production-Ready Backend** (5/5 features)
 
-🔧 **Frontend** (2/3 features)
-- [x] Dashboard & News Browsing
-- [x] News Detail View
-- [ ] Search & Discovery
+✅ **Frontend** (3/3 features)
 
 📋 **Scaling & Multi-User** (0/1 features)
 - [ ] Multi-User Authentication
@@ -32,7 +29,7 @@ Government sources (central banks, ministries, regulatory agencies) publish info
 <!-- AUTO:ROADMAP -->
 | ✅ M1-MVP | MVP Backend | 9/9 |
 | ✅ M2-Production | Production-Ready Backend | 5/5 |
-| 🔧 M3-Frontend | Frontend | 2/3 |
+| ✅ M3-Frontend | Frontend | 3/3 |
 | 📋 M5-Scaling | Scaling & Multi-User | 0/1 |
 <!-- /AUTO:ROADMAP -->
 

@@ -1,6 +1,6 @@
 # Search & Discovery
 
-**Status**: backlog
+**Status**: implemented
 **Milestone**: M3-Frontend
 **Priority**: should-have
 **Depends on**: [dashboard-news-browsing](dashboard-news-browsing.md), [rest-api](../implemented/rest-api.md)
