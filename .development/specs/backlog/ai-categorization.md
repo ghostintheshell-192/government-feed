@@ -1,7 +1,7 @@
 # AI Categorization
 
 **Status**: backlog
-**Milestone**: M4-Advanced
+**Milestone**: M4b-Intelligence
 **Priority**: nice-to-have
 **Depends on**: [ai-summarization](../implemented/ai-summarization.md)
 

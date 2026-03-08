@@ -1,7 +1,7 @@
 # Feed Registry
 
 **Status**: backlog
-**Milestone**: M4-Advanced
+**Milestone**: M4a-Feed-Infrastructure
 **Priority**: should-have
 **Depends on**: [source-management](../implemented/source-management.md)
 

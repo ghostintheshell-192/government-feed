@@ -7,7 +7,8 @@
 | **M1 — MVP Backend** | Complete | Core API, feed parsing, AI summarization, repository pattern |
 | **M2 — Production-Ready** | Complete | Testing (177 tests), background workers, Redis caching, error resilience |
 | **M3 — Frontend** | In progress | Dashboard, news detail, sources management, dark mode, feed discovery |
-| **M4 — Advanced Features** | Planned | Relevance scoring, AI categorization, trend detection, export |
+| **M4a — Feed Infrastructure** | Planned | Health monitoring, automated discovery, starter packs, export, config |
+| **M4b — Intelligence** | Planned | AI categorization, relevance scoring, trend detection, sentiment analysis |
 | **M5 — Scaling & Multi-User** | Planned | Authentication, multi-tenancy, PostgreSQL, cloud deployment |
 
 For current status details, see [`.development/CURRENT-STATUS.md`](../.development/CURRENT-STATUS.md).
@@ -27,14 +28,51 @@ For current status details, see [`.development/CURRENT-STATUS.md`](../.developme
 
 ### Remaining
 
-- Feed discovery text search (search engine integration blocked)
+- Feed discovery text search (moves to M4a — depends on search provider integration)
 - Settings page UI
 - Frontend test coverage
 - Accessibility improvements
 
 ---
 
-## M4 — Advanced Features
+## M4a — Feed Infrastructure
+
+Robust, autonomous feed management — no AI/ML required.
+
+**Prerequisite**: Core entity/model refactoring ([tech-debt](../.development/tech-debt/core-entity-model-misalignment.md))
+
+### Feed Health & Recovery
+
+- Feed health monitoring with stateful escalation (healthy → degraded → unhealthy → dead)
+- Automatic URL recovery for dead feeds via search providers
+- Health status visible in UI and API
+- See: [`specs/planned/feed-health-monitor.md`](../.development/specs/planned/feed-health-monitor.md)
+
+### Automated Feed Discovery
+
+- Multi-provider search (Exa primary, Brave Search fallback)
+- Text search replacing broken DuckDuckGo integration
+- Batch feed validation and deduplication
+- See: [`specs/planned/feed-discovery-automated.md`](../.development/specs/planned/feed-discovery-automated.md)
+
+### Starter Packs
+
+- Pre-configured feed bundles by topic and geography
+- One-click import into personal sources
+- See: [`specs/backlog/starter-packs.md`](../.development/specs/backlog/starter-packs.md)
+
+### Export & Configuration
+
+- Data export (CSV, JSON, PDF)
+- Import/export feed configuration
+- Settings page UI
+- Configurable notifications (email digest, push, webhooks)
+
+---
+
+## M4b — Intelligence
+
+AI/ML-powered features — depends on Ollama and local model infrastructure.
 
 ### Relevance & Categorization
 
@@ -42,6 +80,7 @@ For current status details, see [`.development/CURRENT-STATUS.md`](../.developme
 - AI-powered categorization (hierarchical taxonomy)
 - Multi-label classification
 - Keyword-based and source-based ranking factors
+- User preference learning (collaborative filtering)
 
 ### Analysis
 
@@ -49,14 +88,6 @@ For current status details, see [`.development/CURRENT-STATUS.md`](../.developme
 - Clustering of related news
 - Sentiment analysis (neutral, positive, alarming)
 - Historical sentiment tracking
-
-### Export & Notifications
-
-- CSV, JSON, PDF export
-- Configurable alert system
-- Email digest (daily/weekly)
-- Desktop push notifications
-- Webhook integrations
 
 ---
 

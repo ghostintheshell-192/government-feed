@@ -18,16 +18,6 @@ Government sources (central banks, ministries, regulatory agencies) publish info
 - [x] News Detail View
 - [ ] Search & Discovery
 
-📋 **Advanced Features** (0/8 features)
-- [ ] AI Categorization
-- [ ] Data Export
-- [ ] Feed Registry
-- [ ] Import/Export Configuration
-- [ ] Notifications
-- [ ] Relevance Scoring
-- [ ] Starter Packs
-- [ ] Trend Detection
-
 📋 **Scaling & Multi-User** (0/1 features)
 - [ ] Multi-User Authentication
 
@@ -43,7 +33,6 @@ Government sources (central banks, ministries, regulatory agencies) publish info
 | ✅ M1-MVP | MVP Backend | 9/9 |
 | ✅ M2-Production | Production-Ready Backend | 5/5 |
 | 🔧 M3-Frontend | Frontend | 2/3 |
-| 📋 M4-Advanced | Advanced Features | 0/8 |
 | 📋 M5-Scaling | Scaling & Multi-User | 0/1 |
 <!-- /AUTO:ROADMAP -->
 

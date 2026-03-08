@@ -1,7 +1,7 @@
 # UI Preferences
 
 **Status**: backlog
-**Milestone**: M3-Frontend / M4-Advanced
+**Milestone**: M4a-Feed-Infrastructure
 **Priority**: nice-to-have
 **Depends on**: [frontend-base](../implemented/frontend-base.md)
 

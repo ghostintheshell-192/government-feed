@@ -5,7 +5,7 @@
 ## Project Phase
 
 **Current milestone**: M3-Frontend (mostly complete)
-**Next milestone**: M4-Advanced (AI categorization, relevance scoring, notifications)
+**Next milestone**: M4a-Feed-Infrastructure (health monitoring, automated discovery, starter packs, export)
 
 ## Completed
 

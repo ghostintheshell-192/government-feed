@@ -1,7 +1,7 @@
 # Relevance Scoring
 
 **Status**: backlog
-**Milestone**: M4-Advanced
+**Milestone**: M4b-Intelligence
 **Priority**: should-have
 **Depends on**: [ai-summarization](../implemented/ai-summarization.md), [dashboard-news-browsing](dashboard-news-browsing.md)
 

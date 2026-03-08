@@ -1,7 +1,7 @@
 # Data Export
 
 **Status**: backlog
-**Milestone**: M4-Advanced
+**Milestone**: M4a-Feed-Infrastructure
 **Priority**: nice-to-have
 **Depends on**: [rest-api](../implemented/rest-api.md), [dashboard-news-browsing](dashboard-news-browsing.md)
 

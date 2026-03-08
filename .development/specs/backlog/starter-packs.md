@@ -1,7 +1,7 @@
 # Starter Packs
 
 **Status**: backlog
-**Milestone**: M4-Advanced
+**Milestone**: M4a-Feed-Infrastructure
 **Priority**: should-have
 **Depends on**: [feed-registry](feed-registry.md), [import-export-config](import-export-config.md)
 

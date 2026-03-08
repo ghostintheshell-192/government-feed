@@ -1,7 +1,7 @@
 # Trend Detection
 
 **Status**: backlog
-**Milestone**: M4-Advanced
+**Milestone**: M4b-Intelligence
 **Priority**: nice-to-have
 **Depends on**: [ai-categorization](ai-categorization.md), [relevance-scoring](relevance-scoring.md)
 

@@ -1,7 +1,7 @@
 # Notifications
 
 **Status**: backlog
-**Milestone**: M4-Advanced
+**Milestone**: M4a-Feed-Infrastructure
 **Priority**: nice-to-have
 **Depends on**: [background-workers](../planned/background-workers.md), [relevance-scoring](relevance-scoring.md)
 
