@@ -7,7 +7,8 @@
 | **M1 — MVP Backend** | Complete | Core API, feed parsing, AI summarization, repository pattern |
 | **M2 — Production-Ready** | Complete | Testing (177 tests), background workers, Redis caching, error resilience |
 | **M3 — Frontend** | In progress | Dashboard, news detail, sources management, dark mode, feed discovery |
-| **M4a — Feed Infrastructure** | Planned | Health monitoring, automated discovery, starter packs, export, config |
+| **M3.1 — Admin API** | Planned | Feed inspector, content cleanup, quality report, DB diagnostics |
+| **M4a — Feed Infrastructure** | Planned | Health monitoring, automated discovery, admin UI, starter packs, export |
 | **M4b — Intelligence** | Planned | AI categorization, relevance scoring, trend detection, sentiment analysis |
 | **M5 — Scaling & Multi-User** | Planned | Authentication, multi-tenancy, PostgreSQL, cloud deployment |
 
@@ -29,9 +30,22 @@ For current status details, see [`.development/CURRENT-STATUS.md`](../.developme
 ### Remaining
 
 - Feed discovery text search (moves to M4a — depends on search provider integration)
-- Settings page UI
 - Frontend test coverage
 - Accessibility improvements
+
+---
+
+## M3.1 — Admin API
+
+Backend endpoints for feed inspection, content cleanup, and diagnostics. No authentication required (single-user mode). Admin UI deferred to M4a.
+
+- Feed inspector: preview recent articles per source, per-source stats
+- Content cleanup: purge/reimport source, bulk delete by pattern (with dry-run), HTML residue fix
+- Orphan cleanup: remove articles from deleted sources
+- Quality report: flag short/long content, HTML residue, duplicate titles, empty sources
+- DB stats: article counts, per-source breakdown, articles/day trend
+
+See: [`specs/planned/feed-admin-tools.md`](../.development/specs/planned/feed-admin-tools.md)
 
 ---
 
@@ -40,6 +54,13 @@ For current status details, see [`.development/CURRENT-STATUS.md`](../.developme
 Robust, autonomous feed management — no AI/ML required.
 
 **Prerequisite**: Core entity/model refactoring ([tech-debt](../.development/tech-debt/core-entity-model-misalignment.md))
+
+### Admin UI
+
+- Frontend admin page for feed inspection, cleanup, and diagnostics
+- Uses M3.1 API endpoints with confirmation dialogs for destructive actions
+- Protected by role-based access when multi-user auth lands (M5)
+- See: [`specs/planned/feed-admin-tools.md`](../.development/specs/planned/feed-admin-tools.md) (Phase 2)
 
 ### Feed Health & Recovery
 
