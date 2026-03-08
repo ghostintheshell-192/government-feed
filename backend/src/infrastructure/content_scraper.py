@@ -58,6 +58,53 @@ ALLOWED_ATTRS = {
 }
 
 
+_CONTINUATION_START = re.compile(
+    r"^[,;]"                         # ", CFTC Docket No..." or "; see..."
+    r"|^see[,\s]"                    # "see," or "see " citation keyword
+    r"|^see,\s+e\.g\."               # "see, e.g.,"
+    r"|^cf\.\s"                      # "cf." comparison citation
+    r"|^civil\s+action\s+no\."       # "Civil Action No."
+    r"|^cftc\s+docket\s+no\."        # "CFTC Docket No."
+    r"|^no\.\s+\d"                   # "No. 4:22-cv-..." generic case number
+    r"|^docket\s+no\."               # generic "Docket No."
+    r"|^in\s+re\s"                   # "In re " case name
+    r"|^\("                          # "(S.D. Tex., ...)" court/date info
+    r"|^-\w",                        # "-CFTC-" agency sign-off
+    re.IGNORECASE,
+)
+
+_MAX_FRAGMENT_LENGTH = 160
+
+
+def _merge_citation_fragments(element: Tag) -> None:
+    """Merge short citation/continuation <p> fragments into the preceding <p>.
+
+    Government and regulatory documents often split citation references across
+    multiple <p> tags (e.g. "see, e.g., ...", ", CFTC Docket No. ...",
+    case names). This function detects and merges these fragments in the
+    BeautifulSoup DOM before HTML reconstruction, preserving inline structure.
+
+    Only merges paragraphs that share the same direct parent (no cross-block
+    merging) and whose text matches known continuation patterns.
+    """
+    for p in list(element.find_all("p")):
+        if p.parent is None:
+            continue  # already detached
+        text = p.get_text(strip=True)
+        if len(text) > _MAX_FRAGMENT_LENGTH:
+            continue
+        if not _CONTINUATION_START.match(text):
+            continue
+        prev = p.find_previous_sibling("p")
+        if prev is None or prev.parent is not p.parent:
+            continue
+        # Merge: append a space then move all children of p into prev
+        prev.append(" ")
+        for child in list(p.children):
+            prev.append(child.extract())
+        p.decompose()
+
+
 def _clean_html(element: Tag, base_url: str = "") -> str:
     """Extract semantic HTML from a BeautifulSoup element, keeping only allowed tags."""
     # Remove noise elements inside content
@@ -67,6 +114,9 @@ def _clean_html(element: Tag, base_url: str = "") -> str:
         "script, style, iframe, noscript, svg, video, audio"
     ):
         noise.decompose()
+
+    # Merge citation/continuation fragments before walking the tree
+    _merge_citation_fragments(element)
 
     # Walk the tree and rebuild with only allowed tags
     result_parts: list[str] = []

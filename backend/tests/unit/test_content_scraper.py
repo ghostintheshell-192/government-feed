@@ -4,8 +4,88 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
 import pytest
-from backend.src.infrastructure.content_scraper import ContentScraper, _cb_scraping
+from bs4 import BeautifulSoup
+from backend.src.infrastructure.content_scraper import (
+    ContentScraper,
+    _cb_scraping,
+    _merge_citation_fragments,
+)
 from backend.src.infrastructure.resilience import CircuitState
+
+
+def make_soup(html: str) -> BeautifulSoup:
+    return BeautifulSoup(html, "html.parser")
+
+
+class TestMergeCitationFragments:
+    """Unit tests for _merge_citation_fragments DOM post-processing."""
+
+    def test_merges_comma_continuation(self):
+        """A <p> starting with comma is merged into the previous <p>."""
+        soup = make_soup("<div><p>Main text;</p><p>, CFTC Docket No. 21-09 (2021).</p></div>")
+        _merge_citation_fragments(soup.div)
+        paragraphs = soup.find_all("p")
+        assert len(paragraphs) == 1
+        assert "CFTC Docket No." in paragraphs[0].get_text()
+
+    def test_merges_see_citation(self):
+        """A <p> starting with 'see,' is merged into the previous <p>."""
+        soup = make_soup("<div><p>Prohibited under Section 4c(a)(1);</p><p>see, e.g., In re Khorrami.</p></div>")
+        _merge_citation_fragments(soup.div)
+        paragraphs = soup.find_all("p")
+        assert len(paragraphs) == 1
+        assert "In re Khorrami" in paragraphs[0].get_text()
+
+    def test_merges_civil_action_no(self):
+        """A <p> starting with 'Civil Action No.' is merged."""
+        soup = make_soup("<div><p>CFTC v. Clark,</p><p>Civil Action No. 4:22-cv-00365 (S.D. Tex. 2026).</p></div>")
+        _merge_citation_fragments(soup.div)
+        assert len(soup.find_all("p")) == 1
+
+    def test_merges_in_re(self):
+        """A <p> starting with 'In re ' is merged into the previous <p>."""
+        soup = make_soup("<div><p>See also</p><p>In re Webb, et al., Docket No. 21-09.</p></div>")
+        _merge_citation_fragments(soup.div)
+        assert len(soup.find_all("p")) == 1
+
+    def test_does_not_merge_long_paragraph(self):
+        """A fragment longer than the threshold is left as a separate paragraph."""
+        long_text = ", " + "x" * 200
+        soup = make_soup(f"<div><p>Previous text.</p><p>{long_text}</p></div>")
+        _merge_citation_fragments(soup.div)
+        assert len(soup.find_all("p")) == 2
+
+    def test_does_not_merge_normal_paragraph(self):
+        """A normal paragraph not matching continuation patterns is left alone."""
+        soup = make_soup("<div><p>First paragraph.</p><p>Second independent paragraph.</p></div>")
+        _merge_citation_fragments(soup.div)
+        assert len(soup.find_all("p")) == 2
+
+    def test_does_not_merge_across_parents(self):
+        """Fragments in different parent blocks are not merged across them."""
+        soup = make_soup(
+            "<div>"
+            "<div><p>Block A text.</p></div>"
+            "<div><p>, continuation that looks like citation.</p></div>"
+            "</div>"
+        )
+        _merge_citation_fragments(soup.div)
+        assert len(soup.find_all("p")) == 2
+
+    def test_preserves_inline_tags_when_merging(self):
+        """Inline tags inside the fragment are preserved after merging."""
+        soup = make_soup("<div><p>Regulation violated;</p><p>see, e.g., <em>In re Smith</em>.</p></div>")
+        _merge_citation_fragments(soup.div)
+        paragraphs = soup.find_all("p")
+        assert len(paragraphs) == 1
+        assert soup.find("em") is not None
+        assert "In re Smith" in paragraphs[0].get_text()
+
+    def test_merges_agency_signoff(self):
+        """A <p> starting with '-AGENCY-' sign-off pattern is merged."""
+        soup = make_soup("<div><p>Final statement of the document.</p><p>-CFTC-</p></div>")
+        _merge_citation_fragments(soup.div)
+        assert len(soup.find_all("p")) == 1
 
 
 @pytest.fixture(autouse=True)

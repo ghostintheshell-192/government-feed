@@ -20,6 +20,7 @@ For detailed documentation, see `docs/architecture.md`.
 - [ADR-002: Privacy First Ai](reference/decisions/002-privacy-first-ai.md)
 - [ADR-003: Content Deduplication](reference/decisions/003-content-deduplication.md)
 - [ADR-004: Master Detail Layout](reference/decisions/004-master-detail-layout.md)
+- [ADR-005: Geographic Levels Navigation](reference/decisions/005-geographic-levels-navigation.md)
 
 ## Project Tree
 
