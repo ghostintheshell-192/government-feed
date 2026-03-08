@@ -38,11 +38,26 @@ class ContentScraper:
 
             soup = BeautifulSoup(response.text, "html.parser")
 
-            for element in soup(["script", "style", "nav", "footer", "header", "aside"]):
+            for element in soup(
+                ["script", "style", "nav", "footer", "header", "aside", "iframe", "noscript"]
+            ):
                 element.decompose()
 
             main_content = None
-            for selector in ["article", "main", '[role="main"]', ".content", "#content"]:
+            for selector in [
+                "article",
+                "main",
+                '[role="main"]',
+                ".content",
+                "#content",
+                ".article-body",
+                ".entry-content",
+                ".post-content",
+                ".field--name-body",
+                ".node__content",
+                "#main-content",
+                ".page-content",
+            ]:
                 main_content = soup.select_one(selector)
                 if main_content:
                     break
@@ -50,8 +65,17 @@ class ContentScraper:
             if not main_content:
                 main_content = soup.body
 
-            if main_content:
-                text = main_content.get_text(separator=" ", strip=True)
-                return " ".join(text.split())
+            if not main_content:
+                return ""
 
-            return ""
+            # Remove remaining navigation and menu elements within content
+            for noise in main_content.select(
+                "nav, .menu, .sidebar, .breadcrumb, .pagination, .share-links, "
+                ".social-share, .related-posts, .comments, form"
+            ):
+                noise.decompose()
+
+            text = main_content.get_text(separator="\n", strip=True)
+            # Collapse blank lines but preserve paragraph structure
+            lines = [line.strip() for line in text.splitlines() if line.strip()]
+            return "\n\n".join(lines)

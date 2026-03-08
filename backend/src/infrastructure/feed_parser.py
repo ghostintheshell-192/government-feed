@@ -54,7 +54,8 @@ class FeedParserService:
                 title = entry.get("title", "")
                 link = entry.get("link", "")
                 content = self._extract_content(entry)
-                summary = entry.get("summary", "")
+                raw_summary = entry.get("summary", "")
+                summary = self._strip_html(raw_summary) if raw_summary else ""
 
                 # Parse published date
                 published_at = self._parse_date(entry)
