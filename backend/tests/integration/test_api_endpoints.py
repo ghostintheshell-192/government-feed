@@ -216,12 +216,17 @@ class TestSettingsEndpoints:
         assert response.json()["ai_enabled"] is True
 
     @patch("backend.src.infrastructure.settings_store.save_settings")
-    def test_update_settings(self, mock_save, test_client):
+    @patch("backend.src.infrastructure.settings_store.load_settings")
+    def test_update_settings(self, mock_load, mock_save, test_client):
+        mock_load.return_value = {"ai_enabled": True, "ollama_model": "test"}
         payload = {"ai_enabled": False}
         response = test_client.put("/api/settings", json=payload)
         assert response.status_code == 200
         assert response.json()["success"] is True
-        mock_save.assert_called_once_with({"ai_enabled": False})
+        # Verify merge: current settings + update
+        saved = mock_save.call_args[0][0]
+        assert saved["ai_enabled"] is False
+        assert saved["ollama_model"] == "test"  # Preserved from current
 
     @patch("backend.src.infrastructure.settings_store.load_settings")
     def test_get_features(self, mock_load, test_client):

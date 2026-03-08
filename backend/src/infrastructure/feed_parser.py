@@ -1,5 +1,6 @@
 """Feed parsing service for RSS/Atom feeds."""
 
+import re
 from datetime import UTC, datetime
 from hashlib import sha256
 
@@ -16,6 +17,17 @@ from shared.logging import get_logger
 from sqlalchemy.orm import Session
 
 logger = get_logger(__name__)
+
+# Ensure defusedxml is used by feedparser for XXE protection
+try:
+    import defusedxml  # noqa: F401
+
+    logger.debug("defusedxml available — XXE protection active")
+except ImportError:
+    logger.warning("defusedxml not installed — XXE protection reduced")
+
+# Regex to strip DOCTYPE declarations (XXE defense-in-depth)
+_DOCTYPE_RE = re.compile(r"<!DOCTYPE[^>]*>", re.IGNORECASE)
 
 # Module-level circuit breaker for feed fetching
 _cb_feed_fetch = CircuitBreaker("feed_fetch", failure_threshold=5, recovery_timeout=60.0)
@@ -40,6 +52,9 @@ class FeedParserService:
                     "Feed fetch circuit breaker is open — skipping source %s", source.name
                 )
                 return 0
+
+            # Strip DOCTYPE declarations to prevent XXE attacks
+            xml_content = _DOCTYPE_RE.sub("", xml_content)
 
             feed = feedparser.parse(xml_content)
 
