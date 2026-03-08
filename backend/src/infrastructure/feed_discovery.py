@@ -152,7 +152,11 @@ class FeedDiscoveryService:
                 response = await client.get(feed_url)
                 response.raise_for_status()
 
-            parsed = feedparser.parse(response.text)
+            # Strip DOCTYPE declarations to prevent XXE attacks
+            import re
+
+            xml_safe = re.sub(r"<!DOCTYPE[^>]*>", "", response.text, flags=re.IGNORECASE)
+            parsed = feedparser.parse(xml_safe)
 
             # Check if it's a valid feed
             if not parsed.feed or parsed.bozo:

@@ -343,12 +343,15 @@ async def get_settings():
 
 
 @app.put("/api/settings")
-async def update_settings(settings: dict):
+async def update_settings(settings: schemas.SettingsUpdate):
     """Update application settings."""
-    from backend.src.infrastructure.settings_store import save_settings
+    from backend.src.infrastructure.settings_store import load_settings, save_settings
 
     logger.info("Updating application settings")
-    save_settings(settings)
+    current = load_settings()
+    updates = settings.model_dump(exclude_none=True)
+    current.update(updates)
+    save_settings(current)
     logger.info("Settings updated successfully")
     return {"success": True, "message": "Impostazioni salvate"}
 

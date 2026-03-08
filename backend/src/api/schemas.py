@@ -73,6 +73,18 @@ class PaginatedNewsResponse(BaseModel):
     pagination: PaginationMeta
 
 
+class SettingsUpdate(BaseModel):
+    """Validated settings update schema. Only whitelisted keys are accepted."""
+
+    ai_enabled: bool | None = None
+    summary_max_words: int | None = Field(None, ge=10, le=1000)
+    scheduler_enabled: bool | None = None
+    news_retention_days: int | None = Field(None, ge=1, le=365)
+    ollama_endpoint: str | None = Field(None, max_length=200)
+    ollama_model: str | None = Field(None, max_length=100)
+    redis_url: str | None = Field(None, max_length=200)
+
+
 class FeedDiscoveryRequest(BaseModel):
     """Request schema for feed discovery."""
 
