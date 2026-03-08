@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ChevronRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { ThemeToggle } from './components/theme-toggle'
+import { LanguageToggle } from './components/language-toggle'
 import { fetchNewsById } from './lib/api'
 import Sources from './pages/Sources'
 import Feed from './pages/Feed'
@@ -106,6 +107,7 @@ function AppLayout() {
             <NavLink to="/">{t('nav.dashboard')}</NavLink>
             <NavLink to="/sources">{t('nav.sources')}</NavLink>
             <NavLink to="/settings">{t('nav.settings')}</NavLink>
+            <LanguageToggle />
             <ThemeToggle />
           </div>
         </div>
