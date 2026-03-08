@@ -7,10 +7,9 @@ import { NewsCard } from './news-card'
 
 vi.mock('@/lib/api', () => ({
   summarizeNews: vi.fn(),
-  fetchNewsContent: vi.fn(),
 }))
 
-import { fetchNewsContent, summarizeNews } from '@/lib/api'
+import { summarizeNews } from '@/lib/api'
 
 function makeItem(overrides: Partial<NewsItem> = {}): NewsItem {
   return {
@@ -35,7 +34,6 @@ const defaultProps = {
   aiEnabled: false,
   onRead: vi.fn(),
   onSummaryUpdate: vi.fn(),
-  onContentUpdate: vi.fn(),
 }
 
 function renderCard(props: Partial<typeof defaultProps> = {}) {
@@ -55,7 +53,6 @@ describe('NewsCard', () => {
 
   it('renders formatted date in Italian', () => {
     renderCard()
-    // 1 marzo 2026
     expect(screen.getByText(/1 marzo 2026/)).toBeInTheDocument()
   })
 
@@ -90,44 +87,30 @@ describe('NewsCard', () => {
     expect(screen.getByText('A brief summary')).toBeInTheDocument()
   })
 
-  it('shows "Scarica articolo" button when no full content', () => {
-    renderCard()
-    expect(screen.getByText('Scarica articolo')).toBeInTheDocument()
+  it('shows content snippet as preview when no summary', () => {
+    renderCard({ item: makeItem({ content: 'Some article content here for preview.' }) })
+    expect(screen.getByText('Some article content here for preview.')).toBeInTheDocument()
   })
 
-  it('shows "Mostra articolo" when full content exists', () => {
-    const longContent = 'x'.repeat(600)
+  it('strips HTML tags from content snippet', () => {
+    renderCard({
+      item: makeItem({ content: '<p>Paragraph with <strong>bold</strong> text.</p>' }),
+    })
+    expect(screen.getByText('Paragraph with bold text.')).toBeInTheDocument()
+  })
+
+  it('truncates long content with ellipsis', () => {
+    const longContent = 'Word '.repeat(100)
     renderCard({ item: makeItem({ content: longContent }) })
-    expect(screen.getByText('Mostra articolo')).toBeInTheDocument()
+    const preview = screen.getByText(/Word/)
+    expect(preview.textContent).toContain('...')
   })
 
-  it('fetches content when clicking "Scarica articolo"', async () => {
-    const onContentUpdate = vi.fn()
-    vi.mocked(fetchNewsContent).mockResolvedValue({
-      success: true,
-      content: 'Full article text here',
-    })
-
-    renderCard({ onContentUpdate })
-
-    await userEvent.click(screen.getByText('Scarica articolo'))
-
-    expect(fetchNewsContent).toHaveBeenCalledWith(1)
-    expect(onContentUpdate).toHaveBeenCalledWith(1, 'Full article text here')
-  })
-
-  it('shows alert on fetch content failure', async () => {
-    vi.mocked(fetchNewsContent).mockResolvedValue({
-      success: false,
-      message: 'Not found',
-    })
-    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {})
-
+  it('shows "Leggi articolo" link to detail page', () => {
     renderCard()
-    await userEvent.click(screen.getByText('Scarica articolo'))
-
-    expect(alertSpy).toHaveBeenCalledWith('Not found')
-    alertSpy.mockRestore()
+    const link = screen.getByText('Leggi articolo')
+    expect(link).toBeInTheDocument()
+    expect(link.closest('a')).toHaveAttribute('href', '/news/1')
   })
 
   it('shows "Riassumi con AI" button when AI enabled and no summary', () => {
@@ -175,16 +158,9 @@ describe('NewsCard', () => {
     expect(screen.queryByText('Apri originale')).not.toBeInTheDocument()
   })
 
-  it('toggles expanded content', async () => {
-    const longContent = 'Full article content. '.repeat(50)
-    renderCard({ item: makeItem({ content: longContent }) })
-
-    // Click to expand
-    await userEvent.click(screen.getByText('Mostra articolo'))
-    expect(screen.getByText('Nascondi articolo')).toBeInTheDocument()
-
-    // Click to collapse
-    await userEvent.click(screen.getByText('Nascondi articolo'))
-    expect(screen.getByText('Mostra articolo')).toBeInTheDocument()
+  it('title links to detail page', () => {
+    renderCard()
+    const titleLink = screen.getByText('Test News Title').closest('a')
+    expect(titleLink).toHaveAttribute('href', '/news/1')
   })
 })

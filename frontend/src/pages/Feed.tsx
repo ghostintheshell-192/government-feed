@@ -88,9 +88,6 @@ export default function Feed() {
     updateNewsItem(id, { summary })
   }
 
-  const handleContentUpdate = (id: number, content: string) => {
-    updateNewsItem(id, { content })
-  }
 
   const handleSaveSearch = () => {
     const name = prompt('Nome per questa ricerca:')
@@ -209,7 +206,6 @@ export default function Feed() {
                 searchTerm={debouncedFilters.search}
                 onRead={markAsRead}
                 onSummaryUpdate={handleSummaryUpdate}
-                onContentUpdate={handleContentUpdate}
               />
             ))}
           </div>
