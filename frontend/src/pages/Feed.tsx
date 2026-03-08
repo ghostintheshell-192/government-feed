@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query'
 import { X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -22,6 +23,7 @@ export default function Feed() {
   const queryClient = useQueryClient()
   const { searches: recentSearches, addSearch } = useRecentSearches()
   const { savedSearches, saveSearch, removeSearch } = useSavedSearches()
+  const { t } = useTranslation()
 
   // Track debounced search to add to recent searches
   const prevSearchRef = useRef<string | undefined>()
@@ -90,7 +92,7 @@ export default function Feed() {
 
 
   const handleSaveSearch = () => {
-    const name = prompt('Nome per questa ricerca:')
+    const name = prompt(t('feed.saveSearchPrompt'))
     if (name) {
       saveSearch(name, filters)
     }
@@ -109,8 +111,8 @@ export default function Feed() {
         .filter(Boolean)
       if (names.length) parts.push(names.join(', '))
     }
-    if (f.date_from || f.date_to) parts.push('date range')
-    return parts.length ? parts.join(' + ') : 'tutti i filtri'
+    if (f.date_from || f.date_to) parts.push(t('feed.dateRange'))
+    return parts.length ? parts.join(' + ') : t('feed.allFilters')
   }
 
   return (
@@ -128,7 +130,7 @@ export default function Feed() {
 
       {savedSearches.length > 0 && (
         <div className="mb-6 flex flex-wrap items-center gap-2">
-          <span className="text-xs text-muted-foreground">Salvate:</span>
+          <span className="text-xs text-muted-foreground">{t('feed.savedSearches')}</span>
           {savedSearches.map((saved) => (
             <Badge
               key={saved.id}
@@ -145,7 +147,7 @@ export default function Feed() {
                   e.stopPropagation()
                   removeSearch(saved.id)
                 }}
-                aria-label={`Rimuovi ${saved.name}`}
+                aria-label={t('feed.removeSearch', { name: saved.name })}
               >
                 <X className="h-3 w-3" />
               </button>
@@ -167,26 +169,26 @@ export default function Feed() {
       ) : allItems.length === 0 ? (
         <div className="py-16 text-center">
           <h3 className="text-xl font-semibold text-muted-foreground">
-            Nessuna notizia trovata
+            {t('feed.noNewsFound')}
           </h3>
           <p className="mt-2 text-muted-foreground">
             {total === 0 && !Object.keys(debouncedFilters).length ? (
               <>
-                Vai su{' '}
+                {t('feed.goToSources')}{' '}
                 <a href="/sources" className="text-primary underline">
-                  Gestione Sources
+                  {t('feed.sourcesLink')}
                 </a>{' '}
-                per aggiungere feed e importare le notizie.
+                {t('feed.noNewsHelpAdd')}
               </>
             ) : (
-              'Prova a modificare i filtri di ricerca.'
+              t('feed.noNewsHelpFilter')
             )}
           </p>
         </div>
       ) : (
         <>
           <p className="mb-4 text-sm text-muted-foreground">
-            {total} notizie trovate
+            {t('feed.newsCount', { count: total })}
           </p>
 
           <div className="space-y-4">
@@ -212,8 +214,8 @@ export default function Feed() {
                 disabled={isFetchingNextPage}
               >
                 {isFetchingNextPage
-                  ? 'Caricamento...'
-                  : 'Carica altre notizie'}
+                  ? t('common.loading')
+                  : t('feed.loadMore')}
               </Button>
             </div>
           )}

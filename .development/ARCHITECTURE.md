@@ -19,6 +19,7 @@ For detailed documentation, see `docs/architecture.md`.
 - [ADR-001: Clean Architecture](reference/decisions/001-clean-architecture.md)
 - [ADR-002: Privacy First Ai](reference/decisions/002-privacy-first-ai.md)
 - [ADR-003: Content Deduplication](reference/decisions/003-content-deduplication.md)
+- [ADR-004: Master Detail Layout](reference/decisions/004-master-detail-layout.md)
 
 ## Project Tree
 

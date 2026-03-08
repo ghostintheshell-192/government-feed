@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -22,6 +23,7 @@ type Theme = 'light' | 'dark' | 'system'
 export default function Settings() {
   const queryClient = useQueryClient()
   const { theme, setTheme } = useTheme()
+  const { t } = useTranslation()
 
   const [settings, setSettings] = useState<SettingsData>({
     ollama_endpoint: 'http://localhost:11434',
@@ -48,7 +50,7 @@ export default function Settings() {
       const data = await res.json()
       setSettings(data)
     } catch {
-      setError('Impossibile caricare le impostazioni. Verifica che il backend sia attivo.')
+      setError(t('settings.errorLoad'))
     } finally {
       setLoading(false)
     }
@@ -63,9 +65,9 @@ export default function Settings() {
         body: JSON.stringify(settings),
       })
       if (!res.ok) throw new Error(`Errore ${res.status}`)
-      alert('Impostazioni salvate!')
+      alert(t('settings.successSave'))
     } catch {
-      alert('Errore nel salvataggio delle impostazioni.')
+      alert(t('settings.errorSave'))
     } finally {
       setSaving(false)
     }
@@ -73,32 +75,32 @@ export default function Settings() {
 
   const clearCache = () => {
     queryClient.clear()
-    alert('Cache dati svuotata. Le prossime pagine caricheranno dati freschi.')
+    alert(t('settings.successClearCache'))
   }
 
   const themeOptions: { value: Theme; label: string }[] = [
-    { value: 'light', label: 'Chiaro' },
-    { value: 'dark', label: 'Scuro' },
-    { value: 'system', label: 'Sistema' },
+    { value: 'light', label: t('settings.themeLight') },
+    { value: 'dark', label: t('settings.themeDark') },
+    { value: 'system', label: t('settings.themeSystem') },
   ]
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
       <div className="mb-6">
-        <h1 className="font-serif text-3xl font-bold">Impostazioni</h1>
+        <h1 className="font-serif text-3xl font-bold">{t('settings.title')}</h1>
         <p className="mt-1 text-muted-foreground">
-          Configura AI locale e altre preferenze
+          {t('settings.description')}
         </p>
       </div>
 
       {/* Theme Preferences */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Aspetto</CardTitle>
+          <CardTitle>{t('settings.appearance')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <label className="text-sm font-medium">Tema</label>
+            <label className="text-sm font-medium">{t('settings.themeLabel')}</label>
             <div className="flex gap-2">
               {themeOptions.map((opt) => (
                 <Button
@@ -112,8 +114,7 @@ export default function Settings() {
               ))}
             </div>
             <p className="text-sm text-muted-foreground">
-              Seleziona &quot;Sistema&quot; per seguire le preferenze del tuo
-              dispositivo.
+              {t('settings.themeSystemHelp')}
             </p>
           </div>
         </CardContent>
@@ -123,10 +124,10 @@ export default function Settings() {
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            Configurazione AI (Ollama)
+            {t('settings.aiConfig')}
             {!loading && (
               <Badge variant={settings.ai_enabled ? 'default' : 'secondary'}>
-                {settings.ai_enabled ? 'Attiva' : 'Disattivata'}
+                {settings.ai_enabled ? t('settings.aiActive') : t('settings.aiInactive')}
               </Badge>
             )}
           </CardTitle>
@@ -142,7 +143,7 @@ export default function Settings() {
             <div className="py-8 text-center">
               <p className="text-destructive">{error}</p>
               <Button variant="outline" className="mt-4" onClick={loadSettings}>
-                Riprova
+                {t('common.retry')}
               </Button>
             </div>
           ) : (
@@ -158,12 +159,12 @@ export default function Settings() {
                   className="h-4 w-4 rounded border-input"
                 />
                 <label htmlFor="ai-enabled" className="text-sm font-medium">
-                  Abilita AI per riassunti automatici
+                  {t('settings.aiEnable')}
                 </label>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Endpoint Ollama</label>
+                <label className="text-sm font-medium">{t('settings.ollamaEndpoint')}</label>
                 <Input
                   value={settings.ollama_endpoint}
                   onChange={(e) =>
@@ -175,13 +176,12 @@ export default function Settings() {
                   placeholder="http://localhost:11434"
                 />
                 <p className="text-sm text-muted-foreground">
-                  Indirizzo del server Ollama locale. Predefinito:
-                  http://localhost:11434
+                  {t('settings.ollamaEndpointHelp')}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Modello</label>
+                <label className="text-sm font-medium">{t('settings.ollamaModel')}</label>
                 <Input
                   value={settings.ollama_model}
                   onChange={(e) =>
@@ -190,14 +190,13 @@ export default function Settings() {
                   placeholder="deepseek-r1:7b"
                 />
                 <p className="text-sm text-muted-foreground">
-                  Nome del modello Ollama installato. Esempi: deepseek-r1:7b,
-                  llama3.2, mistral
+                  {t('settings.ollamaModelHelp')}
                 </p>
               </div>
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">
-                  Lunghezza massima riassunto (parole)
+                  {t('settings.summaryMaxWords')}
                 </label>
                 <Input
                   type="number"
@@ -212,12 +211,12 @@ export default function Settings() {
                   }
                 />
                 <p className="text-sm text-muted-foreground">
-                  Numero massimo di parole per i riassunti generati. Predefinito: 200
+                  {t('settings.summaryMaxWordsHelp')}
                 </p>
               </div>
 
               <Button onClick={saveSettings} disabled={saving}>
-                {saving ? 'Salvataggio...' : 'Salva Impostazioni'}
+                {saving ? t('settings.saving') : t('settings.saveSettings')}
               </Button>
             </div>
           )}
@@ -227,7 +226,7 @@ export default function Settings() {
       {/* Feed & Scheduler */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Feed e Aggiornamenti</CardTitle>
+          <CardTitle>{t('settings.feedUpdates')}</CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -251,19 +250,18 @@ export default function Settings() {
                   className="h-4 w-4 rounded border-input"
                 />
                 <label htmlFor="scheduler-enabled" className="text-sm font-medium">
-                  Aggiornamento automatico dei feed
+                  {t('settings.schedulerEnabled')}
                 </label>
               </div>
               <p className="text-sm text-muted-foreground">
-                Quando attivo, i feed vengono aggiornati automaticamente ogni 15
-                minuti.
+                {t('settings.schedulerHelp')}
               </p>
 
               <Separator />
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">
-                  Conservazione notizie (giorni)
+                  {t('settings.newsRetention')}
                 </label>
                 <Input
                   type="number"
@@ -278,13 +276,12 @@ export default function Settings() {
                   }
                 />
                 <p className="text-sm text-muted-foreground">
-                  Le notizie più vecchie di questo periodo vengono rimosse
-                  automaticamente. Predefinito: 30 giorni
+                  {t('settings.newsRetentionHelp')}
                 </p>
               </div>
 
               <Button onClick={saveSettings} disabled={saving}>
-                {saving ? 'Salvataggio...' : 'Salva Impostazioni'}
+                {saving ? t('settings.saving') : t('settings.saveSettings')}
               </Button>
             </div>
           )}
@@ -294,18 +291,18 @@ export default function Settings() {
       {/* Cache Management */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Gestione Dati</CardTitle>
+          <CardTitle>{t('settings.dataManagement')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium">Cache dati</p>
+              <p className="text-sm font-medium">{t('settings.cacheLabel')}</p>
               <p className="text-sm text-muted-foreground">
-                Svuota la cache per forzare il ricaricamento di tutti i dati.
+                {t('settings.cacheHelp')}
               </p>
             </div>
             <Button variant="outline" onClick={clearCache}>
-              Svuota cache
+              {t('settings.clearCache')}
             </Button>
           </div>
         </CardContent>
@@ -314,15 +311,15 @@ export default function Settings() {
       {/* Help */}
       <Card>
         <CardHeader>
-          <CardTitle>Guida AI</CardTitle>
+          <CardTitle>{t('settings.aiGuide')}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="mb-3 text-sm text-muted-foreground">
-            Per utilizzare la funzionalità AI:
+            {t('settings.aiGuideIntro')}
           </p>
           <ol className="list-decimal space-y-1.5 pl-5 text-sm leading-relaxed">
             <li>
-              Installa Ollama dal sito ufficiale:{' '}
+              {t('settings.aiGuideStep1')}{' '}
               <a
                 href="https://ollama.ai"
                 target="_blank"
@@ -333,20 +330,14 @@ export default function Settings() {
               </a>
             </li>
             <li>
-              Scarica un modello:{' '}
+              {t('settings.aiGuideStep2')}{' '}
               <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
                 ollama pull deepseek-r1:7b
               </code>
             </li>
-            <li>
-              Avvia Ollama (di solito si avvia automaticamente
-              all&apos;installazione)
-            </li>
-            <li>Configura endpoint e modello sopra</li>
-            <li>
-              Usa il bottone &quot;Riassumi&quot; nelle notizie per generare
-              riassunti
-            </li>
+            <li>{t('settings.aiGuideStep3')}</li>
+            <li>{t('settings.aiGuideStep4')}</li>
+            <li>{t('settings.aiGuideStep5')}</li>
           </ol>
         </CardContent>
       </Card>

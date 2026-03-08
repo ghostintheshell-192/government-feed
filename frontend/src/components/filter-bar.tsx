@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { NewsFilters, Source } from '@/lib/types'
@@ -21,6 +22,7 @@ export function FilterBar({
   const activeSources = sources.filter((s) => s.is_active)
   const [showRecent, setShowRecent] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
+  const { t } = useTranslation()
 
   const updateFilter = <K extends keyof NewsFilters>(
     key: K,
@@ -48,10 +50,10 @@ export function FilterBar({
     <div className="space-y-3">
       <div className="flex flex-wrap items-end gap-3">
         <div className="relative w-full flex-1 sm:min-w-[200px]" ref={searchRef}>
-          <label className="mb-1 block text-sm font-medium">Cerca</label>
+          <label className="mb-1 block text-sm font-medium">{t('filterBar.searchLabel')}</label>
           <Input
             type="text"
-            placeholder="Cerca nelle notizie..."
+            placeholder={t('filterBar.searchPlaceholder')}
             value={filters.search || ''}
             onChange={(e) =>
               updateFilter('search', e.target.value || undefined)
@@ -65,7 +67,7 @@ export function FilterBar({
           {showRecent && recentSearches.length > 0 && !filters.search && (
             <div className="absolute z-10 mt-1 w-full rounded-md border bg-popover p-1 shadow-md">
               <p className="px-2 py-1 text-xs text-muted-foreground">
-                Ricerche recenti
+                {t('filterBar.recentSearches')}
               </p>
               {recentSearches.map((query) => (
                 <button
@@ -85,7 +87,7 @@ export function FilterBar({
         </div>
 
         <div className="w-full sm:w-auto sm:min-w-[180px]">
-          <label className="mb-1 block text-sm font-medium">Fonte</label>
+          <label className="mb-1 block text-sm font-medium">{t('filterBar.sourceLabel')}</label>
           <select
             className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
             value={filters.source_id?.[0] ?? ''}
@@ -94,7 +96,7 @@ export function FilterBar({
               updateFilter('source_id', val ? [Number(val)] : undefined)
             }}
           >
-            <option value="">Tutte le fonti</option>
+            <option value="">{t('filterBar.allSources')}</option>
             {activeSources.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
@@ -104,7 +106,7 @@ export function FilterBar({
         </div>
 
         <div className="min-w-0 flex-1 sm:min-w-[150px] sm:flex-none">
-          <label className="mb-1 block text-sm font-medium">Da</label>
+          <label className="mb-1 block text-sm font-medium">{t('filterBar.dateFrom')}</label>
           <Input
             type="date"
             value={filters.date_from?.split('T')[0] || ''}
@@ -118,7 +120,7 @@ export function FilterBar({
         </div>
 
         <div className="min-w-0 flex-1 sm:min-w-[150px] sm:flex-none">
-          <label className="mb-1 block text-sm font-medium">A</label>
+          <label className="mb-1 block text-sm font-medium">{t('filterBar.dateTo')}</label>
           <Input
             type="date"
             value={filters.date_to?.split('T')[0] || ''}
@@ -134,10 +136,10 @@ export function FilterBar({
         {hasFilters && (
           <>
             <Button variant="ghost" size="sm" onClick={clearFilters}>
-              Pulisci filtri
+              {t('filterBar.clearFilters')}
             </Button>
             <Button variant="outline" size="sm" onClick={onSaveSearch}>
-              Salva ricerca
+              {t('filterBar.saveSearch')}
             </Button>
           </>
         )}

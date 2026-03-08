@@ -3,6 +3,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import { ThemeProvider } from '@/lib/theme-provider'
+import './lib/i18n'
 import './index.css'
 
 const queryClient = new QueryClient({

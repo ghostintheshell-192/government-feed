@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { ThemeToggle } from './components/theme-toggle'
 import { fetchNewsById } from './lib/api'
 import Sources from './pages/Sources'
@@ -49,17 +50,18 @@ function ArticleCrumb() {
 
 function Breadcrumb() {
   const { pathname } = useLocation()
+  const { t } = useTranslation()
 
   const segments: { label: string; to?: string }[] = []
 
   if (pathname === '/') {
-    segments.push({ label: 'Dashboard' })
+    segments.push({ label: t('breadcrumb.dashboard') })
   } else if (pathname.startsWith('/news/')) {
-    segments.push({ label: 'Dashboard', to: '/' })
+    segments.push({ label: t('breadcrumb.dashboard'), to: '/' })
   } else if (pathname === '/sources') {
-    segments.push({ label: 'Sources' })
+    segments.push({ label: t('breadcrumb.sources') })
   } else if (pathname === '/settings') {
-    segments.push({ label: 'Impostazioni' })
+    segments.push({ label: t('breadcrumb.settings') })
   }
 
   return (
@@ -91,17 +93,19 @@ function Breadcrumb() {
 }
 
 function AppLayout() {
+  const { t } = useTranslation()
+
   return (
     <div className="flex min-h-screen flex-col">
       <nav className="border-b bg-background px-4 py-3 shadow-sm md:px-6 md:py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="font-serif text-xl font-bold tracking-tight text-primary no-underline md:text-2xl">
-            Government Feed
+            {t('nav.brand')}
           </Link>
           <div className="flex items-center gap-3 md:gap-6">
-            <NavLink to="/">Dashboard</NavLink>
-            <NavLink to="/sources">Sources</NavLink>
-            <NavLink to="/settings">Impostazioni</NavLink>
+            <NavLink to="/">{t('nav.dashboard')}</NavLink>
+            <NavLink to="/sources">{t('nav.sources')}</NavLink>
+            <NavLink to="/settings">{t('nav.settings')}</NavLink>
             <ThemeToggle />
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -33,6 +34,7 @@ export function NewsCard({
   onSummaryUpdate,
 }: NewsCardProps) {
   const [summarizing, setSummarizing] = useState(false)
+  const { t, i18n } = useTranslation()
 
   const handleClick = () => {
     if (!isRead) onRead(item.id)
@@ -46,10 +48,10 @@ export function NewsCard({
       if (data.success) {
         onSummaryUpdate(item.id, data.summary)
       } else {
-        alert(data.message || 'Errore nella generazione del riassunto')
+        alert(data.message || t('common.errorSummary'))
       }
     } catch {
-      alert('Errore di connessione al servizio AI')
+      alert(t('common.errorAiConnection'))
     } finally {
       setSummarizing(false)
     }
@@ -86,7 +88,7 @@ export function NewsCard({
             <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               {sourceName && <Badge variant="secondary">{sourceName}</Badge>}
               <span>
-                {new Date(item.published_at).toLocaleDateString('it-IT', {
+                {new Date(item.published_at).toLocaleDateString(i18n.language, {
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric',
@@ -109,7 +111,7 @@ export function NewsCard({
               to={`/news/${item.id}`}
               onClick={(e) => e.stopPropagation()}
             >
-              Leggi articolo
+              {t('newsCard.readArticle')}
             </Link>
           </Button>
 
@@ -120,7 +122,7 @@ export function NewsCard({
               onClick={handleSummarize}
               disabled={summarizing}
             >
-              {summarizing ? 'Generando...' : 'Riassumi con AI'}
+              {summarizing ? t('common.generating') : t('common.aiSummarize')}
             </Button>
           )}
 
@@ -133,7 +135,7 @@ export function NewsCard({
                 window.open(item.external_id!, '_blank')
               }}
             >
-              Apri originale
+              {t('common.openOriginal')}
             </Button>
           )}
         </div>

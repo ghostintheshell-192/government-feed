@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-
+import { useTranslation } from 'react-i18next'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -23,6 +23,7 @@ export default function NewsDetail() {
   const newsId = Number(id)
   const { markAsRead } = useReadStatus()
   const queryClient = useQueryClient()
+  const { t, i18n } = useTranslation()
 
   const [summarizing, setSummarizing] = useState(false)
   const [fetchingContent, setFetchingContent] = useState(false)
@@ -71,10 +72,10 @@ export default function NewsDetail() {
       if (data.success && data.content) {
         updateItem({ content: data.content })
       } else {
-        alert(data.message || 'Impossibile recuperare il contenuto')
+        alert(data.message || t('newsDetail.errorFetchContent'))
       }
     } catch {
-      alert('Errore nel recupero del contenuto')
+      alert(t('newsDetail.errorFetchContentGeneric'))
     } finally {
       setFetchingContent(false)
     }
@@ -88,10 +89,10 @@ export default function NewsDetail() {
       if (data.success) {
         updateItem({ summary: data.summary })
       } else {
-        alert(data.message || 'Errore nella generazione del riassunto')
+        alert(data.message || t('common.errorSummary'))
       }
     } catch {
-      alert('Errore di connessione al servizio AI')
+      alert(t('common.errorAiConnection'))
     } finally {
       setSummarizing(false)
     }
@@ -113,10 +114,10 @@ export default function NewsDetail() {
       <div className="mx-auto max-w-4xl px-4 py-6 md:px-6">
         <div className="py-16 text-center">
           <h2 className="font-serif text-xl font-semibold text-muted-foreground">
-            Articolo non trovato
+            {t('common.notFound')}
           </h2>
           <p className="mt-2 text-muted-foreground">
-            L&apos;articolo richiesto non esiste o non è più disponibile.
+            {t('common.notFoundDesc')}
           </p>
         </div>
       </div>
@@ -133,8 +134,8 @@ export default function NewsDetail() {
         <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
           {sourceName && <Badge variant="secondary">{sourceName}</Badge>}
           <span>
-            Pubblicato il{' '}
-            {new Date(item.published_at).toLocaleDateString('it-IT', {
+            {t('newsDetail.publishedAt')}{' '}
+            {new Date(item.published_at).toLocaleDateString(i18n.language, {
               year: 'numeric',
               month: 'long',
               day: 'numeric',
@@ -148,7 +149,7 @@ export default function NewsDetail() {
           <Card className="mt-6 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/50">
             <CardContent className="pt-6">
               <p className="mb-2 text-sm font-semibold text-blue-700 dark:text-blue-300">
-                Riassunto AI
+                {t('newsDetail.aiSummary')}
               </p>
               <p className="leading-relaxed text-blue-900 dark:text-blue-100">
                 {item.summary}
@@ -167,15 +168,14 @@ export default function NewsDetail() {
               {item.content}
             </p>
             <p className="mt-4 text-sm italic text-muted-foreground">
-              Il contenuto completo non è ancora stato scaricato.
+              {t('newsDetail.partialContent')}
             </p>
           </div>
         ) : (
           <div className="py-8 text-center text-muted-foreground">
-            <p>Contenuto non disponibile.</p>
+            <p>{t('newsDetail.noContent')}</p>
             <p className="mt-1 text-sm">
-              Usa il pulsante &quot;Scarica contenuto&quot; per recuperare
-              l&apos;articolo completo.
+              {t('newsDetail.noContentHelp')}
             </p>
           </div>
         )}
@@ -189,7 +189,7 @@ export default function NewsDetail() {
               onClick={() => handleFetchContent()}
               disabled={fetchingContent}
             >
-              {fetchingContent ? 'Caricamento...' : 'Scarica contenuto'}
+              {fetchingContent ? t('common.loading') : t('newsDetail.fetchContent')}
             </Button>
           ) : (
             <Button
@@ -197,7 +197,7 @@ export default function NewsDetail() {
               onClick={() => handleFetchContent(true)}
               disabled={fetchingContent}
             >
-              {fetchingContent ? 'Caricamento...' : 'Aggiorna contenuto'}
+              {fetchingContent ? t('common.loading') : t('newsDetail.updateContent')}
             </Button>
           )}
 
@@ -207,7 +207,7 @@ export default function NewsDetail() {
               onClick={handleSummarize}
               disabled={summarizing}
             >
-              {summarizing ? 'Generando...' : 'Riassumi con AI'}
+              {summarizing ? t('common.generating') : t('common.aiSummarize')}
             </Button>
           )}
 
@@ -216,7 +216,7 @@ export default function NewsDetail() {
               variant="ghost"
               onClick={() => window.open(item.external_id!, '_blank')}
             >
-              Apri originale
+              {t('common.openOriginal')}
             </Button>
           )}
         </div>
