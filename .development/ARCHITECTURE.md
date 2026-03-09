@@ -32,6 +32,15 @@ For detailed documentation, see `docs/architecture.md`.
 - `dependencies.py` — Dependency injection helpers for FastAPI.
 - `main.py` — FastAPI main application.
 - `schemas.py` — Base schema for Source.
+- `state.py` — Shared application state for cross-router access.
+
+### backend/src/api/routes
+- `ai.py` — AI-related endpoints (summarization).
+- `cache.py` — Cache status endpoints.
+- `news.py` — News item endpoints.
+- `scheduler.py` — Background scheduler endpoints.
+- `settings.py` — Settings and feature flag endpoints.
+- `sources.py` — Source management endpoints.
 
 ### backend/src/core
 - `entities.py` — Status of content verification.
