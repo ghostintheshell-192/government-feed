@@ -76,6 +76,8 @@
     "themeDark": "Scuro",
     "themeSystem": "Sistema",
     "themeSystemHelp": "Seleziona \"Sistema\" per seguire le preferenze del tuo dispositivo.",
+    "templateLabel": "Stile visivo",
+    "templateHelp": "Cambia font, colori e personalità dell'interfaccia.",
     "aiConfig": "Configurazione AI (Ollama)",
     "aiActive": "Attiva",
     "aiInactive": "Disattivata",

@@ -1,0 +1,50 @@
+/*
+ * Brutalist — Raw, high contrast, no decoration
+ * Space Mono, black/white, zero radius, hard edges
+ * Light mode: stark white with heavy black borders
+ */
+html[data-template="brutalist"] {
+  --font-sans: "Space Mono", ui-monospace, monospace;
+  --font-serif: "Space Mono", ui-monospace, monospace;
+  --radius: 0rem;
+
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.10 0 0);
+  --card: oklch(0.99 0 0);
+  --card-foreground: oklch(0.10 0 0);
+  --popover: oklch(0.99 0 0);
+  --popover-foreground: oklch(0.10 0 0);
+  --primary: oklch(0.10 0 0);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.93 0 0);
+  --secondary-foreground: oklch(0.10 0 0);
+  --muted: oklch(0.93 0 0);
+  --muted-foreground: oklch(0.40 0 0);
+  --accent: oklch(0.93 0 0);
+  --accent-foreground: oklch(0.10 0 0);
+  --destructive: oklch(0.55 0.22 25);
+  --border: oklch(0.10 0 0);
+  --input: oklch(0.10 0 0 / 20%);
+  --ring: oklch(0.10 0 0);
+}
+
+html[data-template="brutalist"].dark {
+  --background: oklch(0.10 0 0);
+  --foreground: oklch(0.93 0 0);
+  --card: oklch(0.15 0 0);
+  --card-foreground: oklch(0.93 0 0);
+  --popover: oklch(0.15 0 0);
+  --popover-foreground: oklch(0.93 0 0);
+  --primary: oklch(0.93 0 0);
+  --primary-foreground: oklch(0.10 0 0);
+  --secondary: oklch(0.20 0 0);
+  --secondary-foreground: oklch(0.93 0 0);
+  --muted: oklch(0.20 0 0);
+  --muted-foreground: oklch(0.60 0 0);
+  --accent: oklch(0.20 0 0);
+  --accent-foreground: oklch(0.93 0 0);
+  --destructive: oklch(0.65 0.20 22);
+  --border: oklch(0.93 0 0);
+  --input: oklch(0.93 0 0 / 20%);
+  --ring: oklch(0.93 0 0);
+}

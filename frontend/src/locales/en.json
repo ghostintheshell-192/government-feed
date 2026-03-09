@@ -76,6 +76,8 @@
     "themeDark": "Dark",
     "themeSystem": "System",
     "themeSystemHelp": "Select \"System\" to follow your device preferences.",
+    "templateLabel": "Visual style",
+    "templateHelp": "Change fonts, colors, and interface personality.",
     "aiConfig": "AI Configuration (Ollama)",
     "aiActive": "Active",
     "aiInactive": "Inactive",

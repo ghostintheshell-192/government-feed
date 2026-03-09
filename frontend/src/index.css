@@ -2,6 +2,14 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @plugin "@tailwindcss/typography";
+
+/* Theme templates */
+@import "./themes/financial-times.css";
+@import "./themes/hacker.css";
+@import "./themes/brutalist.css";
+@import "./themes/gazette.css";
+@import "./themes/minimal.css";
+
 /*
  ---break---
  */
@@ -18,8 +26,8 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -54,7 +62,7 @@
 }
 /*
  ---break---
- Light theme: warm paper tones with teal accent
+ Fallback values (Financial Times is the default template)
  */
 :root {
   --radius: 0.625rem;
@@ -92,7 +100,7 @@
 }
 /*
  ---break---
- Dark theme: deep warm charcoal with teal accent
+ Dark mode fallback
  */
 .dark {
   --background: oklch(0.16 0.01 50);
