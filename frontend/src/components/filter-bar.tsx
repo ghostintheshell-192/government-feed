@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { SlidersHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { NewsFilters, Source } from '@/lib/types'
@@ -21,6 +22,7 @@ export function FilterBar({
 }: FilterBarProps) {
   const activeSources = sources.filter((s) => s.is_active)
   const [showRecent, setShowRecent] = useState(false)
+  const [showFilters, setShowFilters] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
   const { t } = useTranslation()
 
@@ -41,6 +43,11 @@ export function FilterBar({
     filters.date_to ||
     (filters.source_id && filters.source_id.length > 0)
 
+  const hasAdvancedFilters =
+    filters.date_from ||
+    filters.date_to ||
+    (filters.source_id && filters.source_id.length > 0)
+
   const applyRecentSearch = (query: string) => {
     onChange((prev) => ({ ...prev, search: query }))
     setShowRecent(false)
@@ -48,9 +55,8 @@ export function FilterBar({
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="relative w-full flex-1 sm:min-w-[200px]" ref={searchRef}>
-          <label className="mb-1 block text-sm font-medium">{t('filterBar.searchLabel')}</label>
+      <div className="flex items-end gap-2">
+        <div className="relative flex-1" ref={searchRef}>
           <Input
             type="text"
             placeholder={t('filterBar.searchPlaceholder')}
@@ -60,7 +66,6 @@ export function FilterBar({
             }
             onFocus={() => setShowRecent(true)}
             onBlur={() => {
-              // Delay to allow click on dropdown items
               setTimeout(() => setShowRecent(false), 200)
             }}
           />
@@ -86,52 +91,14 @@ export function FilterBar({
           )}
         </div>
 
-        <div className="w-full sm:w-auto sm:min-w-[180px]">
-          <label className="mb-1 block text-sm font-medium">{t('filterBar.sourceLabel')}</label>
-          <select
-            className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
-            value={filters.source_id?.[0] ?? ''}
-            onChange={(e) => {
-              const val = e.target.value
-              updateFilter('source_id', val ? [Number(val)] : undefined)
-            }}
-          >
-            <option value="">{t('filterBar.allSources')}</option>
-            {activeSources.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="min-w-0 flex-1 sm:min-w-[150px] sm:flex-none">
-          <label className="mb-1 block text-sm font-medium">{t('filterBar.dateFrom')}</label>
-          <Input
-            type="date"
-            value={filters.date_from?.split('T')[0] || ''}
-            onChange={(e) =>
-              updateFilter(
-                'date_from',
-                e.target.value ? e.target.value + 'T00:00:00' : undefined,
-              )
-            }
-          />
-        </div>
-
-        <div className="min-w-0 flex-1 sm:min-w-[150px] sm:flex-none">
-          <label className="mb-1 block text-sm font-medium">{t('filterBar.dateTo')}</label>
-          <Input
-            type="date"
-            value={filters.date_to?.split('T')[0] || ''}
-            onChange={(e) =>
-              updateFilter(
-                'date_to',
-                e.target.value ? e.target.value + 'T23:59:59' : undefined,
-              )
-            }
-          />
-        </div>
+        <Button
+          variant={showFilters || hasAdvancedFilters ? 'default' : 'outline'}
+          size="icon"
+          onClick={() => setShowFilters(!showFilters)}
+          title={t('filterBar.filtersToggle')}
+        >
+          <SlidersHorizontal className="h-4 w-4" />
+        </Button>
 
         {hasFilters && (
           <>
@@ -144,6 +111,57 @@ export function FilterBar({
           </>
         )}
       </div>
+
+      {showFilters && (
+        <div className="flex flex-wrap items-end gap-3 rounded-md border bg-card p-3">
+          <div className="min-w-[180px] flex-1">
+            <label className="mb-1 block text-sm font-medium">{t('filterBar.sourceLabel')}</label>
+            <select
+              className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+              value={filters.source_id?.[0] ?? ''}
+              onChange={(e) => {
+                const val = e.target.value
+                updateFilter('source_id', val ? [Number(val)] : undefined)
+              }}
+            >
+              <option value="">{t('filterBar.allSources')}</option>
+              {activeSources.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="min-w-[150px]">
+            <label className="mb-1 block text-sm font-medium">{t('filterBar.dateFrom')}</label>
+            <Input
+              type="date"
+              value={filters.date_from?.split('T')[0] || ''}
+              onChange={(e) =>
+                updateFilter(
+                  'date_from',
+                  e.target.value ? e.target.value + 'T00:00:00' : undefined,
+                )
+              }
+            />
+          </div>
+
+          <div className="min-w-[150px]">
+            <label className="mb-1 block text-sm font-medium">{t('filterBar.dateTo')}</label>
+            <Input
+              type="date"
+              value={filters.date_to?.split('T')[0] || ''}
+              onChange={(e) =>
+                updateFilter(
+                  'date_to',
+                  e.target.value ? e.target.value + 'T23:59:59' : undefined,
+                )
+              }
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

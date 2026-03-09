@@ -91,13 +91,15 @@ class OllamaService:
         if len(content) > 2000:
             content = content[:2000] + "..."
 
-        prompt = f"""Riassumi brevemente il seguente testo in italiano, in massimo {max_length} parole:
+        prompt = (
+            f"Scrivi un riassunto del testo seguente. "
+            f"Il riassunto DEVE essere lungo al massimo {max_length} parole. "
+            f"Non ripetere il titolo. Vai dritto al contenuto.\n\n"
+            f"Testo:\n{content}\n\n"
+            f"Riassunto (max {max_length} parole):"
+        )
 
-{content}
-
-Riassunto:"""
-
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with httpx.AsyncClient(timeout=120.0) as client:
             response = await client.post(
                 f"{self.endpoint}/api/generate",
                 json={

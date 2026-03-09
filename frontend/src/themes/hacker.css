@@ -1,0 +1,50 @@
+/*
+ * Hacker — Terminal aesthetic, cyber green, monospace
+ * JetBrains Mono, green accent (#00ff9f), deep black background
+ * Light mode: dark-on-light terminal feel with green tint
+ */
+html[data-template="hacker"] {
+  --font-sans: "JetBrains Mono", ui-monospace, monospace;
+  --font-serif: "JetBrains Mono", ui-monospace, monospace;
+  --radius: 0.25rem;
+
+  --background: oklch(0.94 0.02 155);
+  --foreground: oklch(0.18 0.04 155);
+  --card: oklch(0.96 0.015 155);
+  --card-foreground: oklch(0.18 0.04 155);
+  --popover: oklch(0.96 0.015 155);
+  --popover-foreground: oklch(0.18 0.04 155);
+  --primary: oklch(0.40 0.14 155);
+  --primary-foreground: oklch(0.96 0.01 155);
+  --secondary: oklch(0.90 0.025 155);
+  --secondary-foreground: oklch(0.22 0.04 155);
+  --muted: oklch(0.90 0.025 155);
+  --muted-foreground: oklch(0.40 0.03 155);
+  --accent: oklch(0.88 0.03 155);
+  --accent-foreground: oklch(0.22 0.04 155);
+  --destructive: oklch(0.55 0.22 25);
+  --border: oklch(0.82 0.03 155);
+  --input: oklch(0.82 0.03 155);
+  --ring: oklch(0.50 0.14 155);
+}
+
+html[data-template="hacker"].dark {
+  --background: oklch(0.10 0.015 160);
+  --foreground: oklch(0.90 0.01 150);
+  --card: oklch(0.14 0.015 160);
+  --card-foreground: oklch(0.90 0.01 150);
+  --popover: oklch(0.14 0.015 160);
+  --popover-foreground: oklch(0.90 0.01 150);
+  --primary: oklch(0.80 0.20 155);
+  --primary-foreground: oklch(0.10 0.015 160);
+  --secondary: oklch(0.20 0.02 160);
+  --secondary-foreground: oklch(0.80 0.01 150);
+  --muted: oklch(0.20 0.02 160);
+  --muted-foreground: oklch(0.55 0.01 150);
+  --accent: oklch(0.20 0.02 160);
+  --accent-foreground: oklch(0.80 0.20 155);
+  --destructive: oklch(0.65 0.20 22);
+  --border: oklch(0.80 0.20 155 / 15%);
+  --input: oklch(0.80 0.20 155 / 12%);
+  --ring: oklch(0.80 0.20 155);
+}

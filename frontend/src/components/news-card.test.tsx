@@ -92,18 +92,20 @@ describe('NewsCard', () => {
     expect(screen.getByText('Some article content here for preview.')).toBeInTheDocument()
   })
 
-  it('strips HTML tags from content snippet', () => {
+  it('renders HTML content preserving structure in preview', () => {
     renderCard({
       item: makeItem({ content: '<p>Paragraph with <strong>bold</strong> text.</p>' }),
     })
-    expect(screen.getByText('Paragraph with bold text.')).toBeInTheDocument()
+    // HTML is rendered via ArticleContent — text is split across elements
+    expect(screen.getByText('bold')).toBeInTheDocument()
+    expect(screen.getByText(/Paragraph with/)).toBeInTheDocument()
   })
 
-  it('truncates long content with ellipsis', () => {
+  it('renders long content in preview (truncated via CSS line-clamp)', () => {
     const longContent = 'Word '.repeat(100)
     renderCard({ item: makeItem({ content: longContent }) })
-    const preview = screen.getByText(/Word/)
-    expect(preview.textContent).toContain('...')
+    // Truncation is handled by CSS line-clamp, not text ellipsis
+    expect(screen.getByText(/Word/)).toBeInTheDocument()
   })
 
   it('shows "Leggi articolo" link to detail page', () => {

@@ -32,6 +32,7 @@
     "dateFrom": "Da",
     "dateTo": "A",
     "recentSearches": "Ricerche recenti",
+    "filtersToggle": "Filtri avanzati",
     "clearFilters": "Pulisci filtri",
     "saveSearch": "Salva ricerca"
   },
@@ -64,7 +65,8 @@
     "fetchContent": "Scarica contenuto",
     "updateContent": "Aggiorna contenuto",
     "errorFetchContent": "Impossibile recuperare il contenuto",
-    "errorFetchContentGeneric": "Errore nel recupero del contenuto"
+    "errorFetchContentGeneric": "Errore nel recupero del contenuto",
+    "regenerateSummary": "Rigenera riassunto"
   },
   "settings": {
     "title": "Impostazioni",
@@ -75,6 +77,8 @@
     "themeDark": "Scuro",
     "themeSystem": "Sistema",
     "themeSystemHelp": "Seleziona \"Sistema\" per seguire le preferenze del tuo dispositivo.",
+    "templateLabel": "Stile visivo",
+    "templateHelp": "Cambia font, colori e personalità dell'interfaccia.",
     "aiConfig": "Configurazione AI (Ollama)",
     "aiActive": "Attiva",
     "aiInactive": "Disattivata",

@@ -37,25 +37,37 @@ function renderBar(props: Partial<typeof defaultProps> = {}) {
   return render(<FilterBar {...defaultProps} {...props} />)
 }
 
+async function openFilters() {
+  await userEvent.click(screen.getByTitle('Filtri avanzati'))
+}
+
 describe('FilterBar', () => {
   it('renders search input', () => {
     renderBar()
     expect(screen.getByPlaceholderText('Cerca nelle notizie...')).toBeInTheDocument()
   })
 
-  it('renders source dropdown with only active sources', () => {
+  it('hides advanced filters by default', () => {
     renderBar()
+    expect(screen.queryByText('Tutte le fonti')).not.toBeInTheDocument()
+    expect(screen.queryByText('Da')).not.toBeInTheDocument()
+  })
+
+  it('shows advanced filters on toggle', async () => {
+    renderBar()
+    await openFilters()
     expect(screen.getByText('Tutte le fonti')).toBeInTheDocument()
+    expect(screen.getByText('Da')).toBeInTheDocument()
+    expect(screen.getByText('A')).toBeInTheDocument()
+  })
+
+  it('renders source dropdown with only active sources', async () => {
+    renderBar()
+    await openFilters()
     expect(screen.getByText('Gazzetta Ufficiale')).toBeInTheDocument()
     expect(screen.getByText('MISE')).toBeInTheDocument()
     // MEF is inactive, should not appear
     expect(screen.queryByText('MEF')).not.toBeInTheDocument()
-  })
-
-  it('renders date inputs', () => {
-    renderBar()
-    expect(screen.getByText('Da')).toBeInTheDocument()
-    expect(screen.getByText('A')).toBeInTheDocument()
   })
 
   it('calls onChange with search value', async () => {
@@ -75,6 +87,7 @@ describe('FilterBar', () => {
   it('calls onChange when selecting a source', async () => {
     const onChange = vi.fn()
     renderBar({ onChange })
+    await openFilters()
 
     await userEvent.selectOptions(
       screen.getByRole('combobox'),
@@ -162,5 +175,10 @@ describe('FilterBar', () => {
   it('shows filters with date_from active', () => {
     renderBar({ filters: { date_from: '2026-01-01T00:00:00' } })
     expect(screen.getByText('Pulisci filtri')).toBeInTheDocument()
+  })
+
+  it('renders filter toggle button', () => {
+    renderBar()
+    expect(screen.getByTitle('Filtri avanzati')).toBeInTheDocument()
   })
 })

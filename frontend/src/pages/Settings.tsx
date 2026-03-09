@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useTheme } from '@/lib/theme-provider'
+import { useTheme, TEMPLATES } from '@/lib/theme-provider'
 
 interface SettingsData {
   ollama_endpoint: string
@@ -22,7 +22,7 @@ type Theme = 'light' | 'dark' | 'system'
 
 export default function Settings() {
   const queryClient = useQueryClient()
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme, template, setTemplate } = useTheme()
   const { t } = useTranslation()
 
   const [settings, setSettings] = useState<SettingsData>({
@@ -85,7 +85,7 @@ export default function Settings() {
   ]
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6 md:px-6">
+    <div className="mx-auto max-w-4xl px-4 py-6 md:px-6">
       <div className="mb-6">
         <h1 className="font-serif text-3xl font-bold">{t('settings.title')}</h1>
         <p className="mt-1 text-muted-foreground">
@@ -115,6 +115,27 @@ export default function Settings() {
             </div>
             <p className="text-sm text-muted-foreground">
               {t('settings.themeSystemHelp')}
+            </p>
+          </div>
+
+          <Separator className="my-4" />
+
+          <div className="space-y-3">
+            <label className="text-sm font-medium">{t('settings.templateLabel')}</label>
+            <div className="flex flex-wrap gap-2">
+              {TEMPLATES.map((tpl) => (
+                <Button
+                  key={tpl.value}
+                  variant={template === tpl.value ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setTemplate(tpl.value)}
+                >
+                  {tpl.label}
+                </Button>
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {t('settings.templateHelp')}
             </p>
           </div>
         </CardContent>

@@ -58,15 +58,122 @@ ALLOWED_ATTRS = {
 }
 
 
+_MAX_FRAGMENT_LENGTH = 160
+
+# Heading text patterns that signal the end of article content.
+# Everything from these headings onward is boilerplate (contacts, related docs, etc.)
+# Patterns cover EN and IT sources; extend as new languages are added.
+_BOILERPLATE_HEADING_PATTERNS = re.compile(
+    r"^("
+    # EN patterns
+    r"further\s+information"
+    r"|related\s+documents?"
+    r"|more\s+on\s+the\s+same\s+topic"
+    r"|contact\s*(us|info|information)?"
+    r"|press\s+contacts?"
+    r"|see\s+also"
+    # IT patterns
+    r"|ulteriori\s+informazioni"
+    r"|documenti\s+correlati"
+    r"|contatti"
+    r"|per\s+saperne\s+di\s+più"
+    r"|vedi\s+anche"
+    r")$",
+    re.IGNORECASE,
+)
+
+
+def _is_continuation_fragment(text: str, prev_text: str) -> bool:
+    """Detect orphaned continuation fragments using structural signals.
+
+    Instead of matching specific legal keywords, this uses language-agnostic
+    heuristics: continuation punctuation, lowercase starts (mid-sentence),
+    and whether the previous paragraph ends with continuation punctuation.
+    """
+    if not text or len(text) > _MAX_FRAGMENT_LENGTH:
+        return False
+    # Current paragraph starts with continuation punctuation
+    if text[0] in ",;(":
+        return True
+    # Current paragraph starts with lowercase — mid-sentence continuation
+    if text[0].islower():
+        return True
+    # Short sign-off pattern like -CFTC- or -END-
+    if text[0] == "-" and len(text) < 30 and re.match(r"^-\w+", text):
+        return True
+    # Previous paragraph ends with continuation punctuation — next is continuation
+    if prev_text:
+        last_char = prev_text.rstrip()[-1] if prev_text.rstrip() else ""
+        if last_char in ",;:":
+            return True
+    return False
+
+
+def _merge_citation_fragments(element: Tag) -> None:
+    """Merge short continuation <p> fragments into the preceding <p>.
+
+    Government and regulatory documents often split citation references across
+    multiple <p> tags. This function detects fragments using structural signals
+    (punctuation, case, paragraph length) rather than keyword matching, making
+    it work across languages and jurisdictions.
+
+    Only merges paragraphs that share the same direct parent (no cross-block
+    merging).
+    """
+    for p in list(element.find_all("p")):
+        if p.parent is None:
+            continue  # already detached
+        text = p.get_text(strip=True)
+        prev = p.find_previous_sibling("p")
+        if prev is None or prev.parent is not p.parent:
+            continue
+        prev_text = prev.get_text(strip=True)
+        if not _is_continuation_fragment(text, prev_text):
+            continue
+        # Merge: append a space then move all children of p into prev
+        prev.append(" ")
+        for child in list(p.children):
+            prev.append(child.extract())
+        p.decompose()
+
+
+def _remove_trailing_boilerplate(element: Tag) -> None:
+    """Remove boilerplate sections from the end of article content.
+
+    Government pages often end with contact blocks, related documents,
+    and "more on the same topic" sections identified by heading text
+    rather than CSS classes. This removes the heading and all subsequent
+    siblings when a boilerplate heading is detected.
+    """
+    headings = element.find_all(re.compile(r"^h[1-6]$"))
+    for heading in headings:
+        text = heading.get_text(strip=True)
+        if _BOILERPLATE_HEADING_PATTERNS.match(text):
+            # Remove this heading and everything after it
+            for sibling in list(heading.find_next_siblings()):
+                sibling.decompose()
+            heading.decompose()
+            break  # only trim from the first match onward
+
+
 def _clean_html(element: Tag, base_url: str = "") -> str:
     """Extract semantic HTML from a BeautifulSoup element, keeping only allowed tags."""
     # Remove noise elements inside content
     for noise in element.select(
-        "nav, .menu, .sidebar, .breadcrumb, .pagination, .share-links, "
-        ".social-share, .related-posts, .comments, form, "
-        "script, style, iframe, noscript, svg, video, audio"
+        "nav, aside, .menu, .sidebar, .breadcrumb, .pagination, "
+        ".share-links, .social-share, .comments, form, "
+        "script, style, iframe, noscript, svg, video, audio, "
+        # Related/recommended content sections (common across CMS platforms)
+        '[class*="related"], [class*="recommended"], [class*="more-on"], '
+        '[class*="teaser"], [role="complementary"]'
     ):
         noise.decompose()
+
+    # Remove trailing boilerplate sections (contacts, related docs, etc.)
+    _remove_trailing_boilerplate(element)
+
+    # Merge citation/continuation fragments before walking the tree
+    _merge_citation_fragments(element)
 
     # Walk the tree and rebuild with only allowed tags
     result_parts: list[str] = []

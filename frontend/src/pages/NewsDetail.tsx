@@ -146,12 +146,12 @@ export default function NewsDetail() {
         </div>
 
         {item.summary && (
-          <Card className="mt-6 border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/50">
+          <Card className="mt-6 border-primary/20 bg-primary/5">
             <CardContent className="pt-6">
-              <p className="mb-2 text-sm font-semibold text-blue-700 dark:text-blue-300">
+              <p className="mb-2 text-sm font-semibold text-primary">
                 {t('newsDetail.aiSummary')}
               </p>
-              <p className="leading-relaxed text-blue-900 dark:text-blue-100">
+              <p className="leading-relaxed text-foreground/90">
                 {item.summary}
               </p>
             </CardContent>
@@ -201,13 +201,17 @@ export default function NewsDetail() {
             </Button>
           )}
 
-          {features?.ai_enabled && !item.summary && (
+          {features?.ai_enabled && (
             <Button
-              variant="outline"
+              variant={item.summary ? 'ghost' : 'outline'}
               onClick={handleSummarize}
               disabled={summarizing}
             >
-              {summarizing ? t('common.generating') : t('common.aiSummarize')}
+              {summarizing
+                ? t('common.generating')
+                : item.summary
+                  ? t('newsDetail.regenerateSummary')
+                  : t('common.aiSummarize')}
             </Button>
           )}
 

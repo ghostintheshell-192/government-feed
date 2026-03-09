@@ -32,6 +32,7 @@
     "dateFrom": "From",
     "dateTo": "To",
     "recentSearches": "Recent searches",
+    "filtersToggle": "Advanced filters",
     "clearFilters": "Clear filters",
     "saveSearch": "Save search"
   },
@@ -64,7 +65,8 @@
     "fetchContent": "Download content",
     "updateContent": "Update content",
     "errorFetchContent": "Unable to retrieve content",
-    "errorFetchContentGeneric": "Error retrieving content"
+    "errorFetchContentGeneric": "Error retrieving content",
+    "regenerateSummary": "Regenerate summary"
   },
   "settings": {
     "title": "Settings",
@@ -75,6 +77,8 @@
     "themeDark": "Dark",
     "themeSystem": "System",
     "themeSystemHelp": "Select \"System\" to follow your device preferences.",
+    "templateLabel": "Visual style",
+    "templateHelp": "Change fonts, colors, and interface personality.",
     "aiConfig": "AI Configuration (Ollama)",
     "aiActive": "Active",
     "aiInactive": "Inactive",
