@@ -5,9 +5,11 @@
 **Priority**: should-have
 **Depends on**: [source-management](../implemented/source-management.md)
 
+**Related ADR**: [ADR-005 Geographic Levels Navigation](../../reference/decisions/005-geographic-levels-navigation.md)
+
 ## Summary
 
-Community marketplace for discovering, contributing, and sharing institutional feed sources, evolving from a static GitHub JSON registry to a full backend-powered platform with accounts and ratings.
+Community marketplace for discovering, contributing, and sharing institutional feed sources, evolving from a static GitHub JSON registry to a full backend-powered platform with accounts and ratings. Sources in the registry are classified by geographic level (local, national, continental, global) per ADR-005, enabling the concentric navigation UX.
 
 ## User Stories
 
@@ -15,12 +17,13 @@ Community marketplace for discovering, contributing, and sharing institutional f
 - As a user, I want to contribute feeds I know about so others can benefit
 - As a user, I want to see how popular and reliable a feed is before subscribing
 - As a user, I want to import/export my feed configuration
+- As a user, I want to browse the registry filtered by geographic level
 
 ## Requirements
 
 ### Functional
 
-- [ ] Feed discovery: search by keyword, geography, category, language, institution type
+- [ ] Feed discovery: search by keyword, geographic level, country, category, language, institution type
 - [ ] Feed contribution: submit new feed URL with title, description, tags, category
 - [ ] Automatic feed validation (URL responds, content is valid RSS/Atom)
 - [ ] Popularity metrics: follower count per feed
@@ -36,8 +39,8 @@ Community marketplace for discovering, contributing, and sharing institutional f
 ## Technical Notes
 
 - **Phase 1**: GitHub repository with JSON file, static interface
-  - JSON schema for feed entries (see vision.md for example)
-  - Simple web interface to browse feeds
+  - JSON schema for feed entries including geographic_level, country_code, region
+  - Simple web interface to browse feeds by geographic level
   - Contribution via pull requests
 - **Phase 2**: Backend API + database for dynamic registry
   - REST API for CRUD operations on registry entries

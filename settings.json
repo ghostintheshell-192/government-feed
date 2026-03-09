@@ -1,6 +1,7 @@
 {
   "ollama_endpoint": "http://localhost:11434",
-  "ollama_model": "deepseek-r1:7b",
+  "ollama_model": "gemma3:4b",
   "ai_enabled": true,
-  "summary_max_words": 200
+  "summary_max_words": 200,
+  "scheduler_enabled": true
 }
