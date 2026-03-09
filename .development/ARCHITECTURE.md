@@ -35,6 +35,7 @@ For detailed documentation, see `docs/architecture.md`.
 - `state.py` — Shared application state for cross-router access.
 
 ### backend/src/api/routes
+- `admin.py` — Admin endpoints for feed inspection, content cleanup, and diagnostics.
 - `ai.py` — AI-related endpoints (summarization).
 - `cache.py` — Cache status endpoints.
 - `news.py` — News item endpoints.
