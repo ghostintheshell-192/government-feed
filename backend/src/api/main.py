@@ -48,7 +48,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 app = FastAPI(
     title="Government Feed API",
     description="Aggregator for institutional news and government communications",
-    version="0.1.0",
+    version="0.2.0",
     lifespan=lifespan,
 )
 
@@ -74,4 +74,4 @@ app.include_router(admin.router)
 @app.get("/")
 async def root():
     """Health check endpoint."""
-    return {"message": "Government Feed API", "version": "0.1.0", "status": "running"}
+    return {"message": "Government Feed API", "version": "0.2.0", "status": "running"}
