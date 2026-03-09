@@ -64,7 +64,8 @@
     "fetchContent": "Scarica contenuto",
     "updateContent": "Aggiorna contenuto",
     "errorFetchContent": "Impossibile recuperare il contenuto",
-    "errorFetchContentGeneric": "Errore nel recupero del contenuto"
+    "errorFetchContentGeneric": "Errore nel recupero del contenuto",
+    "regenerateSummary": "Rigenera riassunto"
   },
   "settings": {
     "title": "Impostazioni",

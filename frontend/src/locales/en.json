@@ -64,7 +64,8 @@
     "fetchContent": "Download content",
     "updateContent": "Update content",
     "errorFetchContent": "Unable to retrieve content",
-    "errorFetchContentGeneric": "Error retrieving content"
+    "errorFetchContentGeneric": "Error retrieving content",
+    "regenerateSummary": "Regenerate summary"
   },
   "settings": {
     "title": "Settings",
