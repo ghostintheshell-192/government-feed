@@ -42,6 +42,10 @@ See: `specs/implemented/` for completed specifications.
 - Sources Management: CRUD UI with modal form, import trigger, toggle active
 - Frontend Tests: 73 Vitest tests
 
+## Design Decisions In Progress
+
+- **ADR-005 Geographic Levels Navigation** (proposed): Concentric geographic levels (local → national → continental → global) as primary navigation structure, unifying onboarding, source management, and feed discovery. Starter packs spec updated to reflect this. See `reference/decisions/005-geographic-levels-navigation.md`.
+
 ## Partially Complete / Known Gaps
 
 - **Feed Discovery text search**: DuckDuckGo integration not returning results — URL discovery works, text search blocked (moved to M4a)

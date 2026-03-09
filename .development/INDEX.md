@@ -1,6 +1,6 @@
 # INDEX - Government Feed Development Documentation
 
-*Auto-generated: 2026-03-08 17:31*
+*Auto-generated: 2026-03-09 19:40*
 
 ---
 
@@ -19,31 +19,31 @@
 
 ### (root)/ (4 files)
 
-- [INDEX.md](INDEX.md) (5KB, 2026-03-08) **RECENT**
-- [ARCHITECTURE.md](ARCHITECTURE.md) (2KB, 2026-03-08) **RECENT**
+- [ARCHITECTURE.md](ARCHITECTURE.md) (2KB, 2026-03-09) **RECENT**
 - [CURRENT-STATUS.md](CURRENT-STATUS.md) (3KB, 2026-03-08) **RECENT**
+- [INDEX.md](INDEX.md) (6KB, 2026-03-08) **RECENT**
 - [README.md](README.md) (2KB, 2026-02-07)
 
 ### specs/ (1 files)
 
 - [README.md](specs/README.md) (1KB, 2026-02-07)
 
-### specs/backlog/ (11 files)
+### specs/backlog/ (10 files)
 
-- [relevance-scoring.md](specs/backlog/relevance-scoring.md) (2KB, 2026-02-07)
-- [search-discovery.md](specs/backlog/search-discovery.md) (1KB, 2026-02-07)
-- [starter-packs.md](specs/backlog/starter-packs.md) (1KB, 2026-02-07)
-- [trend-detection.md](specs/backlog/trend-detection.md) (1KB, 2026-02-07)
-- [ui-preferences.md](specs/backlog/ui-preferences.md) (1KB, 2026-02-07)
-- [ai-categorization.md](specs/backlog/ai-categorization.md) (1KB, 2026-02-07)
-- [data-export.md](specs/backlog/data-export.md) (1KB, 2026-02-07)
-- [feed-registry.md](specs/backlog/feed-registry.md) (2KB, 2026-02-07)
-- [import-export-config.md](specs/backlog/import-export-config.md) (1KB, 2026-02-07)
+- [feed-registry.md](specs/backlog/feed-registry.md) (2KB, 2026-03-08) **RECENT**
+- [starter-packs.md](specs/backlog/starter-packs.md) (3KB, 2026-03-08) **RECENT**
+- [ai-categorization.md](specs/backlog/ai-categorization.md) (1KB, 2026-03-08) **RECENT**
+- [data-export.md](specs/backlog/data-export.md) (1KB, 2026-03-08) **RECENT**
+- [import-export-config.md](specs/backlog/import-export-config.md) (1KB, 2026-03-08) **RECENT**
+- [notifications.md](specs/backlog/notifications.md) (2KB, 2026-03-08) **RECENT**
+- [relevance-scoring.md](specs/backlog/relevance-scoring.md) (2KB, 2026-03-08) **RECENT**
+- [trend-detection.md](specs/backlog/trend-detection.md) (1KB, 2026-03-08) **RECENT**
+- [ui-preferences.md](specs/backlog/ui-preferences.md) (1KB, 2026-03-08) **RECENT**
 - [multi-user-auth.md](specs/backlog/multi-user-auth.md) (2KB, 2026-02-07)
-- [notifications.md](specs/backlog/notifications.md) (2KB, 2026-02-07)
 
-### specs/implemented/ (16 files)
+### specs/implemented/ (17 files)
 
+- [search-discovery.md](specs/implemented/search-discovery.md) (1KB, 2026-03-08) **RECENT**
 - [dashboard-news-browsing.md](specs/implemented/dashboard-news-browsing.md) (1KB, 2026-03-07) **RECENT**
 - [news-detail-view.md](specs/implemented/news-detail-view.md) (1KB, 2026-03-07) **RECENT**
 - [redis-caching.md](specs/implemented/redis-caching.md) (2KB, 2026-02-07)
@@ -61,17 +61,20 @@
 - [source-management.md](specs/implemented/source-management.md) (2KB, 2026-02-07)
 - [structured-logging.md](specs/implemented/structured-logging.md) (1KB, 2026-02-07)
 
-### specs/planned/ (2 files)
+### specs/planned/ (3 files)
 
+- [feed-admin-tools.md](specs/planned/feed-admin-tools.md) (5KB, 2026-03-08) **RECENT**
 - [feed-discovery-automated.md](specs/planned/feed-discovery-automated.md) (8KB, 2026-03-08) **RECENT**
 - [feed-health-monitor.md](specs/planned/feed-health-monitor.md) (5KB, 2026-03-08) **RECENT**
 
-### tech-debt/ (11 files)
+### tech-debt/ (13 files)
 
+- [code-review-2026-03-08.md](tech-debt/code-review-2026-03-08.md) (41KB, 2026-03-08) **RECENT**
+- [dependency-analysis-2026-03-08.md](tech-debt/dependency-analysis-2026-03-08.md) (14KB, 2026-03-08) **RECENT**
+- [security-audit-2026-03-08.md](tech-debt/security-audit-2026-03-08.md) (33KB, 2026-03-08) **RECENT**
+- [security-ssrf-arbitrary-urls.md](tech-debt/security-ssrf-arbitrary-urls.md) (10KB, 2026-03-08) **RECENT**
 - [core-entity-model-misalignment.md](tech-debt/core-entity-model-misalignment.md) (4KB, 2026-03-08) **RECENT**
 - [README.md](tech-debt/README.md) (2KB, 2026-03-07) **RECENT**
-- [deprecated-datetime-utcnow.md](tech-debt/deprecated-datetime-utcnow.md) (1KB, 2026-03-07) **RECENT**
-- [deprecated-fastapi-pydantic-apis.md](tech-debt/deprecated-fastapi-pydantic-apis.md) (1KB, 2026-03-07) **RECENT**
 - [global-mutable-state-main.md](tech-debt/global-mutable-state-main.md) (1KB, 2026-03-07) **RECENT**
 - [duplicated-html-stripping.md](tech-debt/duplicated-html-stripping.md) (<1KB, 2026-03-07) **RECENT**
 - [feedparser-bypasses-uow.md](tech-debt/feedparser-bypasses-uow.md) (1KB, 2026-03-07) **RECENT**
@@ -80,12 +83,21 @@
 - [_TEMPLATE.md](tech-debt/_TEMPLATE.md) (1KB, 2026-02-07)
 - [pre-commit-grep-regex.md](tech-debt/pre-commit-grep-regex.md) (1KB, 2026-02-07)
 
-### reference/decisions/ (4 files)
+### reference/decisions/ (6 files)
 
+- [005-geographic-levels-navigation.md](reference/decisions/005-geographic-levels-navigation.md) (4KB, 2026-03-08) **RECENT**
+- [004-master-detail-layout.md](reference/decisions/004-master-detail-layout.md) (2KB, 2026-03-08) **RECENT**
 - [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) (1KB, 2026-02-07)
 - [002-privacy-first-ai.md](reference/decisions/002-privacy-first-ai.md) (1KB, 2026-02-07)
 - [003-content-deduplication.md](reference/decisions/003-content-deduplication.md) (1KB, 2026-02-07)
 - [README.md](reference/decisions/README.md) (<1KB, 2026-02-07)
+
+### archive/completed/ (4 files)
+
+- [2026-03-08_security-xxe-feed-parser.md](archive/completed/2026-03-08_security-xxe-feed-parser.md) (10KB, 2026-03-08) **RECENT**
+- [2026-03-08_deprecated-datetime-utcnow.md](archive/completed/2026-03-08_deprecated-datetime-utcnow.md) (1KB, 2026-03-08) **RECENT**
+- [2026-03-08_deprecated-fastapi-pydantic-apis.md](archive/completed/2026-03-08_deprecated-fastapi-pydantic-apis.md) (1KB, 2026-03-08) **RECENT**
+- [2026-03-08_security-unvalidated-settings-endpoint.md](archive/completed/2026-03-08_security-unvalidated-settings-endpoint.md) (3KB, 2026-03-08) **RECENT**
 
 ---
 
@@ -96,7 +108,7 @@
 ### docs/
 
 - [README.md](docs/README.md) (<1KB, 2026-03-08) **RECENT**
-- [roadmap.md](docs/roadmap.md) (2KB, 2026-03-08) **RECENT**
+- [roadmap.md](docs/roadmap.md) (5KB, 2026-03-08) **RECENT**
 - [technical.md](docs/technical.md) (4KB, 2026-03-08) **RECENT**
 - [vision.md](docs/vision.md) (14KB, 2025-10-25)
 
@@ -104,16 +116,16 @@
 
 ## Recently Modified (last 7 days)
 
-1. [INDEX.md](INDEX.md) (today)
-2. [core-entity-model-misalignment.md](tech-debt/core-entity-model-misalignment.md) (today)
-3. [feed-discovery-automated.md](specs/planned/feed-discovery-automated.md) (today)
-4. [feed-health-monitor.md](specs/planned/feed-health-monitor.md) (today)
-5. [ARCHITECTURE.md](ARCHITECTURE.md) (today)
-6. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
-7. [README.md](tech-debt/README.md) (today)
-8. [deprecated-datetime-utcnow.md](tech-debt/deprecated-datetime-utcnow.md) (today)
-9. [deprecated-fastapi-pydantic-apis.md](tech-debt/deprecated-fastapi-pydantic-apis.md) (today)
-10. [global-mutable-state-main.md](tech-debt/global-mutable-state-main.md) (today)
+1. [ARCHITECTURE.md](ARCHITECTURE.md) (today)
+2. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
+3. [feed-registry.md](specs/backlog/feed-registry.md) (today)
+4. [starter-packs.md](specs/backlog/starter-packs.md) (today)
+5. [005-geographic-levels-navigation.md](reference/decisions/005-geographic-levels-navigation.md) (today)
+6. [INDEX.md](INDEX.md) (today)
+7. [004-master-detail-layout.md](reference/decisions/004-master-detail-layout.md) (today)
+8. [2026-03-08_security-xxe-feed-parser.md](archive/completed/2026-03-08_security-xxe-feed-parser.md) (today)
+9. [code-review-2026-03-08.md](tech-debt/code-review-2026-03-08.md) (today)
+10. [dependency-analysis-2026-03-08.md](tech-debt/dependency-analysis-2026-03-08.md) (today)
 
 ---
 
