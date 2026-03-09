@@ -208,6 +208,111 @@ class TestCleanHtmlNoiseRemoval:
         assert "Extra info" not in result
 
 
+class TestTrailingBoilerplateRemoval:
+    """Tests for heading-based boilerplate trimming."""
+
+    def test_removes_further_information_section(self):
+        """'Further information' heading and everything after it is removed."""
+        soup = make_soup(
+            "<article>"
+            "<p>Article content.</p>"
+            "<h4>Further information</h4>"
+            "<p>press@esma.europa.eu</p>"
+            "<h6>Author Name</h6>"
+            "</article>"
+        )
+        result = _clean_html(soup.article)
+        assert "Article content." in result
+        assert "press@esma" not in result
+        assert "Author Name" not in result
+
+    def test_removes_related_documents_heading(self):
+        """'Related Documents' heading and table after it are removed."""
+        soup = make_soup(
+            "<article>"
+            "<p>Main text here.</p>"
+            "<h5>Related Documents</h5>"
+            "<table><tr><td>Document.pdf</td></tr></table>"
+            "</article>"
+        )
+        result = _clean_html(soup.article)
+        assert "Main text here." in result
+        assert "Document.pdf" not in result
+
+    def test_removes_more_on_same_topic_heading(self):
+        """'More on the same topic' heading and links are removed."""
+        soup = make_soup(
+            "<article>"
+            "<p>Core article.</p>"
+            "<h4>More on the same topic</h4>"
+            '<a href="/other">Other article</a>'
+            "<p>Some other news snippet</p>"
+            "</article>"
+        )
+        result = _clean_html(soup.article)
+        assert "Core article." in result
+        assert "Other article" not in result
+
+    def test_removes_italian_ulteriori_informazioni(self):
+        """Italian 'Ulteriori informazioni' heading is detected."""
+        soup = make_soup(
+            "<article>"
+            "<p>Contenuto articolo.</p>"
+            "<h4>Ulteriori informazioni</h4>"
+            "<p>Ufficio stampa: press@example.it</p>"
+            "</article>"
+        )
+        result = _clean_html(soup.article)
+        assert "Contenuto articolo." in result
+        assert "press@example" not in result
+
+    def test_removes_italian_contatti(self):
+        """Italian 'Contatti' heading is detected."""
+        soup = make_soup(
+            "<article>"
+            "<p>Testo principale.</p>"
+            "<h3>Contatti</h3>"
+            "<p>Tel: 06 12345</p>"
+            "</article>"
+        )
+        result = _clean_html(soup.article)
+        assert "Testo principale." in result
+        assert "06 12345" not in result
+
+    def test_preserves_content_before_boilerplate(self):
+        """All content before the boilerplate heading is preserved."""
+        soup = make_soup(
+            "<article>"
+            "<h2>Introduction</h2>"
+            "<p>First paragraph.</p>"
+            "<h3>Next steps</h3>"
+            "<p>Second paragraph.</p>"
+            "<h4>Further information</h4>"
+            "<p>Contact info</p>"
+            "</article>"
+        )
+        result = _clean_html(soup.article)
+        assert "Introduction" in result
+        assert "First paragraph." in result
+        assert "Next steps" in result
+        assert "Second paragraph." in result
+        assert "Contact info" not in result
+
+    def test_no_boilerplate_heading_preserves_all(self):
+        """Without boilerplate headings, all content is preserved."""
+        soup = make_soup(
+            "<article>"
+            "<p>Full article text.</p>"
+            "<h4>Conclusion</h4>"
+            "<p>Final thoughts.</p>"
+            "</article>"
+        )
+        result = _clean_html(soup.article)
+        assert "Full article text." in result
+        assert "Conclusion" in result
+        assert "Final thoughts." in result
+
+
 @pytest.fixture(autouse=True)
 def reset_circuit_breaker():
     """Reset circuit breaker before each test."""
