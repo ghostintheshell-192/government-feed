@@ -1,8 +1,9 @@
 """Pydantic schemas for API."""
 
 from datetime import datetime
+from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class SourceBase(BaseModel):
@@ -31,21 +32,23 @@ class SourceUpdate(SourceBase):
 class SourceResponse(SourceBase):
     """Schema for Source response."""
 
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     is_active: bool
     last_fetched: datetime | None
     created_at: datetime
     updated_at: datetime
 
-    class Config:
-        from_attributes = True
-
 
 class NewsItemResponse(BaseModel):
     """Schema for NewsItem response."""
 
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     source_id: int
+    external_id: str | None
     title: str
     content: str | None
     summary: str | None
@@ -54,5 +57,169 @@ class NewsItemResponse(BaseModel):
     relevance_score: float | None
     verification_status: str
 
-    class Config:
-        from_attributes = True
+
+class PaginationMeta(BaseModel):
+    """Pagination metadata for paginated responses."""
+
+    total: int
+    limit: int
+    offset: int
+    has_more: bool
+
+
+class PaginatedNewsResponse(BaseModel):
+    """Paginated response for news items."""
+
+    items: list[NewsItemResponse]
+    pagination: PaginationMeta
+
+
+class SettingsUpdate(BaseModel):
+    """Validated settings update schema. Only whitelisted keys are accepted."""
+
+    ai_enabled: bool | None = None
+    summary_max_words: int | None = Field(None, ge=10, le=1000)
+    scheduler_enabled: bool | None = None
+    news_retention_days: int | None = Field(None, ge=1, le=365)
+    ollama_endpoint: str | None = Field(None, max_length=200)
+    ollama_model: str | None = Field(None, max_length=100)
+    redis_url: str | None = Field(None, max_length=200)
+
+
+class FeedDiscoveryRequest(BaseModel):
+    """Request schema for feed discovery."""
+
+    query: str = Field(..., min_length=1, max_length=500)
+
+
+class DiscoveredFeedResponse(BaseModel):
+    """Schema for a discovered feed."""
+
+    url: str
+    title: str
+    feed_type: str
+    site_url: str
+    entry_count: int
+
+
+class FeedDiscoveryResponse(BaseModel):
+    """Response schema for feed discovery."""
+
+    feeds: list[DiscoveredFeedResponse]
+    searched_sites: list[str]
+
+
+# ==================== ADMIN SCHEMAS ====================
+
+
+class NewsPreviewResponse(BaseModel):
+    """Brief article preview for feed inspector."""
+
+    id: int
+    title: str
+    published_at: datetime
+    snippet: str | None
+
+
+class SourceStatsResponse(BaseModel):
+    """Statistics for a single source."""
+
+    source_id: int
+    source_name: str
+    article_count: int
+    earliest_article: datetime | None
+    latest_article: datetime | None
+    avg_content_length: int | None
+    last_fetched: datetime | None
+    is_active: bool
+
+
+class CleanupResultResponse(BaseModel):
+    """Result of a cleanup operation."""
+
+    matched: int
+    deleted: int
+    dry_run: bool
+
+
+class ReimportResultResponse(BaseModel):
+    """Result of a purge + reimport operation."""
+
+    purged: int
+    imported: int
+
+
+class PatternCleanupRequest(BaseModel):
+    """Request for pattern-based article cleanup."""
+
+    field: Literal["title", "content"]
+    pattern: str = Field(..., min_length=1, max_length=500)
+    source_id: int | None = None
+    dry_run: bool = True
+
+
+class HtmlResidueFlagResponse(BaseModel):
+    """A single HTML residue flag."""
+
+    id: int
+    title: str
+    field: str
+
+
+class HtmlResidueResultResponse(BaseModel):
+    """Result of HTML residue cleanup."""
+
+    flagged: list[HtmlResidueFlagResponse]
+    fixed: int
+    dry_run: bool
+
+
+class PerSourceCountResponse(BaseModel):
+    """Article count for a single source."""
+
+    source_id: int
+    source_name: str
+    article_count: int
+
+
+class GlobalStatsResponse(BaseModel):
+    """Global database statistics."""
+
+    total_articles: int
+    total_sources: int
+    per_source: list[PerSourceCountResponse]
+
+
+class ContentLengthFlagResponse(BaseModel):
+    """An article flagged for unusual content length."""
+
+    id: int
+    title: str
+    length: int
+
+
+class DuplicateTitleResponse(BaseModel):
+    """A group of duplicate titles within a source."""
+
+    title: str
+    source_id: int
+    count: int
+
+
+class EmptySourceResponse(BaseModel):
+    """A source with zero articles."""
+
+    id: int
+    name: str
+
+
+class QualityReportResponse(BaseModel):
+    """Quality report with all issue categories."""
+
+    total_articles: int
+    total_sources: int
+    short_content: list[ContentLengthFlagResponse]
+    long_content: list[ContentLengthFlagResponse]
+    html_residue: list[HtmlResidueFlagResponse]
+    duplicate_titles: list[DuplicateTitleResponse]
+    empty_sources: list[EmptySourceResponse]

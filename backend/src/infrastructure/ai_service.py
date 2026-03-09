@@ -1,10 +1,20 @@
 """AI service for content summarization using Ollama."""
 
 import httpx
+from backend.src.infrastructure.resilience import (
+    CircuitBreaker,
+    CircuitBreakerOpenError,
+    retry_ollama_api,
+    retry_web_scraping,
+)
 from bs4 import BeautifulSoup
 from shared.logging import get_logger
 
 logger = get_logger(__name__)
+
+# Module-level circuit breakers (shared across instances for global state)
+_cb_ollama = CircuitBreaker("ollama_api", failure_threshold=5, recovery_timeout=60.0)
+_cb_scraping = CircuitBreaker("web_scraping", failure_threshold=5, recovery_timeout=60.0)
 
 
 class OllamaService:
@@ -17,87 +27,105 @@ class OllamaService:
     async def fetch_article_content(self, url: str) -> str:
         """Fetch and extract text content from article URL."""
         try:
-            logger.info(f"Fetching article content from URL: {url}")
-            async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
-                response = await client.get(url)
-                response.raise_for_status()
-
-                soup = BeautifulSoup(response.text, "html.parser")
-
-                # Remove script, style, nav, footer, header elements
-                for element in soup(["script", "style", "nav", "footer", "header", "aside"]):
-                    element.decompose()
-
-                # Try to find main content area (common patterns)
-                main_content = None
-                for selector in ["article", "main", '[role="main"]', ".content", "#content"]:
-                    main_content = soup.select_one(selector)
-                    if main_content:
-                        break
-
-                # If no main content found, use body
-                if not main_content:
-                    main_content = soup.body
-
-                if main_content:
-                    # Extract text and clean up
-                    text = main_content.get_text(separator=" ", strip=True)
-                    # Collapse multiple spaces/newlines
-                    text = " ".join(text.split())
-                    return text
-
-                return ""
-
+            return await _cb_scraping.call_async(self._fetch_article_content_impl, url)
+        except CircuitBreakerOpenError:
+            logger.warning("Web scraping circuit breaker is open — skipping fetch for %s", url)
+            return "Servizio di scraping temporaneamente non disponibile"
         except Exception as e:
-            # If scraping fails, return error message
-            logger.error(f"Error fetching article from {url}: {e}")
-            return f"Impossibile recuperare il contenuto dall'URL: {str(e)}"
+            logger.error("Error fetching article from %s: %s", url, e)
+            return f"Impossibile recuperare il contenuto dall'URL: {e}"
+
+    @retry_web_scraping
+    async def _fetch_article_content_impl(self, url: str) -> str:
+        """Internal: fetch article with retry."""
+        logger.info("Fetching article content from URL: %s", url)
+        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+            response = await client.get(url)
+            response.raise_for_status()
+
+            soup = BeautifulSoup(response.text, "html.parser")
+
+            # Remove script, style, nav, footer, header elements
+            for element in soup(["script", "style", "nav", "footer", "header", "aside"]):
+                element.decompose()
+
+            # Try to find main content area (common patterns)
+            main_content = None
+            for selector in ["article", "main", '[role="main"]', ".content", "#content"]:
+                main_content = soup.select_one(selector)
+                if main_content:
+                    break
+
+            # If no main content found, use body
+            if not main_content:
+                main_content = soup.body
+
+            if main_content:
+                # Extract text and clean up
+                text = main_content.get_text(separator=" ", strip=True)
+                # Collapse multiple spaces/newlines
+                text = " ".join(text.split())
+                return text
+
+            return ""
 
     async def summarize(self, content: str, max_length: int = 200) -> str:
         """Summarize content using Ollama."""
         try:
-            logger.info(f"Generating summary (max {max_length} words)")
-            # Strip HTML tags from content
-            content = self._strip_html(content)
-
-            # Truncate content if too long (max 2000 characters)
-            if len(content) > 2000:
-                content = content[:2000] + "..."
-
-            prompt = f"""Riassumi brevemente il seguente testo in italiano, in massimo {max_length} parole:
-
-{content}
-
-Riassunto:"""
-
-            async with httpx.AsyncClient(timeout=60.0) as client:
-                response = await client.post(
-                    f"{self.endpoint}/api/generate",
-                    json={
-                        "model": self.model,
-                        "prompt": prompt,
-                        "stream": False,
-                        "options": {
-                            "temperature": 0.3,
-                            "top_p": 0.9,
-                        },
-                    },
-                )
-
-                if response.status_code == 200:
-                    data = response.json()
-                    raw_response = data.get("response", "").strip()
-                    # Remove <think> blocks if present (DeepSeek reasoning)
-                    summary = self._extract_summary(raw_response)
-                    logger.info("Summary generated successfully")
-                    return summary
-                else:
-                    logger.error(f"AI service error: HTTP {response.status_code}")
-                    return f"Errore AI: {response.status_code}"
-
+            return await _cb_ollama.call_async(self._summarize_impl, content, max_length)
+        except CircuitBreakerOpenError:
+            logger.warning("Ollama circuit breaker is open — skipping summarization")
+            return "Servizio AI temporaneamente non disponibile"
         except Exception as e:
-            logger.error(f"Error calling AI service: {e}")
-            return f"Errore nella chiamata AI: {str(e)}"
+            logger.error("Error calling AI service: %s", e)
+            return f"Errore nella chiamata AI: {e}"
+
+    @retry_ollama_api
+    async def _summarize_impl(self, content: str, max_length: int = 200) -> str:
+        """Internal: call Ollama with retry."""
+        logger.info("Generating summary (max %d words)", max_length)
+        # Strip HTML tags from content
+        content = self._strip_html(content)
+
+        # Truncate content if too long (max 2000 characters)
+        if len(content) > 2000:
+            content = content[:2000] + "..."
+
+        prompt = (
+            f"Scrivi un riassunto del testo seguente. "
+            f"Il riassunto DEVE essere lungo al massimo {max_length} parole. "
+            f"Non ripetere il titolo. Vai dritto al contenuto.\n\n"
+            f"Testo:\n{content}\n\n"
+            f"Riassunto (max {max_length} parole):"
+        )
+
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            response = await client.post(
+                f"{self.endpoint}/api/generate",
+                json={
+                    "model": self.model,
+                    "prompt": prompt,
+                    "stream": False,
+                    "options": {
+                        "temperature": 0.3,
+                        "top_p": 0.9,
+                    },
+                },
+            )
+
+            if response.status_code == 200:
+                data = response.json()
+                raw_response = data.get("response", "").strip()
+                # Remove <think> blocks if present (DeepSeek reasoning)
+                summary = self._extract_summary(raw_response)
+                logger.info("Summary generated successfully")
+                return summary
+            else:
+                raise httpx.HTTPStatusError(
+                    f"AI service error: HTTP {response.status_code}",
+                    request=response.request,
+                    response=response,
+                )
 
     def _strip_html(self, html_content: str) -> str:
         """Remove HTML tags and return clean text."""

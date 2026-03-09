@@ -1,6 +1,6 @@
 [project]
 name = "government-feed"
-version = "0.1.0"
+version = "0.2.0"
 description = "Open-source aggregator for institutional news and government communications"
 requires-python = ">=3.13"
 license = { text = "MIT" }
@@ -19,8 +19,12 @@ dependencies = [
     "httpx>=0.28.1",
     "redis>=5.2.1",
     "feedparser>=6.0.11",
+    "defusedxml>=0.7.1",
     "beautifulsoup4>=4.12.3",
     "python-dateutil>=2.9.0",
+    "tenacity>=9.0.0",
+    "apscheduler>=3.10.0,<4",
+    "duckduckgo-search>=7.0.0",
 ]
 
 [project.optional-dependencies]
@@ -46,6 +50,14 @@ target-version = "py313"
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
 ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = [
+    "unit: Unit tests (no external dependencies)",
+    "integration: Integration tests (database, API)",
+]
 
 [tool.mypy]
 python_version = "3.13"

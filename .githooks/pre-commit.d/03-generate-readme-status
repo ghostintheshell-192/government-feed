@@ -1,0 +1,40 @@
+#!/bin/bash
+# Pre-commit hook: Generate README.md status sections
+# Runs when spec files change in .development/specs/
+
+# Colors
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+# Get project root
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+
+SCRIPT_PATH="$PROJECT_ROOT/.development/scripts/generate-readme-status.py"
+README_FILE="$PROJECT_ROOT/README.md"
+
+# Check if this project has the script
+if [[ ! -f "$SCRIPT_PATH" ]]; then
+    exit 0
+fi
+
+echo -e "${BLUE}[03] README Status${NC}"
+
+# Check if any spec files are staged
+if ! git diff --cached --name-only | grep -q '.development/specs/'; then
+    echo -e "  ${GREEN}✓${NC} No spec changes, skipping"
+    exit 0
+fi
+
+# Regenerate status sections
+python3 "$SCRIPT_PATH" > /dev/null 2>&1
+
+# Check if README changed
+if git diff --quiet "$README_FILE" 2>/dev/null; then
+    echo -e "  ${GREEN}✓${NC} No changes to README status"
+else
+    git add "$README_FILE"
+    echo -e "  ${GREEN}✓${NC} Updated and staged README.md"
+fi
+
+exit 0

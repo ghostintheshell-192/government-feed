@@ -1,6 +1,6 @@
 """SQLAlchemy ORM models."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from backend.src.infrastructure.database import Base
 from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Text
@@ -20,8 +20,8 @@ class Source(Base):
     update_frequency_minutes = Column(Integer, default=60)
     is_active = Column(Boolean, default=True)
     last_fetched = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
 
 
 class NewsItem(Base):
@@ -36,9 +36,9 @@ class NewsItem(Base):
     content = Column(Text, nullable=True)
     summary = Column(Text, nullable=True)
     published_at = Column(DateTime, nullable=False, index=True)
-    fetched_at = Column(DateTime, default=datetime.utcnow)
+    fetched_at = Column(DateTime, default=lambda: datetime.now(UTC))
     content_hash = Column(String(64), unique=True, index=True)
     relevance_score = Column(Float, nullable=True)
     verification_status = Column(String(20), default="pending")
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))

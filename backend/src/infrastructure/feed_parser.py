@@ -1,15 +1,36 @@
 """Feed parsing service for RSS/Atom feeds."""
 
-from datetime import datetime
+import re
+from datetime import UTC, datetime
 from hashlib import sha256
 
 import feedparser
+import httpx
 from backend.src.infrastructure.models import NewsItem, Source
+from backend.src.infrastructure.resilience import (
+    CircuitBreaker,
+    CircuitBreakerOpenError,
+    retry_feed_fetch,
+)
 from bs4 import BeautifulSoup
 from shared.logging import get_logger
 from sqlalchemy.orm import Session
 
 logger = get_logger(__name__)
+
+# Ensure defusedxml is used by feedparser for XXE protection
+try:
+    import defusedxml  # noqa: F401
+
+    logger.debug("defusedxml available — XXE protection active")
+except ImportError:
+    logger.warning("defusedxml not installed — XXE protection reduced")
+
+# Regex to strip DOCTYPE declarations (XXE defense-in-depth)
+_DOCTYPE_RE = re.compile(r"<!DOCTYPE[^>]*>", re.IGNORECASE)
+
+# Module-level circuit breaker for feed fetching
+_cb_feed_fetch = CircuitBreaker("feed_fetch", failure_threshold=5, recovery_timeout=60.0)
 
 
 class FeedParserService:
@@ -21,11 +42,24 @@ class FeedParserService:
     def parse_and_import(self, source: Source) -> int:
         """Parse feed and import news items. Returns count of imported items."""
         try:
-            logger.info(f"Parsing feed from source: {source.name}")
-            feed = feedparser.parse(source.feed_url)
+            logger.info("Parsing feed from source: %s", source.name)
+
+            # Fetch feed content with resilience
+            try:
+                xml_content = _cb_feed_fetch.call(self._fetch_feed_content_sync, source.feed_url)
+            except CircuitBreakerOpenError:
+                logger.warning(
+                    "Feed fetch circuit breaker is open — skipping source %s", source.name
+                )
+                return 0
+
+            # Strip DOCTYPE declarations to prevent XXE attacks
+            xml_content = _DOCTYPE_RE.sub("", xml_content)
+
+            feed = feedparser.parse(xml_content)
 
             if feed.bozo:  # Feed parse error
-                logger.warning(f"Feed parse error for {source.name}: {feed.bozo_exception}")
+                logger.warning("Feed parse error for %s: %s", source.name, feed.bozo_exception)
                 return 0
 
             imported_count = 0
@@ -35,7 +69,8 @@ class FeedParserService:
                 title = entry.get("title", "")
                 link = entry.get("link", "")
                 content = self._extract_content(entry)
-                summary = entry.get("summary", "")
+                raw_summary = entry.get("summary", "")
+                summary = self._strip_html(raw_summary) if raw_summary else ""
 
                 # Parse published date
                 published_at = self._parse_date(entry)
@@ -61,7 +96,7 @@ class FeedParserService:
                     content=content,
                     summary=summary if summary else None,
                     published_at=published_at,
-                    fetched_at=datetime.utcnow(),
+                    fetched_at=datetime.now(UTC),
                     content_hash=content_hash,
                     verification_status="pending",
                 )
@@ -70,27 +105,36 @@ class FeedParserService:
                 imported_count += 1
 
             # Update source last_fetched
-            source.last_fetched = datetime.utcnow()
+            source.last_fetched = datetime.now(UTC)
 
             self.db.commit()
-            logger.info(f"Imported {imported_count} news items from {source.name}")
+            logger.info("Imported %d news items from %s", imported_count, source.name)
             return imported_count
 
         except Exception as e:
             self.db.rollback()
-            logger.error(f"Error parsing feed from {source.name}: {e}")
+            logger.error("Error parsing feed from %s: %s", source.name, e)
             return 0
 
-    def _extract_content(self, entry) -> str:
+    @retry_feed_fetch
+    def _fetch_feed_content_sync(self, url: str) -> str:
+        """Fetch feed XML content via httpx with retry."""
+        logger.info("Fetching feed content from: %s", url)
+        with httpx.Client(timeout=30.0, follow_redirects=True) as client:
+            response = client.get(url)
+            response.raise_for_status()
+            return response.text
+
+    def _extract_content(self, entry: object) -> str:
         """Extract content from feed entry."""
         # Try different content fields
         content = ""
-        if hasattr(entry, "content") and entry.content:
-            content = entry.content[0].get("value", "")
+        if hasattr(entry, "content") and entry.content:  # type: ignore[union-attr]
+            content = entry.content[0].get("value", "")  # type: ignore[union-attr]
         elif hasattr(entry, "description"):
-            content = entry.description
+            content = entry.description  # type: ignore[union-attr]
         elif hasattr(entry, "summary"):
-            content = entry.summary
+            content = entry.summary  # type: ignore[union-attr]
 
         # Strip HTML tags and return clean text
         return self._strip_html(content) if content else ""
@@ -111,13 +155,13 @@ class FeedParserService:
         text = " ".join(text.split())
         return text
 
-    def _parse_date(self, entry) -> datetime:
+    def _parse_date(self, entry: object) -> datetime:
         """Parse date from feed entry."""
-        if hasattr(entry, "published_parsed") and entry.published_parsed:
-            return datetime(*entry.published_parsed[:6])
-        if hasattr(entry, "updated_parsed") and entry.updated_parsed:
-            return datetime(*entry.updated_parsed[:6])
-        return datetime.utcnow()
+        if hasattr(entry, "published_parsed") and entry.published_parsed:  # type: ignore[union-attr]
+            return datetime(*entry.published_parsed[:6])  # type: ignore[union-attr]
+        if hasattr(entry, "updated_parsed") and entry.updated_parsed:  # type: ignore[union-attr]
+            return datetime(*entry.updated_parsed[:6])  # type: ignore[union-attr]
+        return datetime.now(UTC)
 
     def _create_hash(self, title: str, content: str, source_id: int, published_at: datetime) -> str:
         """Create content hash for deduplication."""
