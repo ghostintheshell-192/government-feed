@@ -161,7 +161,7 @@ export default function NewsDetail() {
         <Separator className="my-6" />
 
         {hasFullContent ? (
-          <ArticleContent content={item.content!} />
+          <ArticleContent content={item.content!} title={item.title} />
         ) : item.content ? (
           <div>
             <p className="leading-relaxed text-muted-foreground">

@@ -3,6 +3,7 @@ import { type ReactNode } from 'react'
 
 interface ArticleContentProps {
   content: string
+  title?: string
   searchTerm?: string
   highlighter?: (text: string, term?: string) => ReactNode
   className?: string
@@ -51,6 +52,27 @@ function sanitizeHtml(html: string): string {
   return DOMPurify.sanitize(html, {
     ALLOWED_TAGS,
     ALLOWED_ATTR,
+  })
+}
+
+/**
+ * Remove an <h1> from HTML content if it substantially matches the article title.
+ * Checks all <h1> tags, not just the first one (some sources prepend metadata h1s).
+ * Uses normalized text comparison (lowercase, trimmed, punctuation-stripped).
+ */
+function removeLeadingDuplicateTitle(html: string, title: string): string {
+  const normalize = (s: string) =>
+    s.replace(/<[^>]+>/g, '').replace(/[\s\u00a0]+/g, ' ').replace(/[^\w\s]/g, '').trim().toLowerCase()
+
+  const titleText = normalize(title)
+  const h1Regex = /<h1\b[^>]*>[\s\S]*?<\/h1>/gi
+
+  return html.replace(h1Regex, (match) => {
+    const h1Text = normalize(match)
+    if (h1Text.length > 10 && (titleText.includes(h1Text) || h1Text.includes(titleText))) {
+      return ''
+    }
+    return match
   })
 }
 
@@ -105,6 +127,7 @@ function parsePlainText(content: string): string[] {
  */
 export function ArticleContent({
   content,
+  title,
   searchTerm,
   highlighter,
   className = '',
@@ -112,7 +135,17 @@ export function ArticleContent({
   const proseClasses = `prose prose-neutral dark:prose-invert max-w-none prose-p:text-justify prose-p:leading-relaxed prose-headings:font-semibold prose-th:text-left prose-table:text-sm prose-td:py-1 prose-td:pr-4 prose-th:py-1 prose-th:pr-4 prose-img:mx-auto prose-img:rounded-md prose-img:bg-white prose-img:p-2 ${className}`
 
   if (isHtmlContent(content)) {
-    const clean = sanitizeHtml(content)
+    let html = content
+    if (title) {
+      html = removeLeadingDuplicateTitle(html, title)
+    }
+    // Downgrade headings by 2 levels: the page already shows the article title,
+    // so content headings should be less prominent (h1→h3, h2→h4, h3→h5, h4+→h6).
+    html = html.replace(/<(\/?)h([1-6])\b/gi, (_, slash: string, level: string) => {
+      const newLevel = Math.min(Number(level) + 2, 6)
+      return `<${slash}h${newLevel}`
+    })
+    const clean = sanitizeHtml(html)
     return (
       <div
         className={proseClasses}

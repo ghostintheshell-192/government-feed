@@ -87,6 +87,20 @@ export interface ReimportResult {
   imported: number
 }
 
+export interface BulkFetchProgress {
+  current: number
+  total: number
+  title: string
+  status: 'fetched' | 'skipped' | 'failed'
+}
+
+export interface BulkFetchResult {
+  total: number
+  fetched: number
+  skipped: number
+  failed: number
+}
+
 export interface HtmlResidueFlag {
   id: number
   title: string
