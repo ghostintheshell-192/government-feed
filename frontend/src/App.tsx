@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { ThemeToggle } from './components/theme-toggle'
 import { LanguageToggle } from './components/language-toggle'
 import { fetchNewsById } from './lib/api'
+import Admin from './pages/Admin'
 import Sources from './pages/Sources'
 import Feed from './pages/Feed'
 import NewsDetail from './pages/NewsDetail'
@@ -61,13 +62,15 @@ function Breadcrumb() {
     segments.push({ label: t('breadcrumb.dashboard'), to: '/' })
   } else if (pathname === '/sources') {
     segments.push({ label: t('breadcrumb.sources') })
+  } else if (pathname === '/admin') {
+    segments.push({ label: t('breadcrumb.admin') })
   } else if (pathname === '/settings') {
     segments.push({ label: t('breadcrumb.settings') })
   }
 
   return (
     <div className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-4xl items-center gap-1.5 px-4 py-2 text-xs text-muted-foreground md:px-6">
+      <div className={`mx-auto flex items-center gap-1.5 px-4 py-2 text-xs text-muted-foreground md:px-6 ${pathname === '/admin' ? '' : 'max-w-4xl'}`}>
         {segments.map((seg, i) => (
           <span key={i} className="flex items-center gap-1.5">
             {i > 0 && <ChevronRight className="h-3 w-3 shrink-0" />}
@@ -106,6 +109,7 @@ function AppLayout() {
           <div className="flex items-center gap-3 md:gap-6">
             <NavLink to="/">{t('nav.dashboard')}</NavLink>
             <NavLink to="/sources">{t('nav.sources')}</NavLink>
+            <NavLink to="/admin">{t('nav.admin')}</NavLink>
             <NavLink to="/settings">{t('nav.settings')}</NavLink>
             <LanguageToggle />
             <ThemeToggle />
@@ -121,6 +125,7 @@ function AppLayout() {
           <Route path="/feed" element={<Navigate to="/" replace />} />
           <Route path="/news/:id" element={<NewsDetail />} />
           <Route path="/sources" element={<Sources />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </main>

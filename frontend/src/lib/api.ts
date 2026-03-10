@@ -1,9 +1,16 @@
 import type {
+  CleanupResult,
   FeatureFlags,
+  GlobalStats,
+  HtmlResidueResult,
   NewsFilters,
   NewsItem,
+  NewsPreview,
   PaginatedNewsResponse,
+  QualityReport,
+  ReimportResult,
   Source,
+  SourceStats,
   SummarizeResponse,
 } from './types'
 
@@ -108,5 +115,70 @@ export async function fetchNewsContent(
   if (!res.ok) {
     throw new Error(`Failed to fetch content: ${res.status}`)
   }
+  return res.json()
+}
+
+// ==================== ADMIN API ====================
+
+export async function fetchGlobalStats(): Promise<GlobalStats> {
+  const res = await fetch('/api/admin/stats')
+  if (!res.ok) throw new Error(`Failed to fetch stats: ${res.status}`)
+  return res.json()
+}
+
+export async function fetchQualityReport(): Promise<QualityReport> {
+  const res = await fetch('/api/admin/quality-report')
+  if (!res.ok) throw new Error(`Failed to fetch quality report: ${res.status}`)
+  return res.json()
+}
+
+export async function fetchSourceStats(sourceId: number): Promise<SourceStats> {
+  const res = await fetch(`/api/admin/sources/${sourceId}/stats`)
+  if (!res.ok) throw new Error(`Failed to fetch source stats: ${res.status}`)
+  return res.json()
+}
+
+export async function fetchSourcePreview(sourceId: number, limit = 20): Promise<NewsPreview[]> {
+  const res = await fetch(`/api/admin/sources/${sourceId}/preview?limit=${limit}`)
+  if (!res.ok) throw new Error(`Failed to fetch preview: ${res.status}`)
+  return res.json()
+}
+
+export async function purgeSource(sourceId: number): Promise<CleanupResult> {
+  const res = await fetch(`/api/admin/sources/${sourceId}/purge`, { method: 'POST' })
+  if (!res.ok) throw new Error(`Failed to purge source: ${res.status}`)
+  return res.json()
+}
+
+export async function reimportSource(sourceId: number): Promise<ReimportResult> {
+  const res = await fetch(`/api/admin/sources/${sourceId}/reimport`, { method: 'POST' })
+  if (!res.ok) throw new Error(`Failed to reimport source: ${res.status}`)
+  return res.json()
+}
+
+export async function cleanupByPattern(
+  field: 'title' | 'content',
+  pattern: string,
+  sourceId?: number,
+  dryRun = true,
+): Promise<CleanupResult> {
+  const res = await fetch('/api/admin/cleanup/by-pattern', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ field, pattern, source_id: sourceId, dry_run: dryRun }),
+  })
+  if (!res.ok) throw new Error(`Failed to cleanup by pattern: ${res.status}`)
+  return res.json()
+}
+
+export async function cleanupHtmlResidue(dryRun = true): Promise<HtmlResidueResult> {
+  const res = await fetch(`/api/admin/cleanup/html-residue?dry_run=${dryRun}`, { method: 'POST' })
+  if (!res.ok) throw new Error(`Failed to cleanup HTML: ${res.status}`)
+  return res.json()
+}
+
+export async function cleanupOrphans(): Promise<CleanupResult> {
+  const res = await fetch('/api/admin/cleanup/orphans', { method: 'POST' })
+  if (!res.ok) throw new Error(`Failed to cleanup orphans: ${res.status}`)
   return res.json()
 }
