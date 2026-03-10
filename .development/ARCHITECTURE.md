@@ -21,6 +21,7 @@ For detailed documentation, see `docs/architecture.md`.
 - [ADR-003: Content Deduplication](reference/decisions/003-content-deduplication.md)
 - [ADR-004: Master Detail Layout](reference/decisions/004-master-detail-layout.md)
 - [ADR-005: Geographic Levels Navigation](reference/decisions/005-geographic-levels-navigation.md)
+- [ADR-006: Headless Browser Scraping](reference/decisions/006-headless-browser-scraping.md)
 
 ## Project Tree
 
