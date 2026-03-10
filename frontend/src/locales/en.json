@@ -222,6 +222,13 @@
     "latest": "Latest article",
     "lastFetched": "Last fetched",
     "recentArticles": "Recent articles",
-    "noArticles": "No articles for this source."
+    "noArticles": "No articles for this source.",
+    "articlesDesc": "Article distribution across sources",
+    "qualityDesc": "Content quality issues",
+    "actionsDesc": "Purge, reimport, cleanup",
+    "inspectorDesc": "Source diagnostics and preview",
+    "bulkFetch": "Fetch content",
+    "confirmBulkFetch": "Fetch full content for all articles from \"{{name}}\"? This may take a while.",
+    "bulkFetchResult": "{{fetched}} fetched, {{skipped}} already present, {{failed}} failed."
   }
 }

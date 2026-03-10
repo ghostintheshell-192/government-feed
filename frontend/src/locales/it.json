@@ -222,6 +222,13 @@
     "latest": "Ultimo articolo",
     "lastFetched": "Ultimo fetch",
     "recentArticles": "Articoli recenti",
-    "noArticles": "Nessun articolo per questa fonte."
+    "noArticles": "Nessun articolo per questa fonte.",
+    "articlesDesc": "Distribuzione degli articoli per fonte",
+    "qualityDesc": "Problemi di qualità dei contenuti",
+    "actionsDesc": "Purge, reimport, pulizia",
+    "inspectorDesc": "Diagnostica e anteprima delle fonti",
+    "bulkFetch": "Scarica contenuti",
+    "confirmBulkFetch": "Scaricare il contenuto completo di tutti gli articoli di \"{{name}}\"? Potrebbe richiedere tempo.",
+    "bulkFetchResult": "{{fetched}} scaricati, {{skipped}} già presenti, {{failed}} falliti."
   }
 }
