@@ -149,6 +149,15 @@ class ReimportResultResponse(BaseModel):
     imported: int
 
 
+class BulkFetchResultResponse(BaseModel):
+    """Result of bulk content fetching for a source."""
+
+    total: int
+    fetched: int
+    skipped: int
+    failed: int
+
+
 class PatternCleanupRequest(BaseModel):
     """Request for pattern-based article cleanup."""
 

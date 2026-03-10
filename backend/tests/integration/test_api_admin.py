@@ -232,7 +232,7 @@ class TestContentCleanup:
             sample_news_item(
                 source_id=source.id,
                 title="Dirty content",
-                content="Clean text <b>with HTML</b> inside",
+                content="Clean text <div class='wrapper'><script>alert(1)</script>inside</div>",
                 content_hash="html-1",
             )
         )
