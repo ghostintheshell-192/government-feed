@@ -130,7 +130,7 @@ export default function Admin() {
   const queryClient = useQueryClient()
 
   // Active accordion section
-  const [activeSection, setActiveSection] = useState<SectionId | null>(null)
+  const [activeSection, setActiveSection] = useState<SectionId>('articles')
 
   // Global data
   const [stats, setStats] = useState<GlobalStats | null>(null)
@@ -448,8 +448,8 @@ export default function Admin() {
     },
   ]
 
-  function toggleSection(id: SectionId) {
-    setActiveSection((prev) => (prev === id ? null : id))
+  function selectSection(id: SectionId) {
+    setActiveSection(id)
   }
 
   // ---------------------------------------------------------------------------
@@ -868,49 +868,34 @@ export default function Admin() {
         <StatCard label={t('admin.totalIssues')} value={totalIssues} />
       </div>
 
-      {/* ==================== ACCORDION-SIDEBAR ==================== */}
+      {/* ==================== SIDEBAR + CONTENT ==================== */}
       <div className="flex gap-6">
-        {/* Navigation stack */}
-        <nav
-          className={cn(
-            'shrink-0 space-y-1.5 overflow-hidden',
-            activeSection ? 'w-56' : 'w-full',
-          )}
-          style={{ transition: 'width 300ms cubic-bezier(0.4, 0, 0.2, 1)' }}
-        >
+        {/* Navigation */}
+        <nav className="w-56 shrink-0 space-y-1.5">
           {sections.map((section) => {
             const isActive = activeSection === section.id
             return (
               <button
                 key={section.id}
                 type="button"
-                onClick={() => toggleSection(section.id)}
+                onClick={() => selectSection(section.id)}
                 className={cn(
-                  'group flex w-full items-center gap-3 rounded-lg border border-l-4 text-left',
+                  'group flex w-full items-center gap-3 rounded-lg border border-l-4 px-3 py-2.5 text-left',
                   section.accentColor,
-                  activeSection ? 'px-3 py-2.5' : 'px-4 py-3.5',
                   isActive
                     ? 'bg-accent shadow-sm'
                     : 'hover:bg-accent/50',
                 )}
-                style={{ transition: 'padding 300ms cubic-bezier(0.4, 0, 0.2, 1), background-color 150ms' }}
               >
                 <span className={cn(
-                  'shrink-0 transition-colors',
+                  'shrink-0',
                   isActive ? 'text-foreground' : 'text-muted-foreground',
                 )}>
                   {section.icon}
                 </span>
-                <div className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium">
-                    {section.title}
-                  </span>
-                  {!activeSection && section.description && (
-                    <span className="block truncate text-xs text-muted-foreground mt-0.5">
-                      {section.description}
-                    </span>
-                  )}
-                </div>
+                <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                  {section.title}
+                </span>
                 {section.badge != null && section.badge > 0 && (
                   <Badge
                     variant={section.badgeVariant ?? 'secondary'}
@@ -928,24 +913,22 @@ export default function Admin() {
         </nav>
 
         {/* Content panel */}
-        {activeSection && (
-          <div className="min-w-0 flex-1 animate-in fade-in slide-in-from-left-3 duration-200">
-            <Card>
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  {sections.find((s) => s.id === activeSection)?.icon}
-                  {sections.find((s) => s.id === activeSection)?.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {activeSection === 'articles' && renderArticlesContent()}
-                {activeSection === 'quality' && renderQualityContent()}
-                {activeSection === 'actions' && renderActionsContent()}
-                {activeSection === 'inspector' && renderInspectorContent()}
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        <div className="min-w-0 flex-1">
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-base">
+                {sections.find((s) => s.id === activeSection)?.icon}
+                {sections.find((s) => s.id === activeSection)?.title}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {activeSection === 'articles' && renderArticlesContent()}
+              {activeSection === 'quality' && renderQualityContent()}
+              {activeSection === 'actions' && renderActionsContent()}
+              {activeSection === 'inspector' && renderInspectorContent()}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   )
