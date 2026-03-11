@@ -70,9 +70,13 @@ class TestPollAllFeeds:
     """Tests for _poll_all_feeds job."""
 
     @patch("backend.src.infrastructure.scheduler.FeedParserService")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
     def test_polls_source_never_fetched(
-        self, mock_session_local: MagicMock, mock_parser_cls: MagicMock
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
+        mock_parser_cls: MagicMock,
     ) -> None:
         """Polls active sources that have never been fetched."""
         mock_db = MagicMock()
@@ -83,7 +87,9 @@ class TestPollAllFeeds:
         source.last_fetched = None
         source.update_frequency_minutes = 60
 
-        mock_db.query.return_value.filter.return_value.all.return_value = [source]
+        mock_uow = MagicMock()
+        mock_uow.source_repository.get_active_sources.return_value = [source]
+        mock_uow_cls.return_value = mock_uow
 
         mock_parser = MagicMock()
         mock_parser.parse_and_import.return_value = 5
@@ -96,9 +102,13 @@ class TestPollAllFeeds:
         mock_db.close.assert_called_once()
 
     @patch("backend.src.infrastructure.scheduler.FeedParserService")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
     def test_polls_source_due_for_update(
-        self, mock_session_local: MagicMock, mock_parser_cls: MagicMock
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
+        mock_parser_cls: MagicMock,
     ) -> None:
         """Polls source whose last_fetched exceeds update_frequency_minutes."""
         mock_db = MagicMock()
@@ -109,7 +119,9 @@ class TestPollAllFeeds:
         source.last_fetched = datetime.now(UTC) - timedelta(minutes=120)
         source.update_frequency_minutes = 60
 
-        mock_db.query.return_value.filter.return_value.all.return_value = [source]
+        mock_uow = MagicMock()
+        mock_uow.source_repository.get_active_sources.return_value = [source]
+        mock_uow_cls.return_value = mock_uow
 
         mock_parser = MagicMock()
         mock_parser.parse_and_import.return_value = 3
@@ -122,9 +134,13 @@ class TestPollAllFeeds:
         mock_db.close.assert_called_once()
 
     @patch("backend.src.infrastructure.scheduler.FeedParserService")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
     def test_skips_recently_fetched(
-        self, mock_session_local: MagicMock, mock_parser_cls: MagicMock
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
+        mock_parser_cls: MagicMock,
     ) -> None:
         """Skips sources fetched recently (within update_frequency_minutes)."""
         mock_db = MagicMock()
@@ -135,7 +151,9 @@ class TestPollAllFeeds:
         source.last_fetched = datetime.now(UTC) - timedelta(minutes=5)
         source.update_frequency_minutes = 60
 
-        mock_db.query.return_value.filter.return_value.all.return_value = [source]
+        mock_uow = MagicMock()
+        mock_uow.source_repository.get_active_sources.return_value = [source]
+        mock_uow_cls.return_value = mock_uow
 
         scheduler = FeedScheduler()
         scheduler._poll_all_feeds()
@@ -145,9 +163,13 @@ class TestPollAllFeeds:
         mock_db.close.assert_called_once()
 
     @patch("backend.src.infrastructure.scheduler.FeedParserService")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
     def test_polls_multiple_sources(
-        self, mock_session_local: MagicMock, mock_parser_cls: MagicMock
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
+        mock_parser_cls: MagicMock,
     ) -> None:
         """Polls all due sources, skips those not due."""
         mock_db = MagicMock()
@@ -163,10 +185,12 @@ class TestPollAllFeeds:
         source_recent.last_fetched = datetime.now(UTC) - timedelta(minutes=5)
         source_recent.update_frequency_minutes = 60
 
-        mock_db.query.return_value.filter.return_value.all.return_value = [
+        mock_uow = MagicMock()
+        mock_uow.source_repository.get_active_sources.return_value = [
             source_due,
             source_recent,
         ]
+        mock_uow_cls.return_value = mock_uow
 
         mock_parser = MagicMock()
         mock_parser.parse_and_import.return_value = 2
@@ -180,9 +204,13 @@ class TestPollAllFeeds:
         mock_db.close.assert_called_once()
 
     @patch("backend.src.infrastructure.scheduler.FeedParserService")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
     def test_handles_parse_error(
-        self, mock_session_local: MagicMock, mock_parser_cls: MagicMock
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
+        mock_parser_cls: MagicMock,
     ) -> None:
         """Handles exceptions during feed parsing gracefully."""
         mock_db = MagicMock()
@@ -193,7 +221,9 @@ class TestPollAllFeeds:
         source.last_fetched = None
         source.update_frequency_minutes = 60
 
-        mock_db.query.return_value.filter.return_value.all.return_value = [source]
+        mock_uow = MagicMock()
+        mock_uow.source_repository.get_active_sources.return_value = [source]
+        mock_uow_cls.return_value = mock_uow
 
         mock_parser = MagicMock()
         mock_parser.parse_and_import.side_effect = Exception("parse error")
@@ -205,14 +235,21 @@ class TestPollAllFeeds:
         mock_db.close.assert_called_once()
 
     @patch("backend.src.infrastructure.scheduler.FeedParserService")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
     def test_no_active_sources(
-        self, mock_session_local: MagicMock, mock_parser_cls: MagicMock
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
+        mock_parser_cls: MagicMock,
     ) -> None:
         """Does nothing when there are no active sources."""
         mock_db = MagicMock()
         mock_session_local.return_value = mock_db
-        mock_db.query.return_value.filter.return_value.all.return_value = []
+
+        mock_uow = MagicMock()
+        mock_uow.source_repository.get_active_sources.return_value = []
+        mock_uow_cls.return_value = mock_uow
 
         scheduler = FeedScheduler()
         scheduler._poll_all_feeds()
@@ -220,15 +257,22 @@ class TestPollAllFeeds:
         mock_parser_cls.assert_not_called()
         mock_db.close.assert_called_once()
 
-    @patch("backend.src.infrastructure.scheduler.FeedParserService")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
     def test_session_closed_on_error(
-        self, mock_session_local: MagicMock, mock_parser_cls: MagicMock
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
     ) -> None:
-        """Database session is closed even when query raises."""
+        """Database session is closed even when UoW raises."""
         mock_db = MagicMock()
         mock_session_local.return_value = mock_db
-        mock_db.query.side_effect = Exception("db connection error")
+
+        mock_uow = MagicMock()
+        mock_uow.source_repository.get_active_sources.side_effect = Exception(
+            "db connection error"
+        )
+        mock_uow_cls.return_value = mock_uow
 
         scheduler = FeedScheduler()
         scheduler._poll_all_feeds()
@@ -240,9 +284,13 @@ class TestCleanupOldNews:
     """Tests for _cleanup_old_news job."""
 
     @patch("backend.src.infrastructure.scheduler.load_settings")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
     def test_deletes_old_news(
-        self, mock_session_local: MagicMock, mock_load_settings: MagicMock
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
+        mock_load_settings: MagicMock,
     ) -> None:
         """Deletes news items older than retention period."""
         mock_db = MagicMock()
@@ -251,17 +299,24 @@ class TestCleanupOldNews:
 
         mock_db.query.return_value.filter.return_value.delete.return_value = 10
 
+        mock_uow = MagicMock()
+        mock_uow_cls.return_value = mock_uow
+
         scheduler = FeedScheduler()
         scheduler._cleanup_old_news()
 
         mock_db.query.assert_called_once()
-        mock_db.commit.assert_called_once()
+        mock_uow.commit.assert_called_once()
         mock_db.close.assert_called_once()
 
     @patch("backend.src.infrastructure.scheduler.load_settings")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
     def test_uses_default_retention(
-        self, mock_session_local: MagicMock, mock_load_settings: MagicMock
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
+        mock_load_settings: MagicMock,
     ) -> None:
         """Uses default 30 days if news_retention_days not present."""
         mock_db = MagicMock()
@@ -270,17 +325,23 @@ class TestCleanupOldNews:
 
         mock_db.query.return_value.filter.return_value.delete.return_value = 0
 
+        mock_uow = MagicMock()
+        mock_uow_cls.return_value = mock_uow
+
         scheduler = FeedScheduler()
         scheduler._cleanup_old_news()
 
-        # load_settings().get("news_retention_days", 30) should fall through to 30
-        mock_db.commit.assert_called_once()
+        mock_uow.commit.assert_called_once()
         mock_db.close.assert_called_once()
 
     @patch("backend.src.infrastructure.scheduler.load_settings")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
     def test_custom_retention_period(
-        self, mock_session_local: MagicMock, mock_load_settings: MagicMock
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
+        mock_load_settings: MagicMock,
     ) -> None:
         """Uses custom retention days from settings."""
         mock_db = MagicMock()
@@ -289,11 +350,14 @@ class TestCleanupOldNews:
 
         mock_db.query.return_value.filter.return_value.delete.return_value = 50
 
+        mock_uow = MagicMock()
+        mock_uow_cls.return_value = mock_uow
+
         scheduler = FeedScheduler()
         scheduler._cleanup_old_news()
 
         mock_load_settings.assert_called_once()
-        mock_db.commit.assert_called_once()
+        mock_uow.commit.assert_called_once()
         mock_db.close.assert_called_once()
 
     @patch("backend.src.infrastructure.scheduler.load_settings")
@@ -342,9 +406,13 @@ class TestHealthCheckSources:
     """Tests for _health_check_sources job."""
 
     @patch("backend.src.infrastructure.scheduler.httpx")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
     def test_checks_active_sources(
-        self, mock_session_local: MagicMock, mock_httpx: MagicMock
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
+        mock_httpx: MagicMock,
     ) -> None:
         """Performs HEAD request on active source URLs."""
         mock_db = MagicMock()
@@ -354,7 +422,9 @@ class TestHealthCheckSources:
         source.name = "Healthy Feed"
         source.feed_url = "https://example.com/feed.xml"
 
-        mock_db.query.return_value.filter.return_value.all.return_value = [source]
+        mock_uow = MagicMock()
+        mock_uow.source_repository.get_active_sources.return_value = [source]
+        mock_uow_cls.return_value = mock_uow
 
         mock_client = MagicMock()
         mock_httpx.Client.return_value.__enter__ = MagicMock(return_value=mock_client)
@@ -369,9 +439,13 @@ class TestHealthCheckSources:
         mock_db.close.assert_called_once()
 
     @patch("backend.src.infrastructure.scheduler.httpx")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
     def test_checks_multiple_sources(
-        self, mock_session_local: MagicMock, mock_httpx: MagicMock
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
+        mock_httpx: MagicMock,
     ) -> None:
         """Checks all active sources."""
         mock_db = MagicMock()
@@ -385,10 +459,9 @@ class TestHealthCheckSources:
         source_b.name = "Feed B"
         source_b.feed_url = "https://example.com/b.xml"
 
-        mock_db.query.return_value.filter.return_value.all.return_value = [
-            source_a,
-            source_b,
-        ]
+        mock_uow = MagicMock()
+        mock_uow.source_repository.get_active_sources.return_value = [source_a, source_b]
+        mock_uow_cls.return_value = mock_uow
 
         mock_client = MagicMock()
         mock_httpx.Client.return_value.__enter__ = MagicMock(return_value=mock_client)
@@ -401,9 +474,13 @@ class TestHealthCheckSources:
         mock_db.close.assert_called_once()
 
     @patch("backend.src.infrastructure.scheduler.httpx")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
     def test_handles_unhealthy_source(
-        self, mock_session_local: MagicMock, mock_httpx: MagicMock
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
+        mock_httpx: MagicMock,
     ) -> None:
         """Handles connection failure for a source without crashing."""
         mock_db = MagicMock()
@@ -413,7 +490,9 @@ class TestHealthCheckSources:
         source.name = "Dead Feed"
         source.feed_url = "https://example.com/dead.xml"
 
-        mock_db.query.return_value.filter.return_value.all.return_value = [source]
+        mock_uow = MagicMock()
+        mock_uow.source_repository.get_active_sources.return_value = [source]
+        mock_uow_cls.return_value = mock_uow
 
         mock_client = MagicMock()
         mock_client.head.side_effect = Exception("connection refused")
@@ -426,9 +505,13 @@ class TestHealthCheckSources:
         mock_db.close.assert_called_once()
 
     @patch("backend.src.infrastructure.scheduler.httpx")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
     def test_continues_after_one_source_fails(
-        self, mock_session_local: MagicMock, mock_httpx: MagicMock
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
+        mock_httpx: MagicMock,
     ) -> None:
         """Continues checking remaining sources after one fails."""
         mock_db = MagicMock()
@@ -442,20 +525,16 @@ class TestHealthCheckSources:
         source_good.name = "Good Feed"
         source_good.feed_url = "https://example.com/good.xml"
 
-        mock_db.query.return_value.filter.return_value.all.return_value = [
-            source_bad,
-            source_good,
-        ]
+        mock_uow = MagicMock()
+        mock_uow.source_repository.get_active_sources.return_value = [source_bad, source_good]
+        mock_uow_cls.return_value = mock_uow
 
-        # Each source gets its own Client() context manager call, so we need
-        # to set up the mock to track per-call behavior. We mock at the
-        # head() level: first call raises, second succeeds.
+        # Each source gets its own Client() context manager call
         mock_client_bad = MagicMock()
         mock_client_bad.head.side_effect = Exception("timeout")
 
         mock_client_good = MagicMock()
 
-        # Each `with httpx.Client() as client:` creates a new context manager
         cm_bad = MagicMock()
         cm_bad.__enter__ = MagicMock(return_value=mock_client_bad)
         cm_bad.__exit__ = MagicMock(return_value=False)
@@ -477,14 +556,21 @@ class TestHealthCheckSources:
         mock_db.close.assert_called_once()
 
     @patch("backend.src.infrastructure.scheduler.httpx")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
     def test_no_sources(
-        self, mock_session_local: MagicMock, mock_httpx: MagicMock
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
+        mock_httpx: MagicMock,
     ) -> None:
         """Does nothing when there are no active sources."""
         mock_db = MagicMock()
         mock_session_local.return_value = mock_db
-        mock_db.query.return_value.filter.return_value.all.return_value = []
+
+        mock_uow = MagicMock()
+        mock_uow.source_repository.get_active_sources.return_value = []
+        mock_uow_cls.return_value = mock_uow
 
         scheduler = FeedScheduler()
         scheduler._health_check_sources()
@@ -492,15 +578,20 @@ class TestHealthCheckSources:
         mock_httpx.Client.assert_not_called()
         mock_db.close.assert_called_once()
 
-    @patch("backend.src.infrastructure.scheduler.httpx")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
     def test_session_closed_on_query_error(
-        self, mock_session_local: MagicMock, mock_httpx: MagicMock
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
     ) -> None:
         """Database session is closed even when query raises."""
         mock_db = MagicMock()
         mock_session_local.return_value = mock_db
-        mock_db.query.side_effect = Exception("db unavailable")
+
+        mock_uow = MagicMock()
+        mock_uow.source_repository.get_active_sources.side_effect = Exception("db unavailable")
+        mock_uow_cls.return_value = mock_uow
 
         scheduler = FeedScheduler()
         scheduler._health_check_sources()

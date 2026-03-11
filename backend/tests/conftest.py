@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from backend.src.infrastructure.database import Base, get_db
 from backend.src.infrastructure.models import NewsItem, Source
+from backend.src.infrastructure.unit_of_work import UnitOfWork
 
 
 @pytest.fixture(scope="session")
@@ -38,6 +39,12 @@ def db_session(db_engine, db_tables):
     session.close()
     transaction.rollback()
     connection.close()
+
+
+@pytest.fixture
+def uow(db_session):
+    """Provide a UnitOfWork wrapping the test database session."""
+    return UnitOfWork(db_session)
 
 
 @pytest.fixture

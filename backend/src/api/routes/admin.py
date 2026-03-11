@@ -193,7 +193,7 @@ async def reimport_source(
     logger.info(f"Purged {purged} articles from source {source_id} before reimport")
 
     # Re-import
-    parser = FeedParserService(uow._db)
+    parser = FeedParserService(uow)
     imported = parser.parse_and_import(source)
     logger.info(f"Reimported {imported} articles for source {source_id} ({source.name})")
 

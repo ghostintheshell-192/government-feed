@@ -7,8 +7,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from backend.src.infrastructure.database import SessionLocal
 from backend.src.infrastructure.feed_parser import FeedParserService
-from backend.src.infrastructure.models import NewsItem, Source
 from backend.src.infrastructure.settings_store import load_settings
+from backend.src.infrastructure.unit_of_work import UnitOfWork
 from shared.logging import get_logger
 
 logger = get_logger(__name__)
@@ -74,13 +74,14 @@ class FeedScheduler:
         """Poll all active feeds that are due for an update."""
         db = SessionLocal()
         try:
-            sources = db.query(Source).filter(Source.is_active == True).all()  # noqa: E712
+            uow = UnitOfWork(db)
+            sources = uow.source_repository.get_active_sources()
             for source in sources:
                 if source.last_fetched is not None:
                     elapsed = (datetime.now(UTC) - source.last_fetched).total_seconds() / 60
                     if elapsed < source.update_frequency_minutes:
                         continue
-                parser = FeedParserService(db)
+                parser = FeedParserService(uow)
                 count = parser.parse_and_import(source)
                 self._logger.info(
                     "Polled source %s: %d new items", source.name, count
@@ -94,11 +95,14 @@ class FeedScheduler:
         """Delete news items older than the configured retention period."""
         db = SessionLocal()
         try:
+            uow = UnitOfWork(db)
             settings = load_settings()
             retention_days = settings.get("news_retention_days", 30)
             cutoff = datetime.now(UTC) - timedelta(days=retention_days)
+            from backend.src.infrastructure.models import NewsItem
+
             deleted = db.query(NewsItem).filter(NewsItem.fetched_at < cutoff).delete()
-            db.commit()
+            uow.commit()
             self._logger.info("Cleaned up %d old news items", deleted)
         except Exception:
             self._logger.exception("Error during news cleanup")
@@ -110,7 +114,8 @@ class FeedScheduler:
         """Check connectivity to all active feed sources."""
         db = SessionLocal()
         try:
-            sources = db.query(Source).filter(Source.is_active == True).all()  # noqa: E712
+            uow = UnitOfWork(db)
+            sources = uow.source_repository.get_active_sources()
             for source in sources:
                 try:
                     with httpx.Client() as client:

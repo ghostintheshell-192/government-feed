@@ -147,8 +147,7 @@ async def process_feed(source_id: int, uow: UnitOfWork = Depends(get_unit_of_wor
         raise HTTPException(status_code=404, detail="Source not found")
 
     logger.info(f"Processing feed for source: ID={source_id}, name={source.name}")
-    # Note: FeedParserService still uses db directly - will be refactored separately
-    parser = FeedParserService(uow._db)
+    parser = FeedParserService(uow)
     imported_count = parser.parse_and_import(source)
 
     if imported_count > 0:
