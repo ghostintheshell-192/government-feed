@@ -1,17 +1,14 @@
-"""Domain entities for Government Feed."""
+"""Domain entities for Government Feed.
+
+These dataclasses define the canonical domain fields. Infrastructure models
+(SQLAlchemy) mirror these fields for persistence. Repository interfaces
+reference these types; concrete repositories return SQLAlchemy model instances
+that are structurally compatible (duck typing).
+"""
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
 from hashlib import sha256
-
-
-class VerificationStatus(str, Enum):
-    """Status of content verification."""
-
-    PENDING = "pending"
-    VERIFIED = "verified"
-    FAILED = "failed"
 
 
 @dataclass
@@ -20,23 +17,15 @@ class Source:
 
     id: int | None = None
     name: str = ""
-    url: str = ""
-    feed_type: str = "rss"  # rss, atom, web_scraping
+    description: str | None = None
+    feed_url: str = ""
+    source_type: str = "RSS"
+    category: str | None = None
+    update_frequency_minutes: int = 60
     is_active: bool = True
-    country: str = "IT"
-    category: str = "government"
+    last_fetched: datetime | None = None
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
-
-
-@dataclass
-class Category:
-    """Content categorization."""
-
-    id: int | None = None
-    name: str = ""
-    slug: str = ""
-    parent_id: int | None = None
 
 
 @dataclass
@@ -53,24 +42,13 @@ class NewsItem:
     fetched_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     content_hash: str = ""
     relevance_score: float | None = None
-    verification_status: VerificationStatus = VerificationStatus.PENDING
-    blockchain_certificate: str | None = None
+    verification_status: str = "pending"
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
-    # Relations (loaded separately)
-    source: Source | None = None
-    categories: list[Category] = field(default_factory=list)
-
     def update_content_hash(self) -> None:
         """Calculate and update content hash for deduplication."""
-        content_str = f"{self.title}|{self.content}|{self.source_id}|{self.published_at.isoformat()}"
+        content_str = (
+            f"{self.title}|{self.content}|{self.source_id}|{self.published_at.isoformat()}"
+        )
         self.content_hash = sha256(content_str.encode()).hexdigest()
-
-    def mark_as_verified(self, certificate: str) -> None:
-        """Mark item as verified with blockchain certificate."""
-        if not certificate:
-            raise ValueError("Certificate cannot be empty")
-        self.blockchain_certificate = certificate
-        self.verification_status = VerificationStatus.VERIFIED
-        self.updated_at = datetime.now(UTC)

@@ -1,29 +1,6 @@
 """Unit tests for core domain entities."""
 
-import pytest
-
-from backend.src.core.entities import (
-    Category,
-    NewsItem,
-    Source,
-    VerificationStatus,
-)
-
-
-class TestVerificationStatus:
-    """Tests for VerificationStatus enum."""
-
-    def test_pending_value(self):
-        assert VerificationStatus.PENDING.value == "pending"
-
-    def test_verified_value(self):
-        assert VerificationStatus.VERIFIED.value == "verified"
-
-    def test_failed_value(self):
-        assert VerificationStatus.FAILED.value == "failed"
-
-    def test_is_string_enum(self):
-        assert isinstance(VerificationStatus.PENDING, str)
+from backend.src.core.entities import NewsItem, Source
 
 
 class TestSource:
@@ -33,34 +10,25 @@ class TestSource:
         source = Source()
         assert source.id is None
         assert source.name == ""
-        assert source.url == ""
-        assert source.feed_type == "rss"
+        assert source.feed_url == ""
+        assert source.source_type == "RSS"
         assert source.is_active is True
-        assert source.country == "IT"
-        assert source.category == "government"
+        assert source.category is None
+        assert source.description is None
+        assert source.update_frequency_minutes == 60
+        assert source.last_fetched is None
 
     def test_custom_values(self):
-        source = Source(name="Test", url="https://example.com", country="US")
+        source = Source(
+            name="Test",
+            feed_url="https://example.com/feed",
+            source_type="Atom",
+            category="economy",
+        )
         assert source.name == "Test"
-        assert source.url == "https://example.com"
-        assert source.country == "US"
-
-
-class TestCategory:
-    """Tests for Category entity."""
-
-    def test_defaults(self):
-        cat = Category()
-        assert cat.id is None
-        assert cat.name == ""
-        assert cat.slug == ""
-        assert cat.parent_id is None
-
-    def test_custom_values(self):
-        cat = Category(name="Politics", slug="politics", parent_id=1)
-        assert cat.name == "Politics"
-        assert cat.slug == "politics"
-        assert cat.parent_id == 1
+        assert source.feed_url == "https://example.com/feed"
+        assert source.source_type == "Atom"
+        assert source.category == "economy"
 
 
 class TestNewsItem:
@@ -73,9 +41,8 @@ class TestNewsItem:
         assert item.title == ""
         assert item.content is None
         assert item.content_hash == ""
-        assert item.verification_status == VerificationStatus.PENDING
-        assert item.blockchain_certificate is None
-        assert item.categories == []
+        assert item.verification_status == "pending"
+        assert item.relevance_score is None
 
     def test_update_content_hash(self):
         item = NewsItem(title="Test", content="Content", source_id=1)
@@ -110,22 +77,3 @@ class TestNewsItem:
         item1.update_content_hash()
         item2.update_content_hash()
         assert item1.content_hash != item2.content_hash
-
-    def test_mark_as_verified(self):
-        item = NewsItem()
-        item.mark_as_verified("cert-abc-123")
-        assert item.verification_status == VerificationStatus.VERIFIED
-        assert item.blockchain_certificate == "cert-abc-123"
-
-    def test_mark_as_verified_raises_on_empty_certificate(self):
-        item = NewsItem()
-        with pytest.raises(ValueError, match="Certificate cannot be empty"):
-            item.mark_as_verified("")
-
-    def test_mark_as_verified_updates_timestamp(self):
-        from datetime import UTC, datetime
-
-        old_time = datetime(2020, 1, 1, tzinfo=UTC)
-        item = NewsItem(updated_at=old_time)
-        item.mark_as_verified("cert")
-        assert item.updated_at > old_time

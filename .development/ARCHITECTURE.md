@@ -45,7 +45,7 @@ For detailed documentation, see `docs/architecture.md`.
 - `sources.py` — Source management endpoints.
 
 ### backend/src/core
-- `entities.py` — Status of content verification.
+- `entities.py` — An institutional source of news/communications.
 
 ### backend/src/core/repositories
 - `news_repository.py` — Abstract base class for NewsItem repository.
