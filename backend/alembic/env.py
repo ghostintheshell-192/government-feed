@@ -6,13 +6,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from backend.src.infrastructure.database import Base
+from backend.src.infrastructure.models import NewsItem, Source, Subscription  # noqa: F401
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-
-from backend.src.infrastructure.database import Base
-from backend.src.infrastructure.models import NewsItem, Source  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
