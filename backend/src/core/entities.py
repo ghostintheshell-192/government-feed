@@ -8,12 +8,22 @@ that are structurally compatible (duck typing).
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from enum import Enum
 from hashlib import sha256
+
+
+class GeographicLevel(str, Enum):
+    """Geographic scope of an institutional source."""
+
+    LOCAL = "LOCAL"
+    NATIONAL = "NATIONAL"
+    CONTINENTAL = "CONTINENTAL"
+    GLOBAL = "GLOBAL"
 
 
 @dataclass
 class Source:
-    """An institutional source of news/communications."""
+    """An institutional source of news/communications (catalog entry)."""
 
     id: int | None = None
     name: str = ""
@@ -24,8 +34,28 @@ class Source:
     update_frequency_minutes: int = 60
     is_active: bool = True
     last_fetched: datetime | None = None
+    # Catalog fields
+    geographic_level: str | None = None
+    country_code: str | None = None
+    region: str | None = None
+    tags: list[str] = field(default_factory=list)
+    is_curated: bool = False
+    verified_at: datetime | None = None
+    # Timestamps
     created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+
+
+@dataclass
+class Subscription:
+    """A user's subscription to a source."""
+
+    id: int | None = None
+    user_id: int = 1
+    source_id: int = 0
+    is_active: bool = True
+    update_frequency_override: int | None = None
+    added_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
 
 @dataclass

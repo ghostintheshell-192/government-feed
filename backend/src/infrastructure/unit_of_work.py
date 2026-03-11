@@ -2,8 +2,12 @@
 
 from backend.src.core.repositories.news_repository import INewsRepository
 from backend.src.core.repositories.source_repository import ISourceRepository
+from backend.src.core.repositories.subscription_repository import ISubscriptionRepository
 from backend.src.infrastructure.repositories.news_repository import NewsRepository
 from backend.src.infrastructure.repositories.source_repository import SourceRepository
+from backend.src.infrastructure.repositories.subscription_repository import (
+    SubscriptionRepository,
+)
 from shared.logging import get_logger
 from sqlalchemy.orm import Session
 
@@ -28,6 +32,7 @@ class UnitOfWork:
         self._db = db
         self._news_repository: INewsRepository | None = None
         self._source_repository: ISourceRepository | None = None
+        self._subscription_repository: ISubscriptionRepository | None = None
 
     @property
     def news_repository(self) -> INewsRepository:
@@ -54,6 +59,14 @@ class UnitOfWork:
             self._source_repository = SourceRepository(self._db)
             logger.debug("SourceRepository initialized")
         return self._source_repository
+
+    @property
+    def subscription_repository(self) -> ISubscriptionRepository:
+        """Get SubscriptionRepository instance (lazy initialization)."""
+        if self._subscription_repository is None:
+            self._subscription_repository = SubscriptionRepository(self._db)
+            logger.debug("SubscriptionRepository initialized")
+        return self._subscription_repository
 
     def commit(self) -> None:
         """

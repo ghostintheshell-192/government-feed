@@ -4,7 +4,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from backend.src.api import state
-from backend.src.api.routes import admin, ai, cache, news, scheduler, settings, sources
+from backend.src.api.routes import admin, ai, cache, catalog, news, scheduler, settings, sources
 from backend.src.infrastructure.cache import RedisCache
 from backend.src.infrastructure.database import init_db
 from backend.src.infrastructure.scheduler import FeedScheduler
@@ -68,6 +68,7 @@ app.include_router(ai.router)
 app.include_router(settings.router)
 app.include_router(scheduler.router)
 app.include_router(cache.router)
+app.include_router(catalog.router)
 app.include_router(admin.router)
 
 

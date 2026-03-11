@@ -83,12 +83,14 @@ class TestPollAllFeeds:
         mock_session_local.return_value = mock_db
 
         source = MagicMock()
+        source.id = 1
         source.name = "New Feed"
         source.last_fetched = None
         source.update_frequency_minutes = 60
 
         mock_uow = MagicMock()
-        mock_uow.source_repository.get_active_sources.return_value = [source]
+        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = [1]
+        mock_uow.source_repository.get_all.return_value = [source]
         mock_uow_cls.return_value = mock_uow
 
         mock_parser = MagicMock()
@@ -115,12 +117,14 @@ class TestPollAllFeeds:
         mock_session_local.return_value = mock_db
 
         source = MagicMock()
+        source.id = 1
         source.name = "Due Feed"
         source.last_fetched = datetime.now(UTC) - timedelta(minutes=120)
         source.update_frequency_minutes = 60
 
         mock_uow = MagicMock()
-        mock_uow.source_repository.get_active_sources.return_value = [source]
+        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = [1]
+        mock_uow.source_repository.get_all.return_value = [source]
         mock_uow_cls.return_value = mock_uow
 
         mock_parser = MagicMock()
@@ -147,12 +151,14 @@ class TestPollAllFeeds:
         mock_session_local.return_value = mock_db
 
         source = MagicMock()
+        source.id = 1
         source.name = "Recent Feed"
         source.last_fetched = datetime.now(UTC) - timedelta(minutes=5)
         source.update_frequency_minutes = 60
 
         mock_uow = MagicMock()
-        mock_uow.source_repository.get_active_sources.return_value = [source]
+        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = [1]
+        mock_uow.source_repository.get_all.return_value = [source]
         mock_uow_cls.return_value = mock_uow
 
         scheduler = FeedScheduler()
@@ -176,20 +182,20 @@ class TestPollAllFeeds:
         mock_session_local.return_value = mock_db
 
         source_due = MagicMock()
+        source_due.id = 1
         source_due.name = "Due"
         source_due.last_fetched = None
         source_due.update_frequency_minutes = 60
 
         source_recent = MagicMock()
+        source_recent.id = 2
         source_recent.name = "Recent"
         source_recent.last_fetched = datetime.now(UTC) - timedelta(minutes=5)
         source_recent.update_frequency_minutes = 60
 
         mock_uow = MagicMock()
-        mock_uow.source_repository.get_active_sources.return_value = [
-            source_due,
-            source_recent,
-        ]
+        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = [1, 2]
+        mock_uow.source_repository.get_all.return_value = [source_due, source_recent]
         mock_uow_cls.return_value = mock_uow
 
         mock_parser = MagicMock()
@@ -217,12 +223,14 @@ class TestPollAllFeeds:
         mock_session_local.return_value = mock_db
 
         source = MagicMock()
+        source.id = 1
         source.name = "Error Feed"
         source.last_fetched = None
         source.update_frequency_minutes = 60
 
         mock_uow = MagicMock()
-        mock_uow.source_repository.get_active_sources.return_value = [source]
+        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = [1]
+        mock_uow.source_repository.get_all.return_value = [source]
         mock_uow_cls.return_value = mock_uow
 
         mock_parser = MagicMock()
@@ -248,7 +256,8 @@ class TestPollAllFeeds:
         mock_session_local.return_value = mock_db
 
         mock_uow = MagicMock()
-        mock_uow.source_repository.get_active_sources.return_value = []
+        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = []
+        mock_uow.source_repository.get_all.return_value = []
         mock_uow_cls.return_value = mock_uow
 
         scheduler = FeedScheduler()
@@ -269,7 +278,7 @@ class TestPollAllFeeds:
         mock_session_local.return_value = mock_db
 
         mock_uow = MagicMock()
-        mock_uow.source_repository.get_active_sources.side_effect = Exception(
+        mock_uow.subscription_repository.get_subscribed_source_ids.side_effect = Exception(
             "db connection error"
         )
         mock_uow_cls.return_value = mock_uow
@@ -419,11 +428,13 @@ class TestHealthCheckSources:
         mock_session_local.return_value = mock_db
 
         source = MagicMock()
+        source.id = 1
         source.name = "Healthy Feed"
         source.feed_url = "https://example.com/feed.xml"
 
         mock_uow = MagicMock()
-        mock_uow.source_repository.get_active_sources.return_value = [source]
+        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = [1]
+        mock_uow.source_repository.get_all.return_value = [source]
         mock_uow_cls.return_value = mock_uow
 
         mock_client = MagicMock()
@@ -452,15 +463,18 @@ class TestHealthCheckSources:
         mock_session_local.return_value = mock_db
 
         source_a = MagicMock()
+        source_a.id = 1
         source_a.name = "Feed A"
         source_a.feed_url = "https://example.com/a.xml"
 
         source_b = MagicMock()
+        source_b.id = 2
         source_b.name = "Feed B"
         source_b.feed_url = "https://example.com/b.xml"
 
         mock_uow = MagicMock()
-        mock_uow.source_repository.get_active_sources.return_value = [source_a, source_b]
+        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = [1, 2]
+        mock_uow.source_repository.get_all.return_value = [source_a, source_b]
         mock_uow_cls.return_value = mock_uow
 
         mock_client = MagicMock()
@@ -487,11 +501,13 @@ class TestHealthCheckSources:
         mock_session_local.return_value = mock_db
 
         source = MagicMock()
+        source.id = 1
         source.name = "Dead Feed"
         source.feed_url = "https://example.com/dead.xml"
 
         mock_uow = MagicMock()
-        mock_uow.source_repository.get_active_sources.return_value = [source]
+        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = [1]
+        mock_uow.source_repository.get_all.return_value = [source]
         mock_uow_cls.return_value = mock_uow
 
         mock_client = MagicMock()
@@ -518,15 +534,18 @@ class TestHealthCheckSources:
         mock_session_local.return_value = mock_db
 
         source_bad = MagicMock()
+        source_bad.id = 1
         source_bad.name = "Bad Feed"
         source_bad.feed_url = "https://example.com/bad.xml"
 
         source_good = MagicMock()
+        source_good.id = 2
         source_good.name = "Good Feed"
         source_good.feed_url = "https://example.com/good.xml"
 
         mock_uow = MagicMock()
-        mock_uow.source_repository.get_active_sources.return_value = [source_bad, source_good]
+        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = [1, 2]
+        mock_uow.source_repository.get_all.return_value = [source_bad, source_good]
         mock_uow_cls.return_value = mock_uow
 
         # Each source gets its own Client() context manager call
@@ -569,7 +588,8 @@ class TestHealthCheckSources:
         mock_session_local.return_value = mock_db
 
         mock_uow = MagicMock()
-        mock_uow.source_repository.get_active_sources.return_value = []
+        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = []
+        mock_uow.source_repository.get_all.return_value = []
         mock_uow_cls.return_value = mock_uow
 
         scheduler = FeedScheduler()
@@ -590,7 +610,9 @@ class TestHealthCheckSources:
         mock_session_local.return_value = mock_db
 
         mock_uow = MagicMock()
-        mock_uow.source_repository.get_active_sources.side_effect = Exception("db unavailable")
+        mock_uow.subscription_repository.get_subscribed_source_ids.side_effect = Exception(
+            "db unavailable"
+        )
         mock_uow_cls.return_value = mock_uow
 
         scheduler = FeedScheduler()

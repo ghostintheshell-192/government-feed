@@ -71,11 +71,17 @@ class FeedScheduler:
         }
 
     def _poll_all_feeds(self) -> None:
-        """Poll all active feeds that are due for an update."""
+        """Poll all feeds with active subscriptions that are due for an update."""
         db = SessionLocal()
         try:
             uow = UnitOfWork(db)
-            sources = uow.source_repository.get_active_sources()
+            subscribed_ids = uow.subscription_repository.get_subscribed_source_ids(user_id=1)
+            if not subscribed_ids:
+                return
+            sources = [
+                s for s in uow.source_repository.get_all()
+                if s.id in set(subscribed_ids)
+            ]
             for source in sources:
                 if source.last_fetched is not None:
                     elapsed = (datetime.now(UTC) - source.last_fetched).total_seconds() / 60
@@ -111,11 +117,14 @@ class FeedScheduler:
             db.close()
 
     def _health_check_sources(self) -> None:
-        """Check connectivity to all active feed sources."""
+        """Check connectivity to all subscribed feed sources."""
         db = SessionLocal()
         try:
             uow = UnitOfWork(db)
-            sources = uow.source_repository.get_active_sources()
+            subscribed_ids = set(
+                uow.subscription_repository.get_subscribed_source_ids(user_id=1)
+            )
+            sources = [s for s in uow.source_repository.get_all() if s.id in subscribed_ids]
             for source in sources:
                 try:
                     with httpx.Client() as client:

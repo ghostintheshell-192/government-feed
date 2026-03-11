@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from backend.src.infrastructure.database import Base, get_db
-from backend.src.infrastructure.models import NewsItem, Source
+from backend.src.infrastructure.models import NewsItem, Source, Subscription
 from backend.src.infrastructure.unit_of_work import UnitOfWork
 
 
@@ -100,3 +100,15 @@ def sample_news_item(source_id: int = 1, **kwargs) -> NewsItem:
     }
     defaults.update(kwargs)
     return NewsItem(**defaults)
+
+
+def sample_subscription(source_id: int = 1, **kwargs) -> Subscription:
+    """Factory for creating test Subscription ORM instances."""
+    defaults = {
+        "user_id": 1,
+        "source_id": source_id,
+        "is_active": True,
+        "added_at": datetime(2025, 1, 1),
+    }
+    defaults.update(kwargs)
+    return Subscription(**defaults)

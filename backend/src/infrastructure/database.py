@@ -24,5 +24,5 @@ def get_db():
 
 def init_db():
     """Initialize database tables."""
-    from backend.src.infrastructure.models import Source, NewsItem  # noqa
+    from backend.src.infrastructure.models import Source, Subscription, NewsItem  # noqa
     Base.metadata.create_all(bind=engine)

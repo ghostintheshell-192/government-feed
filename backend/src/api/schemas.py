@@ -41,6 +41,54 @@ class SourceResponse(SourceBase):
     updated_at: datetime
 
 
+# ==================== CATALOG SCHEMAS ====================
+
+
+class CatalogSourceResponse(BaseModel):
+    """Schema for a source in the catalog browse view."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    description: str | None
+    feed_url: str
+    source_type: str
+    category: str | None
+    geographic_level: str | None
+    country_code: str | None
+    region: str | None
+    tags: list[str]
+    is_curated: bool
+    is_subscribed: bool = False
+
+
+class PaginatedCatalogResponse(BaseModel):
+    """Paginated response for catalog browsing."""
+
+    items: list[CatalogSourceResponse]
+    pagination: "PaginationMeta"
+
+
+class CatalogStatsResponse(BaseModel):
+    """Statistics about the catalog."""
+
+    total_sources: int
+    by_geographic_level: dict[str, int]
+    top_tags: list[tuple[str, int]]
+
+
+class SubscriptionResponse(BaseModel):
+    """Schema for subscription response."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    source_id: int
+    is_active: bool
+    added_at: datetime
+
+
 class NewsItemResponse(BaseModel):
     """Schema for NewsItem response."""
 

@@ -22,6 +22,7 @@ For detailed documentation, see `docs/architecture.md`.
 - [ADR-004: Master Detail Layout](reference/decisions/004-master-detail-layout.md)
 - [ADR-005: Geographic Levels Navigation](reference/decisions/005-geographic-levels-navigation.md)
 - [ADR-006: Headless Browser Scraping](reference/decisions/006-headless-browser-scraping.md)
+- [ADR-007: Catalog Subscription Model](reference/decisions/007-catalog-subscription-model.md)
 
 ## Project Tree
 
@@ -39,17 +40,19 @@ For detailed documentation, see `docs/architecture.md`.
 - `admin.py` — Admin endpoints for feed inspection, content cleanup, and diagnostics.
 - `ai.py` — AI-related endpoints (summarization).
 - `cache.py` — Cache status endpoints.
+- `catalog.py` — Catalog endpoints for browsing and subscribing to sources.
 - `news.py` — News item endpoints.
 - `scheduler.py` — Background scheduler endpoints.
 - `settings.py` — Settings and feature flag endpoints.
 - `sources.py` — Source management endpoints.
 
 ### backend/src/core
-- `entities.py` — An institutional source of news/communications.
+- `entities.py` — Geographic scope of an institutional source.
 
 ### backend/src/core/repositories
 - `news_repository.py` — Abstract base class for NewsItem repository.
 - `source_repository.py` — Abstract base class for Source repository.
+- `subscription_repository.py` — Abstract base class for Subscription repository.
 
 ### backend/src/infrastructure
 - `ai_service.py` — Service for interacting with Ollama API.
@@ -58,7 +61,7 @@ For detailed documentation, see `docs/architecture.md`.
 - `database.py` — Database configuration and session management.
 - `feed_discovery.py` — A discovered feed with metadata.
 - `feed_parser.py` — Service for parsing RSS/Atom feeds.
-- `models.py` — Source model for database.
+- `models.py` — Source model for database (catalog entry).
 - `resilience.py` — Raised when a call is attempted on an open circuit breaker.
 - `scheduler.py` — Background job scheduler for feed polling, cleanup, and health checks.
 - `settings_store.py` — Simple settings storage.
@@ -67,6 +70,7 @@ For detailed documentation, see `docs/architecture.md`.
 ### backend/src/infrastructure/repositories
 - `news_repository.py` — SQLAlchemy implementation of NewsItem repository.
 - `source_repository.py` — SQLAlchemy implementation of Source repository.
+- `subscription_repository.py` — SQLAlchemy implementation of Subscription repository.
 
 ### shared/logging
 - `logger.py` — Centralized logging configuration for the application.
