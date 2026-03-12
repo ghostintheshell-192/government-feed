@@ -1,0 +1,184 @@
+[
+  {
+    "name": "News Agency UNIAN",
+    "description": "UNIAN",
+    "feed_url": "https://rss.unian.net/site/news_eng.rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "UA",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 100
+    }
+  },
+  {
+    "name": "ТЕЛЕГРАФ - последние новости Украины и мира",
+    "description": "ТЕЛЕГРАФ - последние новости Украины и мира за последний час, свежие и популярные мировые новости технологий, бизнеса, культуры и спорта за неделю",
+    "feed_url": "https://telegraf.com.ua/yandex-feed/",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "UA",
+    "tags": [],
+    "validation": {
+      "valid": false,
+      "status_code": 404,
+      "error": "HTTP 404",
+      "entry_count": 0
+    }
+  },
+  {
+    "name": "Последние новости на сайте korrespondent.net",
+    "description": "Корреспондент - информационно-новостной портал №1 в Украине. Объективно о событиях по всему миру.",
+    "feed_url": "http://k.img.com.ua/rss/ru/all_news2.0.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "UA",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 20
+    }
+  },
+  {
+    "name": "Цензор.НЕТ - Новости",
+    "description": "Самые свежие новости Украины и мира",
+    "feed_url": "https://censor.net.ua/includes/news_ru.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "UA",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 125
+    }
+  },
+  {
+    "name": "Новини на tsn.ua",
+    "description": "TSN.UA RSS feed",
+    "feed_url": "https://tsn.ua/rss/full.rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "UA",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 215
+    }
+  },
+  {
+    "name": "Українська правда",
+    "description": "",
+    "feed_url": "https://www.pravda.com.ua/rss/",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "UA",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 20
+    }
+  },
+  {
+    "name": "Гордон - Самые популярные материалы",
+    "description": "ГОРДОН",
+    "feed_url": "https://gordonua.com/xml/rss_category/top.html",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "UA",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 50
+    }
+  },
+  {
+    "name": "НВ",
+    "description": "Главные новости Украины и мира, эксклюзивные комментарии, аналитика",
+    "feed_url": "https://nv.ua/rss/all.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "UA",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 40
+    }
+  },
+  {
+    "name": "Информационное агентство УНИАН",
+    "description": "Информационное агентство УНИАН :: Новости, Политика, Бизнес, Фотосервис, Регионы",
+    "feed_url": "https://rss.unian.net/site/news_rus.rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "UA",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 100
+    }
+  },
+  {
+    "name": "Український погляд: новини, відео, пояснення, репортажі, ексклюзиви ᐈ Еспресо",
+    "description": "Новини України та світу",
+    "feed_url": "https://espreso.tv/rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "UA",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 40
+    }
+  },
+  {
+    "name": "Gazeta.ua",
+    "description": "Всеукраїнська он-лайн газета. Оперативні новини з України і світу: події, політика, спорт, культура",
+    "feed_url": "https://gazeta.ua/rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "UA",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 387
+    }
+  },
+  {
+    "name": "Вести.ua",
+    "description": "Вести Украина – это новостной медиа ресурс. Мы рассказываем обо всех событиях одними из первых и всегда честно.",
+    "feed_url": "https://vesti.ua/feeds/partners",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "UA",
+    "tags": [],
+    "validation": {
+      "valid": false,
+      "status_code": null,
+      "error": "[Errno -3] Temporary failure in name resolution",
+      "entry_count": 0
+    }
+  }
+]

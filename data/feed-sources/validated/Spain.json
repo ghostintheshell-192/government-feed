@@ -1,0 +1,145 @@
+[
+  {
+    "name": "The Local Spain",
+    "description": "Europe's news in English",
+    "feed_url": "https://feeds.thelocal.com/rss/es",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "ES",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 20
+    }
+  },
+  {
+    "name": "EL PAÍS: el periódico global",
+    "description": "Noticias de última hora sobre la actualidad en España y el mundo: política, economía, deportes, cultura, sociedad, tecnología, gente, opinión, viajes, moda, televisión, los blogs y las firmas de EL PAÍS. Además especiales, vídeos, fotos, audios, gráficos, entrevistas, promociones y todos los servicios de EL PAÍS.",
+    "feed_url": "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "ES",
+    "tags": [
+      "economy"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 102
+    }
+  },
+  {
+    "name": "España",
+    "description": "España",
+    "feed_url": "https://rss.elconfidencial.com/espana/",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "ES",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 15
+    }
+  },
+  {
+    "name": "ElDiario.es - ElDiario.es",
+    "description": "ElDiario.es - ElDiario.es",
+    "feed_url": "https://www.eldiario.es/rss/",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "ES",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 108
+    }
+  },
+  {
+    "name": "Portada // expansion",
+    "description": "Portada // expansion",
+    "feed_url": "https://e00-expansion.uecdn.es/rss/portada.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "ES",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 68
+    }
+  },
+  {
+    "name": "El Periódico - portada",
+    "description": "El Periódico - Todas las noticias de la portada",
+    "feed_url": "https://www.elperiodico.com/es/rss/rss_portada.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "ES",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 0
+    }
+  },
+  {
+    "name": "HuffPost Spain for Athena2",
+    "description": "",
+    "feed_url": "https://www.huffingtonpost.es/feeds/index.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "ES",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 100
+    }
+  },
+  {
+    "name": "Euro Weekly News Spain",
+    "description": "Spain News",
+    "feed_url": "https://www.euroweeklynews.com/feed/",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "ES",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 30
+    }
+  },
+  {
+    "name": "Agencia EFE | www.efe.com | English edition",
+    "description": "Breaking news from Agencia Efe. Reliable, trustworthy and easy. Information with EFE",
+    "feed_url": "https://www.efe.com/efe/english/4/rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "ES",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": false,
+      "status_code": 200,
+      "error": "Parse error: <unknown>:35:51: not well-formed (invalid token)",
+      "entry_count": 0
+    }
+  }
+]

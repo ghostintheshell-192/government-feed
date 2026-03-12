@@ -1,0 +1,187 @@
+[
+  {
+    "name": "France 24 - International breaking news, top stories and headlines",
+    "description": "",
+    "feed_url": "https://www.france24.com/en/rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "FR",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 24
+    }
+  },
+  {
+    "name": "Mediapart",
+    "description": "Mediapart",
+    "feed_url": "https://www.mediapart.fr/articles/feed",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "FR",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 10
+    }
+  },
+  {
+    "name": "Paris Star",
+    "description": "",
+    "feed_url": "https://www.parisstaronline.com/feed",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "FR",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 8
+    }
+  },
+  {
+    "name": "Le Monde.fr - Actualités et Infos en France et dans le monde",
+    "description": "Le Monde.fr - 1er site d’information. Les articles du journal et toute l’actualité en continu : International, France, Société, Economie, Culture, Environnement, Blogs ...",
+    "feed_url": "https://www.lemonde.fr/rss/une.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "FR",
+    "tags": [
+      "news",
+      "economy"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 17
+    }
+  },
+  {
+    "name": "L'Obs - A la une",
+    "description": "Actualité politique, information sociale ou internationale",
+    "feed_url": "https://www.nouvelobs.com/a-la-une/rss.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "FR",
+    "tags": [
+      "news",
+      "politics"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 294
+    }
+  },
+  {
+    "name": "Franceinfo - Les Titres",
+    "description": "Franceinfo - Les Titres",
+    "feed_url": "https://www.francetvinfo.fr/titres.rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "FR",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 34
+    }
+  },
+  {
+    "name": "Le HuffPost : actualités et infos décalées en continu, en France et dans le monde",
+    "description": "Le Huffington Post",
+    "feed_url": "https://www.huffingtonpost.fr/feeds/index.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "FR",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 20
+    }
+  },
+  {
+    "name": "La Dépêche du Midi : actualités et info en direct de la région Occitanie et des environs - ladepeche.fr",
+    "description": "Toute l’actualité de Toulouse et sa région en direct, photos et vidéos avec La Dépêche du Midi. Retrouvez toutes les informations locales de la région Occitanie : faits divers, politique, sports, économie, loisirs…...",
+    "feed_url": "https://www.ladepeche.fr/rss.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "FR",
+    "tags": [
+      "news",
+      "politics"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 100
+    }
+  },
+  {
+    "name": "Ministry for Europe and Foreign Affairs - Actualités",
+    "description": "",
+    "feed_url": "https://www.diplomatie.gouv.fr/spip.php?page=backend-fd&lang=en",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "FR",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 10
+    }
+  },
+  {
+    "name": "L'essentiel",
+    "description": "Retrouvez l'actualité du Sud Ouest en direct et toutes les informations régionales : politique, économie, sport, photos et vidéos.",
+    "feed_url": "https://www.sudouest.fr/essentiel/rss.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "FR",
+    "tags": [
+      "news",
+      "politics"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 20
+    }
+  },
+  {
+    "name": "Ouest France.fr - L'actualité en direct, en continu et en images",
+    "description": "Dernières minutes",
+    "feed_url": "https://www.ouest-france.fr/rss-en-continu.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "FR",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 10
+    }
+  }
+]

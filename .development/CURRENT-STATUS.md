@@ -68,6 +68,7 @@ See `tech-debt/` for tracked issues. Key items:
 
 | Issue | Priority | File |
 |-------|----------|------|
+| Source tagging unreliable (39/103 untagged) | Medium | `source-tagging-unreliable.md` |
 | Missing FK constraint news_items → sources | Medium | `missing-foreign-key-constraint.md` |
 | NewsCard summary hidden on expand | Medium | `newscard-summary-hidden-on-expand.md` |
 | Pre-commit grep regex | Low | `pre-commit-grep-regex.md` |

@@ -1,0 +1,247 @@
+[
+  {
+    "name": "European Parliament - Press Releases",
+    "description": "All press releases from the European Parliament",
+    "feed_url": "https://www.europarl.europa.eu/rss/doc/press-releases/en.xml",
+    "source_type": "RSS",
+    "geographic_level": "CONTINENTAL",
+    "country_code": null,
+    "tags": [
+      "politics"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 20
+    }
+  },
+  {
+    "name": "European Parliament - Top Stories",
+    "description": "Priority news from the European Parliament",
+    "feed_url": "https://www.europarl.europa.eu/rss/doc/top-stories/en.xml",
+    "source_type": "RSS",
+    "geographic_level": "CONTINENTAL",
+    "country_code": null,
+    "tags": [
+      "news",
+      "politics"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 10
+    }
+  },
+  {
+    "name": "European Parliament - Texts Adopted",
+    "description": "Texts adopted by the European Parliament in plenary",
+    "feed_url": "https://www.europarl.europa.eu/rss/doc/texts-adopted/en.xml",
+    "source_type": "RSS",
+    "geographic_level": "CONTINENTAL",
+    "country_code": null,
+    "tags": [
+      "politics"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 25
+    }
+  },
+  {
+    "name": "EUR-Lex - Parliament and Council Legislation",
+    "description": "Legislative acts adopted by the Council or jointly by the Council and the European Parliament",
+    "feed_url": "https://eur-lex.europa.eu/EN/display-feed.rss?rssId=162",
+    "source_type": "RSS",
+    "geographic_level": "CONTINENTAL",
+    "country_code": null,
+    "tags": [
+      "politics",
+      "law"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 100
+    }
+  },
+  {
+    "name": "4 - Commission proposals and related documents",
+    "description": "Commission proposals and other acts adopted by the Commission",
+    "feed_url": "https://eur-lex.europa.eu/EN/display-feed.rss?rssId=161",
+    "source_type": "RSS",
+    "geographic_level": "CONTINENTAL",
+    "country_code": null,
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 100
+    }
+  },
+  {
+    "name": "2 - All case-law of the Court of Justice of the European Union",
+    "description": "All documents from the Court of Justice of the European Union",
+    "feed_url": "https://eur-lex.europa.eu/EN/display-feed.rss?rssId=163",
+    "source_type": "RSS",
+    "geographic_level": "CONTINENTAL",
+    "country_code": null,
+    "tags": [
+      "law"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 100
+    }
+  },
+  {
+    "name": "EUR-Lex - Official Journal L (Legislation)",
+    "description": "Individual acts in the L series of the Official Journal",
+    "feed_url": "https://eur-lex.europa.eu/EN/display-feed.rss?rssId=222",
+    "source_type": "RSS",
+    "geographic_level": "CONTINENTAL",
+    "country_code": null,
+    "tags": [
+      "law"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 100
+    }
+  },
+  {
+    "name": "ECB - Press Releases and Speeches",
+    "description": "ECB press releases, speeches, interviews, press conference transcripts",
+    "feed_url": "https://www.ecb.europa.eu/rss/press.html",
+    "source_type": "RSS",
+    "geographic_level": "CONTINENTAL",
+    "country_code": null,
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 15
+    }
+  },
+  {
+    "name": "ECB - European Central Bank",
+    "description": "European Central Bank blog posts",
+    "feed_url": "https://www.ecb.europa.eu/rss/blog.html",
+    "source_type": "RSS",
+    "geographic_level": "CONTINENTAL",
+    "country_code": null,
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 15
+    }
+  },
+  {
+    "name": "ECB - Statistical Press Releases",
+    "description": "ECB statistical press releases",
+    "feed_url": "https://www.ecb.europa.eu/rss/statpress.html",
+    "source_type": "RSS",
+    "geographic_level": "CONTINENTAL",
+    "country_code": null,
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 15
+    }
+  },
+  {
+    "name": "ECB - European Central Bank",
+    "description": "ECB publications",
+    "feed_url": "https://www.ecb.europa.eu/rss/pub.html",
+    "source_type": "RSS",
+    "geographic_level": "CONTINENTAL",
+    "country_code": null,
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 15
+    }
+  },
+  {
+    "name": "Eurostat - Custom RSS Feed",
+    "description": "Latest statistical news releases from Eurostat",
+    "feed_url": "https://ec.europa.eu/eurostat/en/search?p_p_id=estatsearchportlet_WAR_estatsearchportlet&p_p_lifecycle=2&p_p_state=maximized&p_p_mode=view&p_p_resource_id=atom&_estatsearchportlet_WAR_estatsearchportlet_collection=CAT_PREREL",
+    "source_type": "ATOM",
+    "geographic_level": "CONTINENTAL",
+    "country_code": null,
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 11
+    }
+  },
+  {
+    "name": "EEA - Press Releases",
+    "description": "European Environment Agency press releases",
+    "feed_url": "https://www.eea.europa.eu/en/newsroom/rss-feeds/eeas-press-releases-rss",
+    "source_type": "RSS",
+    "geographic_level": "CONTINENTAL",
+    "country_code": null,
+    "tags": [
+      "environment"
+    ],
+    "validation": {
+      "valid": false,
+      "status_code": 200,
+      "error": "Parse error: <unknown>:2:0: syntax error",
+      "entry_count": 0
+    }
+  },
+  {
+    "name": "EEA - Publications",
+    "description": "European Environment Agency publications",
+    "feed_url": "https://www.eea.europa.eu/en/newsroom/rss-feeds/publications-rss",
+    "source_type": "RSS",
+    "geographic_level": "CONTINENTAL",
+    "country_code": null,
+    "tags": [
+      "environment"
+    ],
+    "validation": {
+      "valid": false,
+      "status_code": 200,
+      "error": "Parse error: <unknown>:2:0: syntax error",
+      "entry_count": 0
+    }
+  },
+  {
+    "name": "ECHR - Judgments",
+    "description": "European Court of Human Rights judgments execution",
+    "feed_url": "https://www.coe.int/en/web/execution/rss-feeds",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": null,
+    "tags": [],
+    "validation": {
+      "valid": false,
+      "status_code": 403,
+      "error": "HTTP 403",
+      "entry_count": 0
+    }
+  }
+]
