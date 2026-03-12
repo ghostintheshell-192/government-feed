@@ -127,6 +127,7 @@ async def subscribe(source_id: int, uow: UnitOfWork = Depends(get_unit_of_work))
 
     if state.cache:
         state.cache.delete("sources:all")
+        state.cache.delete("news:*")
 
     return sub
 
@@ -138,11 +139,16 @@ async def unsubscribe(source_id: int, uow: UnitOfWork = Depends(get_unit_of_work
     if not sub:
         raise HTTPException(status_code=404, detail="Subscription not found")
 
+    deleted_news = uow.news_repository.delete_by_source_id(source_id)
     uow.subscription_repository.delete(sub)
     uow.commit()
-    logger.info("User %d unsubscribed from source %d", _USER_ID, source_id)
+    logger.info(
+        "User %d unsubscribed from source %d, deleted %d news items",
+        _USER_ID, source_id, deleted_news,
+    )
 
     if state.cache:
         state.cache.delete("sources:all")
+        state.cache.delete("news:*")
 
     return None

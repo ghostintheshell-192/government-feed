@@ -4,7 +4,7 @@ import json
 
 from backend.src.api import schemas, state
 from backend.src.api.dependencies import get_unit_of_work
-from backend.src.infrastructure.models import Source
+from backend.src.infrastructure.models import Source, Subscription
 from backend.src.infrastructure.unit_of_work import UnitOfWork
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
@@ -13,16 +13,20 @@ from shared.logging import get_logger
 logger = get_logger(__name__)
 router = APIRouter(prefix="/api/sources", tags=["sources"])
 
+# Default user ID for single-user mode (M5 will replace with auth)
+_USER_ID = 1
+
 
 @router.get("", response_model=list[schemas.SourceResponse])
 async def get_sources(uow: UnitOfWork = Depends(get_unit_of_work)):
-    """Get all sources."""
+    """Get subscribed sources only."""
     if state.cache:
         cached = state.cache.get("sources:all")
         if cached:
             return JSONResponse(content=json.loads(cached))
 
-    sources = uow.source_repository.get_all()
+    subscribed_ids = uow.subscription_repository.get_subscribed_source_ids(_USER_ID)
+    sources = uow.source_repository.get_by_ids(subscribed_ids)
     result = [schemas.SourceResponse.model_validate(s).model_dump(mode="json") for s in sources]
 
     if state.cache:
@@ -53,15 +57,20 @@ async def get_source(source_id: int, uow: UnitOfWork = Depends(get_unit_of_work)
 
 @router.post("", response_model=schemas.SourceResponse, status_code=201)
 async def create_source(source: schemas.SourceCreate, uow: UnitOfWork = Depends(get_unit_of_work)):
-    """Create new source."""
+    """Create new source and auto-subscribe."""
     logger.info(f"Creating new source: {source.name}")
     db_source = Source(**source.model_dump())
     uow.source_repository.add(db_source)
+    uow._db.flush()  # get the ID before creating subscription
+
+    sub = Subscription(user_id=_USER_ID, source_id=db_source.id)
+    uow.subscription_repository.add(sub)
     uow.commit()
-    logger.info(f"Source created successfully: ID={db_source.id}, name={db_source.name}")
+    logger.info(f"Source created and subscribed: ID={db_source.id}, name={db_source.name}")
 
     if state.cache:
         state.cache.delete("sources:all")
+        state.cache.delete("news:*")
 
     return db_source
 
@@ -93,20 +102,24 @@ async def update_source(
 
 @router.delete("/{source_id}", status_code=204)
 async def delete_source(source_id: int, uow: UnitOfWork = Depends(get_unit_of_work)):
-    """Delete source."""
-    db_source = uow.source_repository.get_by_id(source_id)
-    if not db_source:
-        logger.warning(f"Delete failed: Source {source_id} not found")
-        raise HTTPException(status_code=404, detail="Source not found")
+    """Unsubscribe from source and clean up news items."""
+    sub = uow.subscription_repository.get_by_user_and_source(_USER_ID, source_id)
+    if not sub:
+        logger.warning(f"Unsubscribe failed: no subscription for source {source_id}")
+        raise HTTPException(status_code=404, detail="Subscription not found")
 
-    logger.info(f"Deleting source: ID={source_id}, name={db_source.name}")
-    uow.source_repository.delete(db_source)
+    deleted_news = uow.news_repository.delete_by_source_id(source_id)
+    uow.subscription_repository.delete(sub)
     uow.commit()
-    logger.info(f"Source deleted successfully: ID={source_id}")
+    logger.info(
+        "Unsubscribed from source %d: removed subscription + %d news items",
+        source_id, deleted_news,
+    )
 
     if state.cache:
         state.cache.delete(f"source:{source_id}")
         state.cache.delete("sources:all")
+        state.cache.delete("news:*")
 
     return None
 
@@ -148,7 +161,11 @@ async def process_feed(source_id: int, uow: UnitOfWork = Depends(get_unit_of_wor
 
     logger.info(f"Processing feed for source: ID={source_id}, name={source.name}")
     parser = FeedParserService(uow)
-    imported_count = parser.parse_and_import(source)
+    try:
+        imported_count = parser.parse_and_import(source)
+    except Exception:
+        logger.exception(f"Error processing feed for source {source_id}")
+        return {"success": False, "error": True, "message": "Errore nel caricamento del feed."}
 
     if imported_count > 0:
         logger.info(
@@ -160,8 +177,9 @@ async def process_feed(source_id: int, uow: UnitOfWork = Depends(get_unit_of_wor
 
         return {
             "success": True,
+            "error": False,
             "message": f"Feed importato con successo! {imported_count} notizie aggiunte.",
         }
     else:
-        logger.warning(f"Feed processing completed with no new items from {source.name}")
-        return {"success": False, "message": "Nessuna nuova notizia trovata o errore nel parsing."}
+        logger.info(f"No new items from {source.name}")
+        return {"success": False, "error": False, "message": "Nessuna nuova notizia trovata."}
