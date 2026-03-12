@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query'
-import { X } from 'lucide-react'
+import { Download, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ProgressBar } from '@/components/progress-bar'
 import { FilterBar } from '@/components/filter-bar'
 import { NewsCard } from '@/components/news-card'
 import { fetchFeatures, fetchNews, fetchSources } from '@/lib/api'
@@ -24,6 +25,15 @@ export default function Feed() {
   const { searches: recentSearches, addSearch } = useRecentSearches()
   const { savedSearches, saveSearch, removeSearch } = useSavedSearches()
   const { t } = useTranslation()
+
+  // Import-all state
+  const [importingAll, setImportingAll] = useState(false)
+  const [importAllProgress, setImportAllProgress] = useState<{
+    current: number; total: number; source: string
+  } | null>(null)
+  const [importAllResult, setImportAllResult] = useState<{
+    imported: number; errors: number; total: number
+  } | null>(null)
 
   // Track debounced search to add to recent searches
   const prevSearchRef = useRef<string | undefined>()
@@ -98,6 +108,44 @@ export default function Feed() {
     }
   }
 
+  const importAll = async () => {
+    setImportingAll(true)
+    setImportAllProgress(null)
+    setImportAllResult(null)
+    try {
+      const res = await fetch('/api/sources/import-all', { method: 'POST' })
+      if (!res.ok || !res.body) throw new Error(`Errore ${res.status}`)
+
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() ?? ''
+        for (const line of lines) {
+          if (!line.trim()) continue
+          const data = JSON.parse(line)
+          if (data.done) {
+            setImportAllResult({ imported: data.imported, errors: data.errors, total: data.total })
+          } else {
+            setImportAllProgress({ current: data.current, total: data.total, source: data.source })
+          }
+        }
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['news'] })
+    } catch {
+      alert(t('feed.errorImportAll'))
+    } finally {
+      setImportingAll(false)
+      setImportAllProgress(null)
+    }
+  }
+
   const applySavedSearch = (searchFilters: NewsFilters) => {
     setFilters(searchFilters)
   }
@@ -127,6 +175,56 @@ export default function Feed() {
           onSaveSearch={handleSaveSearch}
         />
       </div>
+
+      {/* Import-all */}
+      <div className="mb-4 flex items-center gap-3">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={importAll}
+          disabled={importingAll || sources.length === 0}
+        >
+          <Download className="mr-1.5 h-4 w-4" />
+          {importingAll
+            ? importAllProgress
+              ? `${importAllProgress.current}/${importAllProgress.total}`
+              : t('feed.importAll')
+            : t('feed.importAll')}
+        </Button>
+        {importAllResult && (
+          <div className="flex flex-1 items-center justify-between rounded-lg border bg-muted/50 px-3 py-2 text-xs">
+            <span>
+              {t('feed.importAllResult', {
+                total: importAllResult.total,
+                imported: importAllResult.imported,
+                errors: importAllResult.errors,
+              })}
+            </span>
+            <Button
+              variant="outline"
+              size="icon"
+              className="ml-2 h-5 w-5 shrink-0 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+              onClick={() => setImportAllResult(null)}
+            >
+              &times;
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {importingAll && importAllProgress && (
+        <div className="mb-4 rounded-lg border bg-muted/50 px-4 py-3">
+          <ProgressBar
+            current={importAllProgress.current}
+            total={importAllProgress.total}
+            label={t('feed.importingSource', {
+              current: importAllProgress.current,
+              total: importAllProgress.total,
+              source: importAllProgress.source,
+            })}
+          />
+        </div>
+      )}
 
       {savedSearches.length > 0 && (
         <div className="mb-6 flex flex-wrap items-center gap-2">

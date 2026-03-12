@@ -56,7 +56,11 @@
     "loadMore": "Load more news",
     "dateRange": "date range",
     "allFilters": "all filters",
-    "saveSearchPrompt": "Name for this search:"
+    "saveSearchPrompt": "Name for this search:",
+    "importAll": "Import all",
+    "importAllResult": "Import complete: {{imported}} articles from {{total}} sources ({{errors}} errors).",
+    "importingSource": "Importing {{current}}/{{total}}: {{source}}...",
+    "errorImportAll": "Error importing feeds."
   },
   "newsDetail": {
     "publishedAt": "Published on",

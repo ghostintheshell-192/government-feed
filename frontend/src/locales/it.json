@@ -56,7 +56,11 @@
     "loadMore": "Carica altre notizie",
     "dateRange": "intervallo date",
     "allFilters": "tutti i filtri",
-    "saveSearchPrompt": "Nome per questa ricerca:"
+    "saveSearchPrompt": "Nome per questa ricerca:",
+    "importAll": "Importa tutti",
+    "importAllResult": "Importazione completata: {{imported}} notizie da {{total}} fonti ({{errors}} errori).",
+    "importingSource": "Importando {{current}}/{{total}}: {{source}}...",
+    "errorImportAll": "Errore nell'importazione dei feed."
   },
   "newsDetail": {
     "publishedAt": "Pubblicato il",
