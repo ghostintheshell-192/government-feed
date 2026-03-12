@@ -166,7 +166,18 @@
     "errorAdd": "Error adding feed.",
     "errorImport": "Error importing news.",
     "errorLoad": "Unable to load feeds. Make sure the backend is running.",
-    "discoveredFrom": "Discovered from: {{url}}"
+    "discoveredFrom": "Discovered from: {{url}}",
+    "searchCatalog": "Search catalog...",
+    "catalogResults": "Catalog results",
+    "subscribe": "Subscribe",
+    "subscribed": "Subscribed",
+    "unsubscribe": "Remove",
+    "confirmUnsubscribe": "Remove this source? Associated articles will be deleted.",
+    "noResults": "No sources found in catalog.",
+    "loadMore": "Load more sources",
+    "yourSources": "Your sources",
+    "errorSubscribe": "Error subscribing.",
+    "errorUnsubscribe": "Error unsubscribing."
   },
   "admin": {
     "overview": "Overview",

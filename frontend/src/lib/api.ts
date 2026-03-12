@@ -1,6 +1,8 @@
 import type {
   BulkFetchProgress,
   BulkFetchResult,
+  CatalogFilters,
+  CatalogStats,
   CleanupResult,
   FeatureFlags,
   GlobalStats,
@@ -8,6 +10,7 @@ import type {
   NewsFilters,
   NewsItem,
   NewsPreview,
+  PaginatedCatalogResponse,
   PaginatedNewsResponse,
   QualityReport,
   ReimportResult,
@@ -118,6 +121,43 @@ export async function fetchNewsContent(
     throw new Error(`Failed to fetch content: ${res.status}`)
   }
   return res.json()
+}
+
+// ==================== CATALOG API ====================
+
+export async function fetchCatalog(
+  limit: number,
+  offset: number,
+  filters: CatalogFilters = {},
+): Promise<PaginatedCatalogResponse> {
+  const params = new URLSearchParams()
+  params.set('limit', String(limit))
+  params.set('offset', String(offset))
+
+  if (filters.search) params.set('search', filters.search)
+  if (filters.geographic_level) params.set('geographic_level', filters.geographic_level)
+  if (filters.tag) params.set('tag', filters.tag)
+
+  const res = await fetch(`/api/catalog?${params.toString()}`)
+  if (!res.ok) throw new Error(`Failed to fetch catalog: ${res.status}`)
+  return res.json()
+}
+
+export async function fetchCatalogStats(): Promise<CatalogStats> {
+  const res = await fetch('/api/catalog/stats')
+  if (!res.ok) throw new Error(`Failed to fetch catalog stats: ${res.status}`)
+  return res.json()
+}
+
+export async function subscribeToCatalog(sourceId: number): Promise<void> {
+  const res = await fetch(`/api/catalog/${sourceId}/subscribe`, { method: 'POST' })
+  if (res.status === 409) return // already subscribed
+  if (!res.ok) throw new Error(`Failed to subscribe: ${res.status}`)
+}
+
+export async function unsubscribeFromCatalog(sourceId: number): Promise<void> {
+  const res = await fetch(`/api/catalog/${sourceId}/subscribe`, { method: 'DELETE' })
+  if (!res.ok) throw new Error(`Failed to unsubscribe: ${res.status}`)
 }
 
 // ==================== ADMIN API ====================

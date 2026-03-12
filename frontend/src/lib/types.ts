@@ -56,6 +56,40 @@ export interface NewsFilters {
   date_to?: string
 }
 
+// Catalog types
+
+export interface CatalogSource {
+  id: number
+  name: string
+  description: string | null
+  feed_url: string
+  source_type: string
+  category: string | null
+  geographic_level: string | null
+  country_code: string | null
+  region: string | null
+  tags: string[]
+  is_curated: boolean
+  is_subscribed: boolean
+}
+
+export interface PaginatedCatalogResponse {
+  items: CatalogSource[]
+  pagination: PaginationMeta
+}
+
+export interface CatalogStats {
+  total_sources: number
+  by_geographic_level: Record<string, number>
+  top_tags: [string, number][]
+}
+
+export interface CatalogFilters {
+  search?: string
+  geographic_level?: string
+  tag?: string
+}
+
 // Admin types
 
 export interface NewsPreview {

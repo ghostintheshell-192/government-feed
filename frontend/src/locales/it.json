@@ -166,7 +166,18 @@
     "errorAdd": "Errore nell'aggiunta del feed.",
     "errorImport": "Errore nell'importazione delle notizie.",
     "errorLoad": "Impossibile caricare i feed. Verifica che il backend sia attivo.",
-    "discoveredFrom": "Scoperto da: {{url}}"
+    "discoveredFrom": "Scoperto da: {{url}}",
+    "searchCatalog": "Cerca nel catalogo...",
+    "catalogResults": "Risultati catalogo",
+    "subscribe": "Sottoscrivi",
+    "subscribed": "Sottoscritta",
+    "unsubscribe": "Rimuovi",
+    "confirmUnsubscribe": "Rimuovere questa fonte? Gli articoli associati verranno eliminati.",
+    "noResults": "Nessuna fonte trovata nel catalogo.",
+    "loadMore": "Carica altre fonti",
+    "yourSources": "Le tue fonti",
+    "errorSubscribe": "Errore nella sottoscrizione.",
+    "errorUnsubscribe": "Errore nella rimozione della sottoscrizione."
   },
   "admin": {
     "overview": "Panoramica",
