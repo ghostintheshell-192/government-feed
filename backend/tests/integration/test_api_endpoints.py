@@ -3,6 +3,7 @@
 from datetime import datetime
 from unittest.mock import patch
 
+from backend.src.infrastructure.models import Subscription
 from backend.tests.conftest import sample_news_item, sample_source
 
 
@@ -80,17 +81,76 @@ class TestSourcesEndpoints:
         response = test_client.put("/api/sources/9999", json=payload)
         assert response.status_code == 404
 
-    def test_delete_source(self, test_client, db_session):
+    def test_delete_source_unsubscribes(self, test_client, db_session):
         source = sample_source(name="Delete Me")
         db_session.add(source)
+        db_session.flush()
+        db_session.add(Subscription(user_id=1, source_id=source.id))
         db_session.flush()
 
         response = test_client.delete(f"/api/sources/{source.id}")
         assert response.status_code == 204
 
-    def test_delete_source_not_found(self, test_client):
-        response = test_client.delete("/api/sources/9999")
+        # Source still exists in DB (catalog), but subscription is gone
+        assert db_session.query(Subscription).filter_by(source_id=source.id).first() is None
+
+    def test_delete_source_not_subscribed_returns_404(self, test_client, db_session):
+        source = sample_source(name="Not Subscribed")
+        db_session.add(source)
+        db_session.flush()
+
+        response = test_client.delete(f"/api/sources/{source.id}")
         assert response.status_code == 404
+
+    def test_list_sources_returns_subscribed_only(self, test_client, db_session):
+        s1 = sample_source(name="Subscribed One", feed_url="https://sub1.com/feed")
+        s2 = sample_source(name="Not Subscribed", feed_url="https://unsub.com/feed")
+        db_session.add_all([s1, s2])
+        db_session.flush()
+        db_session.add(Subscription(user_id=1, source_id=s1.id))
+        db_session.flush()
+
+        response = test_client.get("/api/sources")
+        assert response.status_code == 200
+        names = [s["name"] for s in response.json()]
+        assert "Subscribed One" in names
+        assert "Not Subscribed" not in names
+
+    def test_create_source_auto_subscribes(self, test_client, db_session):
+        payload = {
+            "name": "Auto Sub Source",
+            "feed_url": "https://autosub.com/feed.xml",
+            "source_type": "RSS",
+            "update_frequency_minutes": 60,
+        }
+        response = test_client.post("/api/sources", json=payload)
+        assert response.status_code == 201
+        source_id = response.json()["id"]
+
+        # Verify subscription was created
+        sub = db_session.query(Subscription).filter_by(
+            user_id=1, source_id=source_id
+        ).first()
+        assert sub is not None
+
+    def test_delete_source_cleans_news(self, test_client, db_session):
+        from backend.src.infrastructure.models import NewsItem
+
+        source = sample_source(name="Clean News Source")
+        db_session.add(source)
+        db_session.flush()
+        db_session.add(Subscription(user_id=1, source_id=source.id))
+        db_session.add(sample_news_item(
+            source_id=source.id, content_hash="cleanup_test_1"
+        ))
+        db_session.flush()
+
+        response = test_client.delete(f"/api/sources/{source.id}")
+        assert response.status_code == 204
+
+        # News items should be deleted
+        news_count = db_session.query(NewsItem).filter_by(source_id=source.id).count()
+        assert news_count == 0
 
 
 class TestNewsEndpoints:
@@ -108,6 +168,7 @@ class TestNewsEndpoints:
         source = sample_source(name="News Source")
         db_session.add(source)
         db_session.flush()
+        db_session.add(Subscription(user_id=1, source_id=source.id))
 
         item = sample_news_item(source_id=source.id, content_hash="api_test_hash_1")
         db_session.add(item)
@@ -123,6 +184,7 @@ class TestNewsEndpoints:
         source = sample_source(name="Pagination Source")
         db_session.add(source)
         db_session.flush()
+        db_session.add(Subscription(user_id=1, source_id=source.id))
 
         for i in range(5):
             db_session.add(sample_news_item(
@@ -145,6 +207,8 @@ class TestNewsEndpoints:
         db_session.add(source_a)
         db_session.add(source_b)
         db_session.flush()
+        db_session.add(Subscription(user_id=1, source_id=source_a.id))
+        db_session.add(Subscription(user_id=1, source_id=source_b.id))
 
         db_session.add(sample_news_item(
             source_id=source_a.id, content_hash="filter_api_a", title="From A",
@@ -164,6 +228,7 @@ class TestNewsEndpoints:
         source = sample_source(name="Search API Source")
         db_session.add(source)
         db_session.flush()
+        db_session.add(Subscription(user_id=1, source_id=source.id))
 
         db_session.add(sample_news_item(
             source_id=source.id, content_hash="search_api_1", title="Budget Report 2025",
@@ -183,6 +248,7 @@ class TestNewsEndpoints:
         source = sample_source(name="Date API Source")
         db_session.add(source)
         db_session.flush()
+        db_session.add(Subscription(user_id=1, source_id=source.id))
 
         db_session.add(sample_news_item(
             source_id=source.id, content_hash="date_api_1",
@@ -199,6 +265,21 @@ class TestNewsEndpoints:
         titles = [item["title"] for item in data["items"]]
         assert "Recent News" in titles
         assert "Old News" not in titles
+
+    def test_news_empty_subscriptions_returns_empty(self, test_client, db_session):
+        """When user has no subscriptions, news should return empty even if items exist."""
+        source = sample_source(name="Unsubscribed Source")
+        db_session.add(source)
+        db_session.flush()
+        db_session.add(sample_news_item(
+            source_id=source.id, content_hash="empty_sub_test_1"
+        ))
+        db_session.flush()
+
+        response = test_client.get("/api/news")
+        data = response.json()
+        assert data["items"] == []
+        assert data["pagination"]["total"] == 0
 
     def test_get_news_item_not_found(self, test_client):
         response = test_client.get("/api/news/9999")

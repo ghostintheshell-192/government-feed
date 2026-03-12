@@ -317,6 +317,44 @@ class TestNewsRepository:
         with pytest.raises(ValueError, match="News item cannot be None"):
             repo.add(None)
 
+    def test_delete_by_source_id(self, db_session):
+        source_id = self._add_source(db_session, name="Delete Source News")
+        repo = NewsRepository(db_session)
+
+        for i in range(3):
+            repo.add(sample_news_item(
+                source_id=source_id,
+                title=f"Delete Item {i}",
+                content_hash=f"delete_source_{i}",
+            ))
+        db_session.flush()
+
+        count = repo.delete_by_source_id(source_id)
+        assert count == 3
+
+        items, total = repo.get_recent(source_ids=[source_id])
+        assert total == 0
+
+    def test_delete_by_source_id_no_items(self, db_session):
+        repo = NewsRepository(db_session)
+        count = repo.delete_by_source_id(9999)
+        assert count == 0
+
+    def test_get_recent_empty_source_ids_returns_empty(self, db_session):
+        """When source_ids is an empty list, no results should be returned."""
+        source_id = self._add_source(db_session, name="Empty Filter Source")
+        repo = NewsRepository(db_session)
+        repo.add(sample_news_item(
+            source_id=source_id,
+            title="Should Not Appear",
+            content_hash="empty_filter_test",
+        ))
+        db_session.flush()
+
+        items, total = repo.get_recent(source_ids=[])
+        assert items == []
+        assert total == 0
+
     def test_update_none_raises(self, db_session):
         repo = NewsRepository(db_session)
         with pytest.raises(ValueError, match="News item cannot be None"):

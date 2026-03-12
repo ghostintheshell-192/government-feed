@@ -1,7 +1,7 @@
 """Integration tests for catalog API endpoints."""
 
-from backend.src.infrastructure.models import Source, Subscription
-from backend.tests.conftest import sample_source
+from backend.src.infrastructure.models import NewsItem, Source, Subscription
+from backend.tests.conftest import sample_news_item, sample_source
 
 
 class TestCatalogBrowse:
@@ -161,3 +161,23 @@ class TestUnsubscribe:
     def test_unsubscribe_not_found(self, test_client):
         response = test_client.delete("/api/catalog/9999/subscribe")
         assert response.status_code == 404
+
+    def test_unsubscribe_deletes_news(self, test_client, db_session):
+        source = sample_source(name="Unsub News", feed_url="https://unsub-news.com/feed")
+        db_session.add(source)
+        db_session.flush()
+        db_session.add(Subscription(user_id=1, source_id=source.id))
+        db_session.add(sample_news_item(
+            source_id=source.id, content_hash="unsub_news_test_1"
+        ))
+        db_session.commit()
+
+        response = test_client.delete(f"/api/catalog/{source.id}/subscribe")
+        assert response.status_code == 204
+
+        # News items should be deleted
+        news_count = db_session.query(NewsItem).filter_by(source_id=source.id).count()
+        assert news_count == 0
+
+        # Source still exists
+        assert db_session.query(Source).filter_by(id=source.id).first() is not None

@@ -244,8 +244,9 @@ class TestParseAndImport:
 
         # Fail 5 times to open CB
         for _ in range(5):
-            parser.parse_and_import(source)
+            with pytest.raises(Exception, match="always fails"):
+                parser.parse_and_import(source)
 
-        # Next call should be rejected by CB immediately
+        # Next call should be rejected by CB immediately (returns 0, no exception)
         count = parser.parse_and_import(source)
         assert count == 0
