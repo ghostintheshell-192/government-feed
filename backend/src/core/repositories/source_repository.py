@@ -34,6 +34,11 @@ class ISourceRepository(ABC):
         pass
 
     @abstractmethod
+    def get_by_ids(self, ids: list[int]) -> list[Source]:
+        """Get sources by a list of IDs."""
+        pass
+
+    @abstractmethod
     def delete(self, source: Source) -> None:
         """Delete a source."""
         pass

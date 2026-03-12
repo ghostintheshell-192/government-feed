@@ -51,6 +51,11 @@ class INewsRepository(ABC):
         pass
 
     @abstractmethod
+    def delete_by_source_id(self, source_id: int) -> int:
+        """Delete all news items for a given source. Returns count of deleted items."""
+        pass
+
+    @abstractmethod
     def update(self, news_item: NewsItem) -> None:
         """Update an existing news item."""
         pass
