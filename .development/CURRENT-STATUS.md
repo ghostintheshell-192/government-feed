@@ -21,6 +21,7 @@
 
 - **ADR-005** (Accepted): Geographic levels as primary navigation (LOCAL → NATIONAL → CONTINENTAL → GLOBAL)
 - **ADR-007** (Accepted): Catalog-Subscription model — single Source table + Subscription pivot table
+- **ADR-008** (Proposed): Data locality — catalog vs user content split, deferred to M5
 
 ### Planned Specs (M4a)
 

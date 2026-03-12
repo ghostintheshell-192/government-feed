@@ -23,6 +23,7 @@ For detailed documentation, see `docs/architecture.md`.
 - [ADR-005: Geographic Levels Navigation](reference/decisions/005-geographic-levels-navigation.md)
 - [ADR-006: Headless Browser Scraping](reference/decisions/006-headless-browser-scraping.md)
 - [ADR-007: Catalog Subscription Model](reference/decisions/007-catalog-subscription-model.md)
+- [ADR-008: Data Locality Split](reference/decisions/008-data-locality-split.md)
 
 ## Project Tree
 
