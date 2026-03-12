@@ -113,7 +113,7 @@ class FeedParserService:
         except Exception as e:
             self._uow.rollback()
             logger.error("Error parsing feed from %s: %s", source.name, e)
-            return 0
+            raise
 
     @retry_feed_fetch
     def _fetch_feed_content_sync(self, url: str) -> str:
