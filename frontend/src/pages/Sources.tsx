@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Search, Check, Plus } from 'lucide-react'
+import { Search, Check, Plus, Download } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ProgressBar } from '@/components/progress-bar'
 import {
   discoverFeeds,
   fetchCatalog,
@@ -95,6 +96,15 @@ export default function Sources() {
   const [processing, setProcessing] = useState<number | null>(null)
   const [subscribing, setSubscribing] = useState<number | null>(null)
   const [validating, setValidating] = useState(false)
+
+  // Import-all state
+  const [importingAll, setImportingAll] = useState(false)
+  const [importAllProgress, setImportAllProgress] = useState<{
+    current: number; total: number; source: string
+  } | null>(null)
+  const [importAllResult, setImportAllResult] = useState<{
+    imported: number; errors: number; total: number
+  } | null>(null)
 
   useEffect(() => {
     loadSources()
@@ -317,6 +327,45 @@ export default function Sources() {
     }
   }
 
+  const importAll = async () => {
+    setImportingAll(true)
+    setImportAllProgress(null)
+    setImportAllResult(null)
+    try {
+      const res = await fetch('/api/sources/import-all', { method: 'POST' })
+      if (!res.ok || !res.body) throw new Error(`Errore ${res.status}`)
+
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() ?? ''
+        for (const line of lines) {
+          if (!line.trim()) continue
+          const data = JSON.parse(line)
+          if (data.done) {
+            setImportAllResult({ imported: data.imported, errors: data.errors, total: data.total })
+          } else {
+            setImportAllProgress({ current: data.current, total: data.total, source: data.source })
+          }
+        }
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['news'] })
+      await loadSources()
+    } catch {
+      alert(t('sources.errorImportAll'))
+    } finally {
+      setImportingAll(false)
+      setImportAllProgress(null)
+    }
+  }
+
   // Subscribed source IDs for marking catalog results
   const subscribedIds = useMemo(() => new Set(sources.map((s) => s.id)), [sources])
 
@@ -335,11 +384,62 @@ export default function Sources() {
             </TabsTrigger>
             <TabsTrigger value="explore">{t('sources.tabExplore')}</TabsTrigger>
           </TabsList>
-          <Button size="sm" onClick={openAddModal}>
-            <Plus className="mr-1.5 h-4 w-4" />
-            {t('sources.addFeed')}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={importAll}
+              disabled={importingAll || sources.length === 0}
+            >
+              <Download className="mr-1.5 h-4 w-4" />
+              {importingAll
+                ? importAllProgress
+                  ? `${importAllProgress.current}/${importAllProgress.total}`
+                  : t('sources.importing')
+                : t('sources.importAll')}
+            </Button>
+            <Button size="sm" onClick={openAddModal}>
+              <Plus className="mr-1.5 h-4 w-4" />
+              {t('sources.addFeed')}
+            </Button>
+          </div>
         </div>
+
+        {/* Import-all result banner */}
+        {importAllResult && (
+          <div className="mb-4 flex items-center justify-between rounded-lg border bg-muted/50 px-4 py-3 text-sm">
+            <span>
+              {t('sources.importAllResult', {
+                total: importAllResult.total,
+                imported: importAllResult.imported,
+                errors: importAllResult.errors,
+              })}
+            </span>
+            <Button
+              variant="outline"
+              size="icon"
+              className="ml-4 h-6 w-6 shrink-0 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+              onClick={() => setImportAllResult(null)}
+            >
+              &times;
+            </Button>
+          </div>
+        )}
+
+        {/* Import-all progress */}
+        {importingAll && importAllProgress && (
+          <div className="mb-4 rounded-lg border bg-muted/50 px-4 py-3">
+            <ProgressBar
+              current={importAllProgress.current}
+              total={importAllProgress.total}
+              label={t('sources.importingSource', {
+                current: importAllProgress.current,
+                total: importAllProgress.total,
+                source: importAllProgress.source,
+              })}
+            />
+          </div>
+        )}
 
         {/* Tab: Subscribed feeds */}
         <TabsContent value="subscribed">

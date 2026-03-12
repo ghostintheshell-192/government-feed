@@ -183,7 +183,11 @@
     "errorUnsubscribe": "Errore nella rimozione della sottoscrizione.",
     "validating": "Verifica in corso...",
     "feedInvalid": "Feed non valido: {{error}}",
-    "errorValidate": "Impossibile verificare il feed."
+    "errorValidate": "Impossibile verificare il feed.",
+    "importAll": "Importa tutti",
+    "importAllResult": "Importazione completata: {{imported}} notizie da {{total}} fonti ({{errors}} errori).",
+    "importingSource": "Importando {{current}}/{{total}}: {{source}}...",
+    "errorImportAll": "Errore nell'importazione dei feed."
   },
   "admin": {
     "overview": "Panoramica",

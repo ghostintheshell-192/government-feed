@@ -18,6 +18,7 @@ import {
   Wrench,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ProgressBar } from '@/components/progress-bar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -625,22 +626,12 @@ export default function Admin() {
           </div>
           <ActionFeedback result={actionResult} />
           {fetchProgress && (
-            <div className="mt-3 space-y-1.5">
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span className="truncate pr-4">{fetchProgress.title}</span>
-                <span className="shrink-0 tabular-nums">
-                  {fetchProgress.current}/{fetchProgress.total}
-                </span>
-              </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-primary/20">
-                <div
-                  className="h-full rounded-full bg-primary transition-[width] duration-300 ease-out"
-                  style={{
-                    width: `${Math.round((fetchProgress.current / fetchProgress.total) * 100)}%`,
-                  }}
-                />
-              </div>
-            </div>
+            <ProgressBar
+              current={fetchProgress.current}
+              total={fetchProgress.total}
+              label={fetchProgress.title}
+              className="mt-3"
+            />
           )}
         </div>
 

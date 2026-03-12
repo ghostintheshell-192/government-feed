@@ -183,7 +183,11 @@
     "errorUnsubscribe": "Error unsubscribing.",
     "validating": "Validating...",
     "feedInvalid": "Invalid feed: {{error}}",
-    "errorValidate": "Unable to validate feed."
+    "errorValidate": "Unable to validate feed.",
+    "importAll": "Import all",
+    "importAllResult": "Import complete: {{imported}} articles from {{total}} sources ({{errors}} errors).",
+    "importingSource": "Importing {{current}}/{{total}}: {{source}}...",
+    "errorImportAll": "Error importing feeds."
   },
   "admin": {
     "overview": "Overview",

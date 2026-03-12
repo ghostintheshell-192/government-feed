@@ -7,7 +7,7 @@ from backend.src.api.dependencies import get_unit_of_work
 from backend.src.infrastructure.models import Source, Subscription
 from backend.src.infrastructure.unit_of_work import UnitOfWork
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from shared.logging import get_logger
 
 logger = get_logger(__name__)
@@ -185,6 +185,81 @@ async def discover_feeds(request: schemas.FeedDiscoveryRequest):
         ],
         searched_sites=searched_sites,
     )
+
+
+@router.post("/import-all")
+async def import_all_feeds(uow: UnitOfWork = Depends(get_unit_of_work)):
+    """Import news from all subscribed sources. Streams progress as NDJSON."""
+    import json as json_mod
+
+    from backend.src.infrastructure.database import SessionLocal
+    from backend.src.infrastructure.feed_parser import FeedParserService
+
+    subscribed_ids = uow.subscription_repository.get_subscribed_source_ids(_USER_ID)
+    sources = uow.source_repository.get_by_ids(subscribed_ids)
+    active_sources = [s for s in sources if s.is_active]
+
+    if not active_sources:
+        return StreamingResponse(
+            iter([json_mod.dumps({"done": True, "total": 0, "imported": 0, "errors": 0}) + "\n"]),
+            media_type="application/x-ndjson",
+        )
+
+    # Snapshot source info before closing the injected UoW
+    source_info = [(s.id, s.name, s.feed_url) for s in active_sources]
+
+    async def generate():  # type: ignore[no-untyped-def]
+        import asyncio
+
+        total = len(source_info)
+        total_imported = 0
+        total_errors = 0
+
+        for i, (src_id, src_name, _) in enumerate(source_info, 1):
+            # Each source gets its own UoW/session for isolation
+            db = SessionLocal()
+            try:
+                source_uow = UnitOfWork(db)
+                source = source_uow.source_repository.get_by_id(src_id)
+                if not source:
+                    total_errors += 1
+                    yield json_mod.dumps({
+                        "current": i, "total": total,
+                        "source": src_name, "status": "error", "imported": 0,
+                    }) + "\n"
+                    await asyncio.sleep(0)
+                    continue
+
+                parser = FeedParserService(source_uow)
+                imported = parser.parse_and_import(source)
+                total_imported += imported
+                yield json_mod.dumps({
+                    "current": i, "total": total,
+                    "source": src_name, "status": "ok", "imported": imported,
+                }) + "\n"
+                await asyncio.sleep(0)
+            except Exception:
+                logger.warning("Import-all failed for source %s", src_name)
+                total_errors += 1
+                yield json_mod.dumps({
+                    "current": i, "total": total,
+                    "source": src_name, "status": "error", "imported": 0,
+                }) + "\n"
+                await asyncio.sleep(0)
+            finally:
+                db.close()
+
+        if state.cache and total_imported > 0:
+            state.cache.delete("news:*")
+            state.cache.delete("sources:all")
+
+        yield json_mod.dumps({
+            "done": True, "total": total,
+            "imported": total_imported, "errors": total_errors,
+        }) + "\n"
+
+    logger.info("Import-all triggered for %d subscribed sources", len(source_info))
+    return StreamingResponse(generate(), media_type="application/x-ndjson")
 
 
 @router.post("/{source_id}/process")
