@@ -124,6 +124,44 @@ async def delete_source(source_id: int, uow: UnitOfWork = Depends(get_unit_of_wo
     return None
 
 
+@router.post("/validate", response_model=schemas.FeedValidationResponse)
+async def validate_feed(request: schemas.FeedValidationRequest):
+    """Validate a feed URL: check HTTP response and parse content."""
+    import feedparser
+    import httpx
+
+    logger.info("Validating feed URL: %s", request.feed_url)
+    try:
+        async with httpx.AsyncClient(
+            timeout=15.0, follow_redirects=True,
+            headers={"User-Agent": "GovernmentFeed/1.0 (feed validator)"},
+        ) as client:
+            response = await client.get(request.feed_url)
+
+        if response.status_code != 200:
+            return schemas.FeedValidationResponse(
+                valid=False, error=f"HTTP {response.status_code}",
+            )
+
+        parsed = feedparser.parse(response.text)
+        if parsed.bozo and not parsed.entries:
+            return schemas.FeedValidationResponse(
+                valid=False, error="Il contenuto non è un feed RSS/Atom valido.",
+            )
+
+        return schemas.FeedValidationResponse(
+            valid=True,
+            feed_title=parsed.feed.get("title", ""),
+            entry_count=len(parsed.entries),
+        )
+
+    except httpx.TimeoutException:
+        return schemas.FeedValidationResponse(valid=False, error="Timeout: il server non risponde.")
+    except Exception as e:
+        logger.warning("Feed validation error for %s: %s", request.feed_url, e)
+        return schemas.FeedValidationResponse(valid=False, error="URL non raggiungibile.")
+
+
 @router.post("/discover", response_model=schemas.FeedDiscoveryResponse)
 async def discover_feeds(request: schemas.FeedDiscoveryRequest):
     """Discover RSS/Atom feeds from a URL or search query."""

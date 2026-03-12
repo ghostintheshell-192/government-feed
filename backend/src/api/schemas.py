@@ -134,6 +134,21 @@ class SettingsUpdate(BaseModel):
     redis_url: str | None = Field(None, max_length=200)
 
 
+class FeedValidationRequest(BaseModel):
+    """Request schema for feed URL validation."""
+
+    feed_url: str = Field(..., min_length=1, max_length=500)
+
+
+class FeedValidationResponse(BaseModel):
+    """Response schema for feed URL validation."""
+
+    valid: bool
+    feed_title: str | None = None
+    entry_count: int = 0
+    error: str | None = None
+
+
 class FeedDiscoveryRequest(BaseModel):
     """Request schema for feed discovery."""
 
