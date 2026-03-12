@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   discoverFeeds,
   fetchCatalog,
@@ -51,7 +52,7 @@ const emptyForm: SourceFormData = {
 
 function useDebounce<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value)
-  useMemo(() => {
+  useEffect(() => {
     const timer = setTimeout(() => setDebounced(value), delay)
     return () => clearTimeout(timer)
   }, [value, delay])
@@ -75,7 +76,6 @@ export default function Sources() {
   const [catalogLoading, setCatalogLoading] = useState(false)
   const [catalogOffset, setCatalogOffset] = useState(0)
   const [catalogHasMore, setCatalogHasMore] = useState(false)
-  const isSearching = searchQuery.trim().length > 0
 
   // Modal state
   const [showModal, setShowModal] = useState(false)
@@ -94,6 +94,7 @@ export default function Sources() {
   // Action state
   const [processing, setProcessing] = useState<number | null>(null)
   const [subscribing, setSubscribing] = useState<number | null>(null)
+  const [validating, setValidating] = useState(false)
 
   useEffect(() => {
     loadSources()
@@ -151,7 +152,6 @@ export default function Sources() {
       await subscribeToCatalog(sourceId)
       await loadSources()
       queryClient.invalidateQueries({ queryKey: ['news'] })
-      // Update catalog results to reflect subscription
       setCatalogResults((prev) =>
         prev.map((s) => (s.id === sourceId ? { ...s, is_subscribed: true } : s))
       )
@@ -169,7 +169,6 @@ export default function Sources() {
       if (!res.ok) throw new Error(`Errore ${res.status}`)
       await loadSources()
       queryClient.invalidateQueries({ queryKey: ['news'] })
-      // Update catalog results if searching
       setCatalogResults((prev) =>
         prev.map((s) => (s.id === id ? { ...s, is_subscribed: false } : s))
       )
@@ -213,6 +212,30 @@ export default function Sources() {
     if (!formData.name || !formData.feed_url) {
       alert(t('sources.errorValidation'))
       return
+    }
+
+    // Validate feed URL before saving (skip for edits that don't change URL)
+    if (!editMode) {
+      setValidating(true)
+      try {
+        const valRes = await fetch('/api/sources/validate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ feed_url: formData.feed_url }),
+        })
+        if (!valRes.ok) throw new Error(`Errore ${valRes.status}`)
+        const valData = await valRes.json()
+        if (!valData.valid) {
+          alert(t('sources.feedInvalid', { error: valData.error }))
+          setValidating(false)
+          return
+        }
+      } catch {
+        alert(t('sources.errorValidate'))
+        setValidating(false)
+        return
+      }
+      setValidating(false)
     }
 
     const url = editMode ? `/api/sources/${editId}` : '/api/sources'
@@ -295,136 +318,31 @@ export default function Sources() {
   }
 
   // Subscribed source IDs for marking catalog results
-  const subscribedIds = new Set(sources.map((s) => s.id))
+  const subscribedIds = useMemo(() => new Set(sources.map((s) => s.id)), [sources])
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-6 md:px-6">
       <div className="mb-6">
-        <h1 className="font-serif text-3xl font-bold">{t('sources.title')}</h1>
+        <h1 className="font-serif text-3xl font-bold">Feed</h1>
         <p className="mt-1 text-muted-foreground">{t('sources.description')}</p>
       </div>
 
-      {/* Search bar + Add button */}
-      <div className="mb-6 flex gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t('sources.searchCatalog')}
-            className="pl-10"
-          />
+      <Tabs defaultValue="subscribed">
+        <div className="mb-6 flex items-center justify-between gap-2">
+          <TabsList>
+            <TabsTrigger value="subscribed">
+              {t('sources.tabSubscribed')} {!loading && !error && `(${sources.length})`}
+            </TabsTrigger>
+            <TabsTrigger value="explore">{t('sources.tabExplore')}</TabsTrigger>
+          </TabsList>
+          <Button size="sm" onClick={openAddModal}>
+            <Plus className="mr-1.5 h-4 w-4" />
+            {t('sources.addFeed')}
+          </Button>
         </div>
-        <Button onClick={openAddModal}>
-          <Plus className="mr-1.5 h-4 w-4" />
-          {t('sources.addFeed')}
-        </Button>
-      </div>
 
-      {/* Catalog search results */}
-      {isSearching && (
-        <div className="mb-6">
-          {catalogLoading && catalogResults.length === 0 ? (
-            <div className="space-y-3">
-              <Skeleton className="h-20 w-full rounded-lg" />
-              <Skeleton className="h-20 w-full rounded-lg" />
-            </div>
-          ) : catalogResults.length === 0 && !catalogLoading ? (
-            <Card>
-              <CardContent className="py-8 text-center text-muted-foreground">
-                {t('sources.noResults')}
-              </CardContent>
-            </Card>
-          ) : (
-            <>
-              <h2 className="mb-3 text-sm font-semibold text-muted-foreground">
-                {t('sources.catalogResults')} ({catalogTotal})
-              </h2>
-              <div className="space-y-3">
-                {catalogResults.map((source) => {
-                  const isSubbed = source.is_subscribed || subscribedIds.has(source.id)
-                  return (
-                    <Card key={source.id} className="transition-shadow hover:shadow-md">
-                      <CardHeader className="pb-2">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="min-w-0 flex-1">
-                            <CardTitle className="text-base">{source.name}</CardTitle>
-                            {source.description && (
-                              <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">
-                                {source.description}
-                              </p>
-                            )}
-                          </div>
-                          <Button
-                            variant={isSubbed ? 'default' : 'outline'}
-                            size="sm"
-                            className="shrink-0"
-                            onClick={() => !isSubbed && handleSubscribe(source.id)}
-                            disabled={isSubbed || subscribing === source.id}
-                          >
-                            {isSubbed ? (
-                              <>
-                                <Check className="mr-1.5 h-3.5 w-3.5" />
-                                {t('sources.subscribed')}
-                              </>
-                            ) : subscribing === source.id ? (
-                              t('sources.adding')
-                            ) : (
-                              <>
-                                <Plus className="mr-1.5 h-3.5 w-3.5" />
-                                {t('sources.subscribe')}
-                              </>
-                            )}
-                          </Button>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          {source.geographic_level && (
-                            <Badge variant="secondary" className="text-xs">
-                              {source.geographic_level === 'CONTINENTAL'
-                                ? 'EU'
-                                : source.country_code || source.geographic_level}
-                            </Badge>
-                          )}
-                          {source.tags.map((tag) => (
-                            <Badge key={tag} variant="outline" className="text-xs">
-                              {tag}
-                            </Badge>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )
-                })}
-              </div>
-
-              {catalogHasMore && (
-                <div className="mt-4 text-center">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => searchCatalog(debouncedSearch.trim(), catalogOffset)}
-                    disabled={catalogLoading}
-                  >
-                    {catalogLoading ? t('common.loading') : t('sources.loadMore')}
-                  </Button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      )}
-
-      {/* Subscribed sources list */}
-      {!isSearching && (
-        <>
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">
-              {t('sources.yourSources')} {!loading && !error && `(${sources.length})`}
-            </h2>
-          </div>
-
+        {/* Tab: Subscribed feeds */}
+        <TabsContent value="subscribed">
           {loading ? (
             <div className="space-y-4">
               {[1, 2].map((i) => (
@@ -533,8 +451,119 @@ export default function Sources() {
               ))}
             </div>
           )}
-        </>
-      )}
+        </TabsContent>
+
+        {/* Tab: Explore catalog */}
+        <TabsContent value="explore">
+          <div className="mb-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t('sources.searchCatalog')}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
+          {!searchQuery.trim() ? (
+            <Card>
+              <CardContent className="py-12 text-center text-muted-foreground">
+                {t('sources.exploreHint')}
+              </CardContent>
+            </Card>
+          ) : catalogLoading && catalogResults.length === 0 ? (
+            <div className="space-y-3">
+              <Skeleton className="h-20 w-full rounded-lg" />
+              <Skeleton className="h-20 w-full rounded-lg" />
+            </div>
+          ) : catalogResults.length === 0 && !catalogLoading ? (
+            <Card>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                {t('sources.noResults')}
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              <h2 className="mb-3 text-sm font-semibold text-muted-foreground">
+                {t('sources.catalogResults')} ({catalogTotal})
+              </h2>
+              <div className="space-y-3">
+                {catalogResults.map((source) => {
+                  const isSubbed = source.is_subscribed || subscribedIds.has(source.id)
+                  return (
+                    <Card key={source.id} className="transition-shadow hover:shadow-md">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="min-w-0 flex-1">
+                            <CardTitle className="text-base">{source.name}</CardTitle>
+                            {source.description && (
+                              <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">
+                                {source.description}
+                              </p>
+                            )}
+                          </div>
+                          <Button
+                            variant={isSubbed ? 'default' : 'outline'}
+                            size="sm"
+                            className="shrink-0"
+                            onClick={() => !isSubbed && handleSubscribe(source.id)}
+                            disabled={isSubbed || subscribing === source.id}
+                          >
+                            {isSubbed ? (
+                              <>
+                                <Check className="mr-1.5 h-3.5 w-3.5" />
+                                {t('sources.subscribed')}
+                              </>
+                            ) : subscribing === source.id ? (
+                              t('sources.adding')
+                            ) : (
+                              <>
+                                <Plus className="mr-1.5 h-3.5 w-3.5" />
+                                {t('sources.subscribe')}
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {source.geographic_level && (
+                            <Badge variant="secondary" className="text-xs">
+                              {source.geographic_level === 'CONTINENTAL'
+                                ? 'EU'
+                                : source.country_code || source.geographic_level}
+                            </Badge>
+                          )}
+                          {source.tags.map((tag) => (
+                            <Badge key={tag} variant="outline" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
+                })}
+              </div>
+
+              {catalogHasMore && (
+                <div className="mt-4 text-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => searchCatalog(debouncedSearch.trim(), catalogOffset)}
+                    disabled={catalogLoading}
+                  >
+                    {catalogLoading ? t('common.loading') : t('sources.loadMore')}
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </TabsContent>
+      </Tabs>
 
       {/* Add/Edit Modal */}
       {showModal && (
@@ -726,8 +755,12 @@ export default function Sources() {
                 <Button variant="outline" onClick={closeModal}>
                   {t('common.cancel')}
                 </Button>
-                <Button onClick={saveSource}>
-                  {editMode ? t('sources.update') : t('sources.add')}
+                <Button onClick={saveSource} disabled={validating}>
+                  {validating
+                    ? t('sources.validating')
+                    : editMode
+                      ? t('sources.update')
+                      : t('sources.add')}
                 </Button>
               </div>
             </CardContent>

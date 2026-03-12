@@ -1,14 +1,14 @@
 {
   "nav": {
     "dashboard": "Dashboard",
-    "sources": "Sources",
+    "sources": "Feed",
     "admin": "Admin",
     "settings": "Settings",
     "brand": "Government Feed"
   },
   "breadcrumb": {
     "dashboard": "Dashboard",
-    "sources": "Sources",
+    "sources": "Feed",
     "admin": "Admin",
     "settings": "Settings"
   },
@@ -47,7 +47,7 @@
   "feed": {
     "noNewsFound": "No news found",
     "goToSources": "Go to",
-    "sourcesLink": "Sources",
+    "sourcesLink": "Manage Feed",
     "noNewsHelpAdd": "to add feeds and import news.",
     "noNewsHelpFilter": "Try changing the search filters.",
     "newsCount": "{{count}} news found",
@@ -115,8 +115,11 @@
     "successClearCache": "Data cache cleared. Next pages will load fresh data."
   },
   "sources": {
-    "title": "Sources",
-    "description": "Configure and manage institutional feeds",
+    "title": "Feed",
+    "description": "Manage your sources and discover new feeds",
+    "tabSubscribed": "Your feeds",
+    "tabExplore": "Explore catalog",
+    "exploreHint": "Search by name, country or topic to find feeds in the catalog.",
     "discoverTitle": "Discover Feeds",
     "discoverHelp": "Enter an institution name or site URL to find available feeds",
     "discoverPlaceholder": "Institution name or site URL...",
@@ -177,7 +180,10 @@
     "loadMore": "Load more sources",
     "yourSources": "Your sources",
     "errorSubscribe": "Error subscribing.",
-    "errorUnsubscribe": "Error unsubscribing."
+    "errorUnsubscribe": "Error unsubscribing.",
+    "validating": "Validating...",
+    "feedInvalid": "Invalid feed: {{error}}",
+    "errorValidate": "Unable to validate feed."
   },
   "admin": {
     "overview": "Overview",

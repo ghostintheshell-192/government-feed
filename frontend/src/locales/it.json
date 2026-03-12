@@ -1,14 +1,14 @@
 {
   "nav": {
     "dashboard": "Dashboard",
-    "sources": "Sources",
+    "sources": "Feed",
     "admin": "Admin",
     "settings": "Impostazioni",
     "brand": "Government Feed"
   },
   "breadcrumb": {
     "dashboard": "Dashboard",
-    "sources": "Sources",
+    "sources": "Feed",
     "admin": "Admin",
     "settings": "Impostazioni"
   },
@@ -47,7 +47,7 @@
   "feed": {
     "noNewsFound": "Nessuna notizia trovata",
     "goToSources": "Vai su",
-    "sourcesLink": "Gestione Sources",
+    "sourcesLink": "Gestione Feed",
     "noNewsHelpAdd": "per aggiungere feed e importare le notizie.",
     "noNewsHelpFilter": "Prova a modificare i filtri di ricerca.",
     "newsCount": "{{count}} notizie trovate",
@@ -115,8 +115,11 @@
     "successClearCache": "Cache dati svuotata. Le prossime pagine caricheranno dati freschi."
   },
   "sources": {
-    "title": "Gestione Sources",
-    "description": "Configura e gestisci i feed istituzionali",
+    "title": "Feed",
+    "description": "Gestisci le tue fonti e scopri nuovi feed",
+    "tabSubscribed": "I tuoi feed",
+    "tabExplore": "Esplora catalogo",
+    "exploreHint": "Cerca per nome, paese o argomento per trovare feed nel catalogo.",
     "discoverTitle": "Scopri Feed",
     "discoverHelp": "Inserisci il nome di un'istituzione o l'URL di un sito per trovare i feed disponibili",
     "discoverPlaceholder": "Nome istituzione o URL del sito...",
@@ -177,7 +180,10 @@
     "loadMore": "Carica altre fonti",
     "yourSources": "Le tue fonti",
     "errorSubscribe": "Errore nella sottoscrizione.",
-    "errorUnsubscribe": "Errore nella rimozione della sottoscrizione."
+    "errorUnsubscribe": "Errore nella rimozione della sottoscrizione.",
+    "validating": "Verifica in corso...",
+    "feedInvalid": "Feed non valido: {{error}}",
+    "errorValidate": "Impossibile verificare il feed."
   },
   "admin": {
     "overview": "Panoramica",
