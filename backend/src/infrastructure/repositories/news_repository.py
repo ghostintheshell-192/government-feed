@@ -38,8 +38,11 @@ class NewsRepository(INewsRepository):
         """Build a query with optional filters applied."""
         query = self._db.query(NewsItem)
 
-        if source_ids:
-            query = query.filter(NewsItem.source_id.in_(source_ids))
+        if source_ids is not None:
+            if len(source_ids) == 0:
+                query = query.filter(NewsItem.id == -1)  # no results
+            else:
+                query = query.filter(NewsItem.source_id.in_(source_ids))
 
         if search and search.strip():
             search_lower = search.lower()
@@ -122,6 +125,12 @@ class NewsRepository(INewsRepository):
         self._db.add(news_item)
         logger.debug(f"Added news item to session: {news_item.title}")
         return news_item
+
+    def delete_by_source_id(self, source_id: int) -> int:
+        """Delete all news items for a given source. Returns count of deleted items."""
+        count = self._db.query(NewsItem).filter(NewsItem.source_id == source_id).delete()
+        logger.debug("Deleted %d news items for source_id=%d", count, source_id)
+        return count
 
     def update(self, news_item: NewsItem) -> None:
         """Update an existing news item."""

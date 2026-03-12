@@ -41,6 +41,54 @@ class SourceResponse(SourceBase):
     updated_at: datetime
 
 
+# ==================== CATALOG SCHEMAS ====================
+
+
+class CatalogSourceResponse(BaseModel):
+    """Schema for a source in the catalog browse view."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    description: str | None
+    feed_url: str
+    source_type: str
+    category: str | None
+    geographic_level: str | None
+    country_code: str | None
+    region: str | None
+    tags: list[str]
+    is_curated: bool
+    is_subscribed: bool = False
+
+
+class PaginatedCatalogResponse(BaseModel):
+    """Paginated response for catalog browsing."""
+
+    items: list[CatalogSourceResponse]
+    pagination: "PaginationMeta"
+
+
+class CatalogStatsResponse(BaseModel):
+    """Statistics about the catalog."""
+
+    total_sources: int
+    by_geographic_level: dict[str, int]
+    top_tags: list[tuple[str, int]]
+
+
+class SubscriptionResponse(BaseModel):
+    """Schema for subscription response."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    source_id: int
+    is_active: bool
+    added_at: datetime
+
+
 class NewsItemResponse(BaseModel):
     """Schema for NewsItem response."""
 
@@ -84,6 +132,21 @@ class SettingsUpdate(BaseModel):
     ollama_endpoint: str | None = Field(None, max_length=200)
     ollama_model: str | None = Field(None, max_length=100)
     redis_url: str | None = Field(None, max_length=200)
+
+
+class FeedValidationRequest(BaseModel):
+    """Request schema for feed URL validation."""
+
+    feed_url: str = Field(..., min_length=1, max_length=500)
+
+
+class FeedValidationResponse(BaseModel):
+    """Response schema for feed URL validation."""
+
+    valid: bool
+    feed_title: str | None = None
+    entry_count: int = 0
+    error: str | None = None
 
 
 class FeedDiscoveryRequest(BaseModel):
@@ -147,6 +210,15 @@ class ReimportResultResponse(BaseModel):
 
     purged: int
     imported: int
+
+
+class BulkFetchResultResponse(BaseModel):
+    """Result of bulk content fetching for a source."""
+
+    total: int
+    fetched: int
+    skipped: int
+    failed: int
 
 
 class PatternCleanupRequest(BaseModel):

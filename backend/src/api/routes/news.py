@@ -25,7 +25,16 @@ async def get_news(
     uow: UnitOfWork = Depends(get_unit_of_work),
 ):
     """Get recent news items with pagination and filters."""
-    cache_key = f"news:{limit}:{offset}:{source_id}:{search}:{date_from}:{date_to}"
+    # Default to subscribed sources when no explicit source filter
+    effective_source_ids = source_id
+    if not effective_source_ids:
+        effective_source_ids = uow.subscription_repository.get_subscribed_source_ids(
+            user_id=1
+        )
+
+    cache_key = (
+        f"news:{limit}:{offset}:{effective_source_ids}:{search}:{date_from}:{date_to}"
+    )
 
     if state.cache:
         cached = state.cache.get(cache_key)
@@ -35,7 +44,7 @@ async def get_news(
     items, total = uow.news_repository.get_recent(
         limit=limit,
         offset=offset,
-        source_ids=source_id,
+        source_ids=effective_source_ids,
         search=search,
         date_from=date_from,
         date_to=date_to,

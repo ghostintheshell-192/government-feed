@@ -1,8 +1,9 @@
 ---
 type: refactor
 priority: high
-status: open
+status: resolved
 discovered: 2026-03-08
+resolved: 2026-03-11
 related: [feedparser-bypasses-uow.md]
 related_decision: reference/decisions/001-clean-architecture.md
 report: null
@@ -16,7 +17,7 @@ The domain entity `Source` in `core/entities.py` and the SQLAlchemy model `Sourc
 
 ## Analysis
 
-### Field Comparison
+### Field Comparison (before resolution)
 
 | Core Entity (`core/entities.py`) | DB Model (`infrastructure/models.py`) | Match |
 |---|---|---|
@@ -54,29 +55,37 @@ The entities were likely written early as a design sketch, then the infrastructu
 
 - **Option C: Remove core entities, use models directly** — Accept that for a single-user app, the indirection isn't worth it. Keep interfaces in core, but let them reference models. *Pro*: Pragmatic, minimal code. *Con*: Abandons Clean Architecture separation, harder to change DB later.
 
-## Recommended Approach
+## Resolution (2026-03-11)
 
-**Option A** — but pragmatically. The entity becomes the canonical definition of domain fields. The infrastructure model mirrors it for persistence. A thin mapping (factory methods or a simple `to_entity()`/`from_entity()`) bridges them. This sets us up cleanly for the new health monitoring fields.
+**Approach taken: Option A pragmatic (duck typing, no explicit mapping layer).**
 
-Do this **before** implementing feed-health-monitor and feed-discovery-automated, as both specs add new fields to Source.
+### Changes Made
 
-## Notes
+1. **`core/entities.py`** — Aligned Source and NewsItem dataclasses to match infrastructure model fields exactly:
+   - Source: `url` → `feed_url`, `feed_type` → `source_type`, added `description`, `update_frequency_minutes`, `last_fetched`, removed `country`
+   - NewsItem: removed `blockchain_certificate`, `categories`, `VerificationStatus` enum; `verification_status` is now a plain string
+   - Removed `Category` entity (no corresponding model/table)
+   - Kept `update_content_hash()` domain method
 
-- The `Category` entity in core exists but has no corresponding model or table — decide if it's needed
-- `NewsItem.blockchain_certificate` in the core entity appears speculative — remove if not planned
-- Repository interfaces already import from infrastructure via `TYPE_CHECKING` — this needs fixing as part of the refactoring
-- Related: `feedparser-bypasses-uow.md` — fixing the entity/model alignment naturally helps resolve the UoW bypass issue
+2. **`core/repositories/`** — Fixed dependency violation:
+   - `ISourceRepository` and `INewsRepository` now import from `core.entities` directly (no `TYPE_CHECKING` from infrastructure)
+
+3. **Tests** — Updated `test_entities.py` to match new field names and removed dead code tests
+
+### Design Decision
+
+No explicit mapping layer was added. SQLAlchemy models in `infrastructure/models.py` have the same fields as the core entities, so concrete repositories return model instances that satisfy the entity interface via duck typing. This avoids boilerplate while maintaining the Clean Architecture dependency rule: **core has no knowledge of infrastructure**.
+
+### Remaining Related Issues
+
+- `feedparser-bypasses-uow.md` — FeedParserService still uses `db.query()` directly instead of going through repository/UoW. Separate concern, not blocked by this refactoring.
 
 ## Related Documentation
 
 - **Architecture Decision**: [ADR-001: Clean Architecture](../reference/decisions/001-clean-architecture.md)
 - **Related Issues**: [FeedParser bypasses UoW](feedparser-bypasses-uow.md)
 - **Code Locations**:
-  - `backend/src/core/entities.py` — domain entities (lines 18-76)
-  - `backend/src/infrastructure/models.py` — SQLAlchemy models (lines 1-45)
-  - `backend/src/core/repositories/source_repository.py` — interface imports model (line 7)
-  - `backend/src/core/repositories/news_repository.py` — interface imports model (line 8)
-
----
-
-Investigation Note: Read [ARCHITECTURE.md](../ARCHITECTURE.md) to locate relevant files and understand the architectural context before starting your analysis.
+  - `backend/src/core/entities.py` — domain entities
+  - `backend/src/infrastructure/models.py` — SQLAlchemy models
+  - `backend/src/core/repositories/source_repository.py` — interface (now imports from core)
+  - `backend/src/core/repositories/news_repository.py` — interface (now imports from core)

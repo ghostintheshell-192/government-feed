@@ -21,26 +21,26 @@ def _reset_circuit_breaker():
 class TestStripHtml:
     """Tests for _strip_html method."""
 
-    def test_removes_tags(self, db_session):
-        parser = FeedParserService(db_session)
+    def test_removes_tags(self, uow):
+        parser = FeedParserService(uow)
         result = parser._strip_html("<p>Hello <b>world</b></p>")
         assert result == "Hello world"
 
-    def test_removes_script_and_style(self, db_session):
-        parser = FeedParserService(db_session)
+    def test_removes_script_and_style(self, uow):
+        parser = FeedParserService(uow)
         html = "<p>Text</p><script>alert('x')</script><style>.a{}</style>"
         result = parser._strip_html(html)
         assert "alert" not in result
         assert ".a" not in result
         assert "Text" in result
 
-    def test_empty_input(self, db_session):
-        parser = FeedParserService(db_session)
+    def test_empty_input(self, uow):
+        parser = FeedParserService(uow)
         assert parser._strip_html("") == ""
         assert parser._strip_html(None) == ""
 
-    def test_collapses_whitespace(self, db_session):
-        parser = FeedParserService(db_session)
+    def test_collapses_whitespace(self, uow):
+        parser = FeedParserService(uow)
         result = parser._strip_html("<p>Hello</p>   <p>world</p>")
         assert "  " not in result
 
@@ -48,20 +48,20 @@ class TestStripHtml:
 class TestCreateHash:
     """Tests for _create_hash method."""
 
-    def test_produces_sha256(self, db_session):
-        parser = FeedParserService(db_session)
+    def test_produces_sha256(self, uow):
+        parser = FeedParserService(uow)
         h = parser._create_hash("title", "content", 1, datetime(2025, 1, 1))
         assert len(h) == 64  # SHA256 hex digest
 
-    def test_is_deterministic(self, db_session):
-        parser = FeedParserService(db_session)
+    def test_is_deterministic(self, uow):
+        parser = FeedParserService(uow)
         dt = datetime(2025, 1, 1)
         h1 = parser._create_hash("t", "c", 1, dt)
         h2 = parser._create_hash("t", "c", 1, dt)
         assert h1 == h2
 
-    def test_different_inputs_different_hash(self, db_session):
-        parser = FeedParserService(db_session)
+    def test_different_inputs_different_hash(self, uow):
+        parser = FeedParserService(uow)
         dt = datetime(2025, 1, 1)
         h1 = parser._create_hash("title_a", "c", 1, dt)
         h2 = parser._create_hash("title_b", "c", 1, dt)
@@ -71,15 +71,15 @@ class TestCreateHash:
 class TestParseDate:
     """Tests for _parse_date method."""
 
-    def test_published_parsed(self, db_session):
-        parser = FeedParserService(db_session)
+    def test_published_parsed(self, uow):
+        parser = FeedParserService(uow)
         entry = MagicMock()
         entry.published_parsed = struct_time((2025, 3, 15, 10, 0, 0, 0, 0, 0))
         result = parser._parse_date(entry)
         assert result == datetime(2025, 3, 15, 10, 0, 0)
 
-    def test_updated_parsed_fallback(self, db_session):
-        parser = FeedParserService(db_session)
+    def test_updated_parsed_fallback(self, uow):
+        parser = FeedParserService(uow)
         entry = type("Entry", (), {
             "published_parsed": None,
             "updated_parsed": struct_time((2025, 6, 1, 8, 0, 0, 0, 0, 0)),
@@ -87,8 +87,8 @@ class TestParseDate:
         result = parser._parse_date(entry)
         assert result == datetime(2025, 6, 1, 8, 0, 0)
 
-    def test_fallback_to_utcnow(self, db_session):
-        parser = FeedParserService(db_session)
+    def test_fallback_to_utcnow(self, uow):
+        parser = FeedParserService(uow)
         entry = type("Entry", (), {})()
         result = parser._parse_date(entry)
         # Should be close to now
@@ -100,7 +100,7 @@ class TestParseAndImport:
 
     @patch("backend.src.infrastructure.feed_parser.feedparser.parse")
     @patch("backend.src.infrastructure.feed_parser.httpx.Client")
-    def test_imports_new_items(self, mock_httpx_client_cls, mock_parse, db_session):
+    def test_imports_new_items(self, mock_httpx_client_cls, mock_parse, uow, db_session):
         # Setup httpx mock
         mock_response = MagicMock()
         mock_response.text = "<rss>mock feed xml</rss>"
@@ -132,13 +132,13 @@ class TestParseAndImport:
             entries=[entry],
         )
 
-        parser = FeedParserService(db_session)
+        parser = FeedParserService(uow)
         count = parser.parse_and_import(source)
         assert count == 1
 
     @patch("backend.src.infrastructure.feed_parser.feedparser.parse")
     @patch("backend.src.infrastructure.feed_parser.httpx.Client")
-    def test_skips_duplicates(self, mock_httpx_client_cls, mock_parse, db_session):
+    def test_skips_duplicates(self, mock_httpx_client_cls, mock_parse, uow, db_session):
         # Setup httpx mock
         mock_response = MagicMock()
         mock_response.text = "<rss>mock</rss>"
@@ -165,7 +165,7 @@ class TestParseAndImport:
 
         mock_parse.return_value = MagicMock(bozo=False, entries=[entry])
 
-        parser = FeedParserService(db_session)
+        parser = FeedParserService(uow)
         # First import
         parser.parse_and_import(source)
         # Second import — should skip duplicate
@@ -174,7 +174,7 @@ class TestParseAndImport:
 
     @patch("backend.src.infrastructure.feed_parser.feedparser.parse")
     @patch("backend.src.infrastructure.feed_parser.httpx.Client")
-    def test_bozo_feed_returns_zero(self, mock_httpx_client_cls, mock_parse, db_session):
+    def test_bozo_feed_returns_zero(self, mock_httpx_client_cls, mock_parse, uow, db_session):
         # Setup httpx mock
         mock_response = MagicMock()
         mock_response.text = "<rss>bad xml</rss>"
@@ -194,12 +194,12 @@ class TestParseAndImport:
             bozo_exception=Exception("malformed XML"),
         )
 
-        parser = FeedParserService(db_session)
+        parser = FeedParserService(uow)
         count = parser.parse_and_import(source)
         assert count == 0
 
     @patch("backend.src.infrastructure.feed_parser.httpx.Client")
-    def test_retries_on_connect_error(self, mock_httpx_client_cls, db_session):
+    def test_retries_on_connect_error(self, mock_httpx_client_cls, uow, db_session):
         """Verify retry on transient connection errors."""
         mock_response = MagicMock()
         mock_response.text = "<rss>recovered</rss>"
@@ -218,7 +218,7 @@ class TestParseAndImport:
         db_session.add(source)
         db_session.flush()
 
-        parser = FeedParserService(db_session)
+        parser = FeedParserService(uow)
 
         with patch("backend.src.infrastructure.feed_parser.feedparser.parse") as mock_parse:
             mock_parse.return_value = MagicMock(bozo=False, entries=[])
@@ -228,7 +228,7 @@ class TestParseAndImport:
         assert mock_client.get.call_count == 2
 
     @patch("backend.src.infrastructure.feed_parser.httpx.Client")
-    def test_cb_opens_after_repeated_failures(self, mock_httpx_client_cls, db_session):
+    def test_cb_opens_after_repeated_failures(self, mock_httpx_client_cls, uow, db_session):
         """Circuit breaker opens after repeated fetch failures."""
         mock_client = MagicMock()
         mock_client.__enter__ = MagicMock(return_value=mock_client)
@@ -240,12 +240,13 @@ class TestParseAndImport:
         db_session.add(source)
         db_session.flush()
 
-        parser = FeedParserService(db_session)
+        parser = FeedParserService(uow)
 
         # Fail 5 times to open CB
         for _ in range(5):
-            parser.parse_and_import(source)
+            with pytest.raises(Exception, match="always fails"):
+                parser.parse_and_import(source)
 
-        # Next call should be rejected by CB immediately
+        # Next call should be rejected by CB immediately (returns 0, no exception)
         count = parser.parse_and_import(source)
         assert count == 0

@@ -1,0 +1,126 @@
+[
+  {
+    "name": "Najnowsze na wPolityce.pl",
+    "description": "Nowoczesny portal ludzi myślących założony przez Jacka i Michała Karnowskich. Porządkujemy rzeczywistość, dociekamy prawdy, prowadzimy poważną debatę o Polsce.",
+    "feed_url": "http://feeds.feedburner.com/wPolitycepl",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "PL",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 300
+    }
+  },
+  {
+    "name": "Newsweek Polska",
+    "description": "Wiadomości newsweek.pl",
+    "feed_url": "https://www.newsweek.pl/rss.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "PL",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 10
+    }
+  },
+  {
+    "name": "Dziennik.pl Dziennik - dziennik.pl",
+    "description": "",
+    "feed_url": "http://rss.dziennik.pl/Dziennik-PL/",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "PL",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 50
+    }
+  },
+  {
+    "name": "www.wirtualnemedia.pl",
+    "description": "Newsy ze wszystkich działów",
+    "feed_url": "https://www.wirtualnemedia.pl/rss/wirtualnemedia_rss.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "PL",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 15
+    }
+  },
+  {
+    "name": "www.gazetaprawna.pl - GazetaPrawna.pl - biznes, podatki, prawo, finanse, wiadomości, praca, kadry, magazyn, wideo, samorząd i administracja, firma, podcasty",
+    "description": "",
+    "feed_url": "http://rss.gazetaprawna.pl/GazetaPrawna",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "PL",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 14
+    }
+  },
+  {
+    "name": "https://www.rp.pl",
+    "description": "",
+    "feed_url": "https://www.rp.pl/rss/1019",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "PL",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 20
+    }
+  },
+  {
+    "name": "Polska Agencja Prasowa SA",
+    "description": "",
+    "feed_url": "https://www.pap.pl/rss.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "PL",
+    "tags": [],
+    "validation": {
+      "valid": false,
+      "status_code": 200,
+      "error": "Parse error: <unknown>:2:123: not well-formed (invalid token)",
+      "entry_count": 0
+    }
+  },
+  {
+    "name": "RMF24.pl",
+    "description": "Radio numer 1 w Polsce! Największa i najpopularniejsza stacja muzyczno-informacyjna. Zawsze najlepsza muzyka i najświeższe fakty. Posłuchaj nas online.",
+    "feed_url": "https://www.rmf24.pl/feed",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "PL",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 15
+    }
+  }
+]

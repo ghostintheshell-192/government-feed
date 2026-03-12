@@ -1,0 +1,102 @@
+[
+  {
+    "name": "TheJournal.ie",
+    "description": "Ireland's Internet Newspaper",
+    "feed_url": "https://www.thejournal.ie/feed/",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IE",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 40
+    }
+  },
+  {
+    "name": "All: BreakingNews.ie",
+    "description": "Ireland's premier breaking news website providing up to the minute news and sports reports. With e-mail news releases following breaking stories throughout the day.",
+    "feed_url": "https://feeds.breakingnews.ie/bntopstories",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IE",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 5
+    }
+  },
+  {
+    "name": "The 42",
+    "description": "Ireland's Internet Newspaper",
+    "feed_url": "https://www.the42.ie/feed/",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IE",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 40
+    }
+  },
+  {
+    "name": "IrishExaminer.com",
+    "description": "Ireland's premier breaking news website providing up to the minute news and sports reports. With e-mail news releases following breaking stories throughout the day.",
+    "feed_url": "https://feeds.feedburner.com/ietopstories",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IE",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 9
+    }
+  },
+  {
+    "name": "IrishCentral.com - Top Stories",
+    "description": "Whether you are looking for Irish news, Irish entertainment, Irish sport, Irish culture or Irish celebrities - IrishCentral.com is the best daily source for everything Irish.",
+    "feed_url": "https://feeds.feedburner.com/IrishCentral",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IE",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 50
+    }
+  },
+  {
+    "name": "Irish Mirror - Home",
+    "description": "Rss feed from Irish Mirror",
+    "feed_url": "https://www.irishmirror.ie/?service=rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IE",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 25
+    }
+  }
+]

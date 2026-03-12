@@ -4,25 +4,29 @@ import json
 
 from backend.src.api import schemas, state
 from backend.src.api.dependencies import get_unit_of_work
-from backend.src.infrastructure.models import Source
+from backend.src.infrastructure.models import Source, Subscription
 from backend.src.infrastructure.unit_of_work import UnitOfWork
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from shared.logging import get_logger
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/api/sources", tags=["sources"])
 
+# Default user ID for single-user mode (M5 will replace with auth)
+_USER_ID = 1
+
 
 @router.get("", response_model=list[schemas.SourceResponse])
 async def get_sources(uow: UnitOfWork = Depends(get_unit_of_work)):
-    """Get all sources."""
+    """Get subscribed sources only."""
     if state.cache:
         cached = state.cache.get("sources:all")
         if cached:
             return JSONResponse(content=json.loads(cached))
 
-    sources = uow.source_repository.get_all()
+    subscribed_ids = uow.subscription_repository.get_subscribed_source_ids(_USER_ID)
+    sources = uow.source_repository.get_by_ids(subscribed_ids)
     result = [schemas.SourceResponse.model_validate(s).model_dump(mode="json") for s in sources]
 
     if state.cache:
@@ -53,15 +57,20 @@ async def get_source(source_id: int, uow: UnitOfWork = Depends(get_unit_of_work)
 
 @router.post("", response_model=schemas.SourceResponse, status_code=201)
 async def create_source(source: schemas.SourceCreate, uow: UnitOfWork = Depends(get_unit_of_work)):
-    """Create new source."""
+    """Create new source and auto-subscribe."""
     logger.info(f"Creating new source: {source.name}")
     db_source = Source(**source.model_dump())
     uow.source_repository.add(db_source)
+    uow._db.flush()  # get the ID before creating subscription
+
+    sub = Subscription(user_id=_USER_ID, source_id=db_source.id)
+    uow.subscription_repository.add(sub)
     uow.commit()
-    logger.info(f"Source created successfully: ID={db_source.id}, name={db_source.name}")
+    logger.info(f"Source created and subscribed: ID={db_source.id}, name={db_source.name}")
 
     if state.cache:
         state.cache.delete("sources:all")
+        state.cache.delete("news:*")
 
     return db_source
 
@@ -93,22 +102,64 @@ async def update_source(
 
 @router.delete("/{source_id}", status_code=204)
 async def delete_source(source_id: int, uow: UnitOfWork = Depends(get_unit_of_work)):
-    """Delete source."""
-    db_source = uow.source_repository.get_by_id(source_id)
-    if not db_source:
-        logger.warning(f"Delete failed: Source {source_id} not found")
-        raise HTTPException(status_code=404, detail="Source not found")
+    """Unsubscribe from source and clean up news items."""
+    sub = uow.subscription_repository.get_by_user_and_source(_USER_ID, source_id)
+    if not sub:
+        logger.warning(f"Unsubscribe failed: no subscription for source {source_id}")
+        raise HTTPException(status_code=404, detail="Subscription not found")
 
-    logger.info(f"Deleting source: ID={source_id}, name={db_source.name}")
-    uow.source_repository.delete(db_source)
+    deleted_news = uow.news_repository.delete_by_source_id(source_id)
+    uow.subscription_repository.delete(sub)
     uow.commit()
-    logger.info(f"Source deleted successfully: ID={source_id}")
+    logger.info(
+        "Unsubscribed from source %d: removed subscription + %d news items",
+        source_id, deleted_news,
+    )
 
     if state.cache:
         state.cache.delete(f"source:{source_id}")
         state.cache.delete("sources:all")
+        state.cache.delete("news:*")
 
     return None
+
+
+@router.post("/validate", response_model=schemas.FeedValidationResponse)
+async def validate_feed(request: schemas.FeedValidationRequest):
+    """Validate a feed URL: check HTTP response and parse content."""
+    import feedparser
+    import httpx
+
+    logger.info("Validating feed URL: %s", request.feed_url)
+    try:
+        async with httpx.AsyncClient(
+            timeout=15.0, follow_redirects=True,
+            headers={"User-Agent": "GovernmentFeed/1.0 (feed validator)"},
+        ) as client:
+            response = await client.get(request.feed_url)
+
+        if response.status_code != 200:
+            return schemas.FeedValidationResponse(
+                valid=False, error=f"HTTP {response.status_code}",
+            )
+
+        parsed = feedparser.parse(response.text)
+        if parsed.bozo and not parsed.entries:
+            return schemas.FeedValidationResponse(
+                valid=False, error="Il contenuto non è un feed RSS/Atom valido.",
+            )
+
+        return schemas.FeedValidationResponse(
+            valid=True,
+            feed_title=parsed.feed.get("title", ""),
+            entry_count=len(parsed.entries),
+        )
+
+    except httpx.TimeoutException:
+        return schemas.FeedValidationResponse(valid=False, error="Timeout: il server non risponde.")
+    except Exception as e:
+        logger.warning("Feed validation error for %s: %s", request.feed_url, e)
+        return schemas.FeedValidationResponse(valid=False, error="URL non raggiungibile.")
 
 
 @router.post("/discover", response_model=schemas.FeedDiscoveryResponse)
@@ -136,6 +187,81 @@ async def discover_feeds(request: schemas.FeedDiscoveryRequest):
     )
 
 
+@router.post("/import-all")
+async def import_all_feeds(uow: UnitOfWork = Depends(get_unit_of_work)):
+    """Import news from all subscribed sources. Streams progress as NDJSON."""
+    import json as json_mod
+
+    from backend.src.infrastructure.database import SessionLocal
+    from backend.src.infrastructure.feed_parser import FeedParserService
+
+    subscribed_ids = uow.subscription_repository.get_subscribed_source_ids(_USER_ID)
+    sources = uow.source_repository.get_by_ids(subscribed_ids)
+    active_sources = [s for s in sources if s.is_active]
+
+    if not active_sources:
+        return StreamingResponse(
+            iter([json_mod.dumps({"done": True, "total": 0, "imported": 0, "errors": 0}) + "\n"]),
+            media_type="application/x-ndjson",
+        )
+
+    # Snapshot source info before closing the injected UoW
+    source_info = [(s.id, s.name, s.feed_url) for s in active_sources]
+
+    async def generate():  # type: ignore[no-untyped-def]
+        import asyncio
+
+        total = len(source_info)
+        total_imported = 0
+        total_errors = 0
+
+        for i, (src_id, src_name, _) in enumerate(source_info, 1):
+            # Each source gets its own UoW/session for isolation
+            db = SessionLocal()
+            try:
+                source_uow = UnitOfWork(db)
+                source = source_uow.source_repository.get_by_id(src_id)
+                if not source:
+                    total_errors += 1
+                    yield json_mod.dumps({
+                        "current": i, "total": total,
+                        "source": src_name, "status": "error", "imported": 0,
+                    }) + "\n"
+                    await asyncio.sleep(0)
+                    continue
+
+                parser = FeedParserService(source_uow)
+                imported = parser.parse_and_import(source)
+                total_imported += imported
+                yield json_mod.dumps({
+                    "current": i, "total": total,
+                    "source": src_name, "status": "ok", "imported": imported,
+                }) + "\n"
+                await asyncio.sleep(0)
+            except Exception:
+                logger.warning("Import-all failed for source %s", src_name)
+                total_errors += 1
+                yield json_mod.dumps({
+                    "current": i, "total": total,
+                    "source": src_name, "status": "error", "imported": 0,
+                }) + "\n"
+                await asyncio.sleep(0)
+            finally:
+                db.close()
+
+        if state.cache and total_imported > 0:
+            state.cache.delete("news:*")
+            state.cache.delete("sources:all")
+
+        yield json_mod.dumps({
+            "done": True, "total": total,
+            "imported": total_imported, "errors": total_errors,
+        }) + "\n"
+
+    logger.info("Import-all triggered for %d subscribed sources", len(source_info))
+    return StreamingResponse(generate(), media_type="application/x-ndjson")
+
+
 @router.post("/{source_id}/process")
 async def process_feed(source_id: int, uow: UnitOfWork = Depends(get_unit_of_work)):
     """Process feed and import news."""
@@ -147,9 +273,12 @@ async def process_feed(source_id: int, uow: UnitOfWork = Depends(get_unit_of_wor
         raise HTTPException(status_code=404, detail="Source not found")
 
     logger.info(f"Processing feed for source: ID={source_id}, name={source.name}")
-    # Note: FeedParserService still uses db directly - will be refactored separately
-    parser = FeedParserService(uow._db)
-    imported_count = parser.parse_and_import(source)
+    parser = FeedParserService(uow)
+    try:
+        imported_count = parser.parse_and_import(source)
+    except Exception:
+        logger.exception(f"Error processing feed for source {source_id}")
+        return {"success": False, "error": True, "message": "Errore nel caricamento del feed."}
 
     if imported_count > 0:
         logger.info(
@@ -161,8 +290,9 @@ async def process_feed(source_id: int, uow: UnitOfWork = Depends(get_unit_of_wor
 
         return {
             "success": True,
+            "error": False,
             "message": f"Feed importato con successo! {imported_count} notizie aggiunte.",
         }
     else:
-        logger.warning(f"Feed processing completed with no new items from {source.name}")
-        return {"success": False, "message": "Nessuna nuova notizia trovata o errore nel parsing."}
+        logger.info(f"No new items from {source.name}")
+        return {"success": False, "error": False, "message": "Nessuna nuova notizia trovata."}

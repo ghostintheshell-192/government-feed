@@ -7,13 +7,69 @@ from backend.src.api.dependencies import get_unit_of_work
 from backend.src.infrastructure.models import NewsItem, Source
 from backend.src.infrastructure.unit_of_work import UnitOfWork
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from shared.logging import get_logger
 from sqlalchemy import func
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
-_HTML_TAG_PATTERN = re.compile(r"<[a-zA-Z][^>]*>")
+# Tags that are legitimate semantic content — never flag or remove these.
+_SEMANTIC_TAGS = frozenset({
+    "p", "br", "hr",
+    "h1", "h2", "h3", "h4", "h5", "h6",
+    "ul", "ol", "li",
+    "table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption", "colgroup", "col",
+    "a", "strong", "em", "b", "i", "u", "s", "code", "span", "sub", "sup", "mark",
+    "blockquote", "pre", "figure", "figcaption", "img",
+    "dl", "dt", "dd", "abbr", "cite", "q", "time",
+})
+
+# Tags whose content should be removed entirely (not just the tag, but everything inside).
+_REMOVE_WITH_CONTENT_TAGS = frozenset({
+    "script", "style", "noscript", "iframe", "object", "embed", "applet",
+    "form", "input", "button", "select", "textarea",
+    "svg", "math",
+})
+
+# Pattern to detect non-semantic HTML tags (excludes closing tags and semantic tags).
+# Used for flagging: if an article contains tags outside the semantic whitelist, it has residue.
+_RESIDUE_TAG_PATTERN = re.compile(r"</?([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>")
+
+# Patterns for cleanup: remove dangerous tags with their content, then strip remaining non-semantic tags.
+_REMOVE_WITH_CONTENT_PATTERN = re.compile(
+    r"<(" + "|".join(_REMOVE_WITH_CONTENT_TAGS) + r")\b[^>]*>[\s\S]*?</\1>",
+    re.IGNORECASE,
+)
+_NON_SEMANTIC_TAG_PATTERN = re.compile(r"</?([a-zA-Z][a-zA-Z0-9]*)\b[^>]*/?>")
+
+
+def _has_html_residue(text: str) -> bool:
+    """Check if text contains non-semantic HTML tags."""
+    for match in _RESIDUE_TAG_PATTERN.finditer(text):
+        tag_name = match.group(1).lower()
+        if tag_name not in _SEMANTIC_TAGS:
+            return True
+    return False
+
+
+def _clean_html_residue(text: str) -> str:
+    """Remove non-semantic HTML while preserving structural markup."""
+    # First: remove dangerous tags with all their content
+    cleaned = _REMOVE_WITH_CONTENT_PATTERN.sub("", text)
+
+    # Second: strip remaining non-semantic tags (tag only, not content)
+    def _replace_non_semantic(match: re.Match[str]) -> str:
+        tag_name = match.group(1).lower()
+        if tag_name in _SEMANTIC_TAGS:
+            return match.group(0)  # keep semantic tags
+        return ""
+
+    cleaned = _NON_SEMANTIC_TAG_PATTERN.sub(_replace_non_semantic, cleaned)
+
+    # Clean up excessive whitespace left by removals
+    cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
+    return cleaned.strip()
 
 
 # ==================== FEED INSPECTOR ====================
@@ -137,7 +193,7 @@ async def reimport_source(
     logger.info(f"Purged {purged} articles from source {source_id} before reimport")
 
     # Re-import
-    parser = FeedParserService(uow._db)
+    parser = FeedParserService(uow)
     imported = parser.parse_and_import(source)
     logger.info(f"Reimported {imported} articles for source {source_id} ({source.name})")
 
@@ -148,6 +204,104 @@ async def reimport_source(
         purged=purged,
         imported=imported,
     )
+
+
+@router.post("/sources/{source_id}/fetch-content")
+async def bulk_fetch_content(
+    source_id: int,
+    force: bool = False,
+    uow: UnitOfWork = Depends(get_unit_of_work),
+) -> StreamingResponse:
+    """Fetch full article content for all articles of a source.
+
+    Streams progress as newline-delimited JSON (NDJSON). Each line is a JSON object:
+    - Progress: {"current": 3, "total": 42, "title": "...", "status": "fetched"|"skipped"|"failed"}
+    - Final:    {"done": true, "fetched": 30, "skipped": 8, "failed": 4, "total": 42}
+
+    Scrapes articles that have no substantial content (< 500 chars) unless force=True.
+    """
+    import asyncio
+    import json
+
+    from backend.src.infrastructure.content_scraper import ContentScraper
+
+    source = uow.source_repository.get_by_id(source_id)
+    if not source:
+        raise HTTPException(status_code=404, detail="Source not found")
+
+    items = (
+        uow._db.query(NewsItem)
+        .filter(NewsItem.source_id == source_id)
+        .order_by(NewsItem.published_at.desc())
+        .all()
+    )
+
+    async def generate():  # type: ignore[no-untyped-def]
+        scraper = ContentScraper()
+        fetched = 0
+        skipped = 0
+        failed = 0
+        total = len(items)
+
+        for i, item in enumerate(items, 1):
+            title = (item.title[:60] + "...") if len(item.title) > 60 else item.title
+
+            # Skip articles without a URL
+            if not item.external_id:
+                skipped += 1
+                yield json.dumps(
+                    {"current": i, "total": total, "title": title, "status": "skipped"}
+                ) + "\n"
+                continue
+
+            # Skip articles that already have substantial content (unless force)
+            if not force and item.content and len(item.content) > 500:
+                skipped += 1
+                yield json.dumps(
+                    {"current": i, "total": total, "title": title, "status": "skipped"}
+                ) + "\n"
+                continue
+
+            try:
+                content = await scraper.fetch_article_content(item.external_id)
+                if content and not content.startswith(
+                    "Impossibile"
+                ) and not content.startswith("Servizio"):
+                    item.content = content
+                    fetched += 1
+                    yield json.dumps(
+                        {"current": i, "total": total, "title": title, "status": "fetched"}
+                    ) + "\n"
+                else:
+                    failed += 1
+                    yield json.dumps(
+                        {"current": i, "total": total, "title": title, "status": "failed"}
+                    ) + "\n"
+            except Exception:
+                logger.warning(f"Bulk fetch failed for article {item.id}: {item.external_id}")
+                failed += 1
+                yield json.dumps(
+                    {"current": i, "total": total, "title": title, "status": "failed"}
+                ) + "\n"
+
+            # Polite delay between requests
+            await asyncio.sleep(0.5)
+
+        if fetched > 0:
+            uow.commit()
+            logger.info(
+                f"Bulk fetch for source {source_id} ({source.name}): "
+                f"{fetched} fetched, {skipped} skipped, {failed} failed"
+            )
+
+            if state.cache:
+                state.cache.delete("news:*")
+
+        yield json.dumps(
+            {"done": True, "total": total, "fetched": fetched, "skipped": skipped, "failed": failed}
+        ) + "\n"
+
+    return StreamingResponse(generate(), media_type="application/x-ndjson")
 
 
 @router.post("/cleanup/by-pattern", response_model=schemas.CleanupResultResponse)
@@ -192,7 +346,12 @@ async def cleanup_html_residue(
     dry_run: bool = True,
     uow: UnitOfWork = Depends(get_unit_of_work),
 ):
-    """Find and fix articles with HTML tags in content or summary."""
+    """Find and fix articles with non-semantic HTML tags in content or summary.
+
+    Preserves structural markup (p, h1-h6, ul/ol/li, table, a, strong, em, etc.)
+    while removing non-content tags (script, style, iframe, form, div, span classes, etc.).
+    Dangerous tags (script, style, iframe) are removed with their content.
+    """
     db = uow._db
     all_items = db.query(NewsItem).all()
 
@@ -202,7 +361,7 @@ async def cleanup_html_residue(
     for item in all_items:
         for field_name in ("content", "summary"):
             value = getattr(item, field_name)
-            if value and _HTML_TAG_PATTERN.search(value):
+            if value and _has_html_residue(value):
                 flagged.append(
                     schemas.HtmlResidueFlagResponse(
                         id=item.id,
@@ -211,7 +370,7 @@ async def cleanup_html_residue(
                     )
                 )
                 if not dry_run:
-                    cleaned = _HTML_TAG_PATTERN.sub("", value)
+                    cleaned = _clean_html_residue(value)
                     setattr(item, field_name, cleaned)
                     fixed_count += 1
 
@@ -315,15 +474,15 @@ async def quality_report(
         .all()
     )
 
-    # HTML residue in content or summary
+    # HTML residue in content or summary (only non-semantic tags)
     all_items = db.query(NewsItem.id, NewsItem.title, NewsItem.content, NewsItem.summary).all()
     html_residue = []
     for item in all_items:
-        if item.content and _HTML_TAG_PATTERN.search(item.content):
+        if item.content and _has_html_residue(item.content):
             html_residue.append(
                 schemas.HtmlResidueFlagResponse(id=item.id, title=item.title, field="content")
             )
-        if item.summary and _HTML_TAG_PATTERN.search(item.summary):
+        if item.summary and _has_html_residue(item.summary):
             html_residue.append(
                 schemas.HtmlResidueFlagResponse(id=item.id, title=item.title, field="summary")
             )

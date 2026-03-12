@@ -1,0 +1,205 @@
+[
+  {
+    "name": "Primo piano ANSA - ANSA.it",
+    "description": "Updated every day - FOR PERSONAL USE ONLY",
+    "feed_url": "https://www.ansa.it/sito/ansait_rss.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IT",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 28
+    }
+  },
+  {
+    "name": "The Local Italy",
+    "description": "Europe's news in English",
+    "feed_url": "https://feeds.thelocal.com/rss/it",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IT",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 20
+    }
+  },
+  {
+    "name": "RSS DiariodelWeb.it",
+    "description": "RSS DiariodelWeb.it",
+    "feed_url": "https://www.diariodelweb.it/rss/home/",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IT",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 25
+    }
+  },
+  {
+    "name": "Fanpage",
+    "description": "Indipendente, sociale, partecipativo - segui i nostri live, reportage, inchieste, storie e video da Youmedia, partecipa con noi all'informazione.",
+    "feed_url": "https://www.fanpage.it/feed/",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IT",
+    "tags": [],
+    "validation": {
+      "valid": false,
+      "status_code": 403,
+      "error": "HTTP 403",
+      "entry_count": 0
+    }
+  },
+  {
+    "name": "Libero Quotidiano",
+    "description": "Libero Quotidiano contents",
+    "feed_url": "https://www.liberoquotidiano.it/rss.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IT",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 60
+    }
+  },
+  {
+    "name": "Il Mattino Web",
+    "description": "Gli articoli del Mattino",
+    "feed_url": "https://www.ilmattino.it/?sez=XML&args&p=search&args[box]=Home&limit=20&layout=rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IT",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 20
+    }
+  },
+  {
+    "name": "Adnkronos - ultimoratop",
+    "description": "www.adnkronos.com mette a disposizione dei lettori le news pubblicate con il sistema Rss. Con Rss è possibile infatti ricevere in tempo reale sul proprio computer le notizie che vengono messe on line dal Gruppo Adnkronos.",
+    "feed_url": "http://rss.adnkronos.com/RSS_PrimaPagina.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IT",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 12
+    }
+  },
+  {
+    "name": "Milan News",
+    "description": "Milan News news",
+    "feed_url": "https://www.milannews.it/rss/",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IT",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 20
+    }
+  },
+  {
+    "name": "Internazionale",
+    "description": "Ogni settimana il meglio dei giornali di tutto il mondo.",
+    "feed_url": "https://www.internazionale.it/sitemaps/rss.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IT",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 24
+    }
+  },
+  {
+    "name": "Panorama",
+    "description": "Panorama",
+    "feed_url": "https://www.panorama.it/feeds/feed.rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IT",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 10
+    }
+  },
+  {
+    "name": "Italy | The Guardian",
+    "description": "Latest news and features from theguardian.com, the world's leading liberal voice",
+    "feed_url": "https://www.theguardian.com/world/italy/rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IT",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 20
+    }
+  },
+  {
+    "name": "Repubblica.it > Homepage",
+    "description": "Repubblica.it: il quotidiano online in tempo reale.",
+    "feed_url": "https://www.repubblica.it/rss/homepage/rss2.0.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IT",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 30
+    }
+  },
+  {
+    "name": "Il Post",
+    "description": "Gli articoli, le rassegne, i blog, le foto, tutto quello che arriva dal mondo e dalla rete.",
+    "feed_url": "https://www.ilpost.it/feed/",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "IT",
+    "tags": [],
+    "validation": {
+      "valid": false,
+      "status_code": 403,
+      "error": "HTTP 403",
+      "entry_count": 0
+    }
+  }
+]

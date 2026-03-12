@@ -44,6 +44,12 @@ class SourceRepository(ISourceRepository):
         self._db.merge(source)
         logger.debug(f"Updated source: {source.name}")
 
+    def get_by_ids(self, ids: list[int]) -> list[Source]:
+        """Get sources by a list of IDs."""
+        if not ids:
+            return []
+        return self._db.query(Source).filter(Source.id.in_(ids)).order_by(Source.name).all()
+
     def delete(self, source: Source) -> None:
         """Delete a source."""
         if source is None:

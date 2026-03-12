@@ -106,7 +106,7 @@ export function NewsCard({
           </p>
         ) : richPreview ? (
           <div className="line-clamp-5 text-sm text-muted-foreground [&_.prose_*]:!text-muted-foreground">
-            <ArticleContent content={richPreview} className="prose-sm prose-p:my-1" />
+            <ArticleContent content={richPreview} title={item.title} className="prose-sm prose-p:my-1" />
           </div>
         ) : null}
 

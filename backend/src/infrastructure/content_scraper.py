@@ -244,7 +244,18 @@ class ContentScraper:
     async def _fetch_impl(self, url: str) -> str:
         """Fetch article with retry and extract main content as clean HTML."""
         logger.info("Fetching article content from URL: %s", url)
-        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+        async with httpx.AsyncClient(
+            timeout=30.0,
+            follow_redirects=True,
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                    "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+                ),
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.5",
+            },
+        ) as client:
             response = await client.get(url)
             response.raise_for_status()
 

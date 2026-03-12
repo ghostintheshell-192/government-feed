@@ -72,6 +72,27 @@ class TestSourceRepository:
         result = repo.get_by_id(source_id)
         assert result is None
 
+    def test_get_by_ids(self, db_session):
+        repo = SourceRepository(db_session)
+        s1 = sample_source(name="By ID A", feed_url="https://byid-a.com/feed")
+        s2 = sample_source(name="By ID B", feed_url="https://byid-b.com/feed")
+        s3 = sample_source(name="By ID C", feed_url="https://byid-c.com/feed")
+        repo.add(s1)
+        repo.add(s2)
+        repo.add(s3)
+        db_session.flush()
+
+        results = repo.get_by_ids([s1.id, s3.id])
+        names = [s.name for s in results]
+        assert "By ID A" in names
+        assert "By ID C" in names
+        assert "By ID B" not in names
+
+    def test_get_by_ids_empty_list(self, db_session):
+        repo = SourceRepository(db_session)
+        results = repo.get_by_ids([])
+        assert results == []
+
     def test_add_none_raises(self, db_session):
         repo = SourceRepository(db_session)
         with pytest.raises(ValueError, match="Source cannot be None"):

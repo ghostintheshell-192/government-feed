@@ -1,7 +1,7 @@
 # ADR-005: Geographic Levels as Primary Navigation Structure
 
 **Date**: 2026-03-08
-**Status**: Proposed
+**Status**: Accepted
 **Impact**: significant
 
 ## Context

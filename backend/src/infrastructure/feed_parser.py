@@ -6,15 +6,16 @@ from hashlib import sha256
 
 import feedparser
 import httpx
-from backend.src.infrastructure.models import NewsItem, Source
+from backend.src.core.entities import Source
+from backend.src.infrastructure.models import NewsItem
 from backend.src.infrastructure.resilience import (
     CircuitBreaker,
     CircuitBreakerOpenError,
     retry_feed_fetch,
 )
+from backend.src.infrastructure.unit_of_work import UnitOfWork
 from bs4 import BeautifulSoup
 from shared.logging import get_logger
-from sqlalchemy.orm import Session
 
 logger = get_logger(__name__)
 
@@ -36,8 +37,8 @@ _cb_feed_fetch = CircuitBreaker("feed_fetch", failure_threshold=5, recovery_time
 class FeedParserService:
     """Service for parsing RSS/Atom feeds."""
 
-    def __init__(self, db: Session):
-        self.db = db
+    def __init__(self, uow: UnitOfWork):
+        self._uow = uow
 
     def parse_and_import(self, source: Source) -> int:
         """Parse feed and import news items. Returns count of imported items."""
@@ -46,7 +47,9 @@ class FeedParserService:
 
             # Fetch feed content with resilience
             try:
-                xml_content = _cb_feed_fetch.call(self._fetch_feed_content_sync, source.feed_url)
+                xml_content = _cb_feed_fetch.call(
+                    self._fetch_feed_content_sync, source.feed_url
+                )
             except CircuitBreakerOpenError:
                 logger.warning(
                     "Feed fetch circuit breaker is open — skipping source %s", source.name
@@ -78,13 +81,8 @@ class FeedParserService:
                 # Create content hash for deduplication
                 content_hash = self._create_hash(title, content, source.id, published_at)
 
-                # Check if already exists
-                existing = (
-                    self.db.query(NewsItem)
-                    .filter(NewsItem.content_hash == content_hash)
-                    .first()
-                )
-
+                # Check if already exists via repository
+                existing = self._uow.news_repository.get_by_content_hash(content_hash)
                 if existing:
                     continue
 
@@ -101,20 +99,21 @@ class FeedParserService:
                     verification_status="pending",
                 )
 
-                self.db.add(news_item)
+                self._uow.news_repository.add(news_item)
                 imported_count += 1
 
             # Update source last_fetched
             source.last_fetched = datetime.now(UTC)
+            self._uow.source_repository.update(source)
 
-            self.db.commit()
+            self._uow.commit()
             logger.info("Imported %d news items from %s", imported_count, source.name)
             return imported_count
 
         except Exception as e:
-            self.db.rollback()
+            self._uow.rollback()
             logger.error("Error parsing feed from %s: %s", source.name, e)
-            return 0
+            raise
 
     @retry_feed_fetch
     def _fetch_feed_content_sync(self, url: str) -> str:
@@ -163,7 +162,9 @@ class FeedParserService:
             return datetime(*entry.updated_parsed[:6])  # type: ignore[union-attr]
         return datetime.now(UTC)
 
-    def _create_hash(self, title: str, content: str, source_id: int, published_at: datetime) -> str:
+    def _create_hash(
+        self, title: str, content: str, source_id: int, published_at: datetime
+    ) -> str:
         """Create content hash for deduplication."""
         content_str = f"{title}|{content}|{source_id}|{published_at.isoformat()}"
         return sha256(content_str.encode()).hexdigest()

@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<opml version="1.0">
+	<head>
+		<title>EU Institutions - Manually Curated</title>
+	</head>
+	<body>
+		<outline text="EU Institutions" title="EU Institutions">
+			<!-- European Parliament -->
+			<outline text="European Parliament - Press Releases" title="European Parliament - Press Releases" description="All press releases from the European Parliament" xmlUrl="https://www.europarl.europa.eu/rss/doc/press-releases/en.xml" type="rss" />
+			<outline text="European Parliament - Top Stories" title="European Parliament - Top Stories" description="Priority news from the European Parliament" xmlUrl="https://www.europarl.europa.eu/rss/doc/top-stories/en.xml" type="rss" />
+			<outline text="European Parliament - Texts Adopted" title="European Parliament - Texts Adopted" description="Texts adopted by the European Parliament in plenary" xmlUrl="https://www.europarl.europa.eu/rss/doc/texts-adopted/en.xml" type="rss" />
+
+			<!-- EUR-Lex -->
+			<outline text="EUR-Lex - Parliament and Council Legislation" title="EUR-Lex - Parliament and Council Legislation" description="Legislative acts adopted by the Council or jointly by the Council and the European Parliament" xmlUrl="https://eur-lex.europa.eu/EN/display-feed.rss?rssId=162" type="rss" />
+			<outline text="EUR-Lex - Commission Proposals" title="EUR-Lex - Commission Proposals" description="Commission proposals and other acts adopted by the Commission" xmlUrl="https://eur-lex.europa.eu/EN/display-feed.rss?rssId=161" type="rss" />
+			<outline text="EUR-Lex - Court of Justice Case Law" title="EUR-Lex - Court of Justice Case Law" description="All documents from the Court of Justice of the European Union" xmlUrl="https://eur-lex.europa.eu/EN/display-feed.rss?rssId=163" type="rss" />
+			<outline text="EUR-Lex - Official Journal L (Legislation)" title="EUR-Lex - Official Journal L (Legislation)" description="Individual acts in the L series of the Official Journal" xmlUrl="https://eur-lex.europa.eu/EN/display-feed.rss?rssId=222" type="rss" />
+
+			<!-- ECB -->
+			<outline text="ECB - Press Releases and Speeches" title="ECB - Press Releases and Speeches" description="ECB press releases, speeches, interviews, press conference transcripts" xmlUrl="https://www.ecb.europa.eu/rss/press.html" type="rss" />
+			<outline text="ECB - Blog" title="ECB - Blog" description="European Central Bank blog posts" xmlUrl="https://www.ecb.europa.eu/rss/blog.html" type="rss" />
+			<outline text="ECB - Statistical Press Releases" title="ECB - Statistical Press Releases" description="ECB statistical press releases" xmlUrl="https://www.ecb.europa.eu/rss/statpress.html" type="rss" />
+			<outline text="ECB - Publications" title="ECB - Publications" description="ECB publications" xmlUrl="https://www.ecb.europa.eu/rss/pub.html" type="rss" />
+
+			<!-- Eurostat -->
+			<outline text="Eurostat - News Releases" title="Eurostat - News Releases" description="Latest statistical news releases from Eurostat" xmlUrl="https://ec.europa.eu/eurostat/en/search?p_p_id=estatsearchportlet_WAR_estatsearchportlet&amp;p_p_lifecycle=2&amp;p_p_state=maximized&amp;p_p_mode=view&amp;p_p_resource_id=atom&amp;_estatsearchportlet_WAR_estatsearchportlet_collection=CAT_PREREL" type="atom" />
+
+			<!-- EEA -->
+			<outline text="EEA - Press Releases" title="EEA - Press Releases" description="European Environment Agency press releases" xmlUrl="https://www.eea.europa.eu/en/newsroom/rss-feeds/eeas-press-releases-rss" type="rss" />
+			<outline text="EEA - Publications" title="EEA - Publications" description="European Environment Agency publications" xmlUrl="https://www.eea.europa.eu/en/newsroom/rss-feeds/publications-rss" type="rss" />
+
+			<!-- Council of Europe (not EU, but pan-European) -->
+			<outline text="ECHR - Judgments" title="ECHR - Judgments" description="European Court of Human Rights judgments execution" xmlUrl="https://www.coe.int/en/web/execution/rss-feeds" type="rss" />
+		</outline>
+	</body>
+</opml>

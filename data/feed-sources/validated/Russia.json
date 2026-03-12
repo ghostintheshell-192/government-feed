@@ -1,0 +1,208 @@
+[
+  {
+    "name": "Lenta.ru : Новости",
+    "description": "Новости, статьи, фотографии, видео. Семь дней в неделю, 24 часа в сутки.",
+    "feed_url": "https://lenta.ru/rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "RU",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 200
+    }
+  },
+  {
+    "name": "Вести.Ru",
+    "description": "Сетевое издание. Новости, видео и фото дня",
+    "feed_url": "https://www.vesti.ru/vesti.rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "RU",
+    "tags": [],
+    "validation": {
+      "valid": false,
+      "status_code": 404,
+      "error": "HTTP 404",
+      "entry_count": 0
+    }
+  },
+  {
+    "name": "Р“Р°Р·РµС‚Р°.Ru - РџРµСЂРІР°СЏ РїРѕР»РѕСЃР°",
+    "description": "Первая полоса одной из самых популярных российских интернет-газет. Российские и зарубежные новости в режиме он-лайн; важнейшие политические и экономические события в их развитии. Оригинальный взгляд, глубокий анализ и точный прогноз.",
+    "feed_url": "https://www.gazeta.ru/export/rss/first.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "RU",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 7
+    }
+  },
+  {
+    "name": "Все материалы - Московский Комсомолец",
+    "description": "Московский Комсомолец",
+    "feed_url": "https://www.mk.ru/rss/index.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "RU",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 75
+    }
+  },
+  {
+    "name": "Российская Газета",
+    "description": "Российская газета",
+    "feed_url": "https://rg.ru/xml/index.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "RU",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 100
+    }
+  },
+  {
+    "name": "NEWSru.com :: Главные новости",
+    "description": "Все новости России и мира от NEWSru.com.",
+    "feed_url": "https://rss.newsru.com/top/big/",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "RU",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 7
+    }
+  },
+  {
+    "name": "RT - Daily news",
+    "description": "RT : Today",
+    "feed_url": "https://www.rt.com/rss/",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "RU",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 100
+    }
+  },
+  {
+    "name": "Meduza.io",
+    "description": "Мы выбираем для вас самые важные новости и готовим лучшие тексты о том, что происходит в России и мире.",
+    "feed_url": "https://meduza.io/rss/all",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "RU",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 30
+    }
+  },
+  {
+    "name": "Russia Insider Daily Headlines",
+    "description": "",
+    "feed_url": "https://russia-insider.com/en/all-content/rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "RU",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 10
+    }
+  },
+  {
+    "name": "TASS",
+    "description": "TASS News Agency",
+    "feed_url": "http://tass.com/rss/v2.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "RU",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 100
+    }
+  },
+  {
+    "name": "The Moscow Times - Independent News From Russia",
+    "description": "The Moscow Times offers everything you need to know about Russia: Breaking news, top stories, business, analysis, opinion, multimedia, upcoming cultural events",
+    "feed_url": "https://www.themoscowtimes.com/rss/news",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "RU",
+    "tags": [
+      "news",
+      "economy"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 50
+    }
+  },
+  {
+    "name": "Газета \"Коммерсантъ\". Главное",
+    "description": "Ежедневная иллюстрированная общенациональная деловая газета",
+    "feed_url": "https://www.kommersant.ru/RSS/main.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "RU",
+    "tags": [],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 32
+    }
+  },
+  {
+    "name": "PravdaReport",
+    "description": "PravdaReport: Russian news and analysis",
+    "feed_url": "https://www.pravdareport.com/export.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "RU",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 20
+    }
+  }
+]

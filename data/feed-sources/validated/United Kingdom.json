@@ -1,0 +1,87 @@
+[
+  {
+    "name": "BBC News - Home",
+    "description": "BBC News - Home",
+    "feed_url": "http://feeds.bbci.co.uk/news/rss.xml",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "GB",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 35
+    }
+  },
+  {
+    "name": "World news | The Guardian",
+    "description": "Latest World news news, comment and analysis from the Guardian, the world's leading liberal voice",
+    "feed_url": "https://www.theguardian.com/world/rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "GB",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 45
+    }
+  },
+  {
+    "name": "Home | Mail Online",
+    "description": "MailOnline - get the latest breaking news, showbiz & celebrity photos, sport news & rumours, viral videos and top stories from MailOnline, Daily Mail and Mail on Sunday newspapers.",
+    "feed_url": "https://www.dailymail.co.uk/home/index.rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "GB",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 150
+    }
+  },
+  {
+    "name": "The Independent UK",
+    "description": "Visit now for the latest news direct from The Independent and updated throughout the day",
+    "feed_url": "http://www.independent.co.uk/news/uk/rss",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "GB",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 57
+    }
+  },
+  {
+    "name": "Daily Express :: News Feed",
+    "description": "Simply The Best 7 Days A Week",
+    "feed_url": "http://feeds.feedburner.com/daily-express-news-showbiz",
+    "source_type": "RSS",
+    "geographic_level": "NATIONAL",
+    "country_code": "GB",
+    "tags": [
+      "news"
+    ],
+    "validation": {
+      "valid": true,
+      "status_code": 200,
+      "error": null,
+      "entry_count": 10
+    }
+  }
+]

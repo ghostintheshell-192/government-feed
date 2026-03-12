@@ -3,11 +3,22 @@
 from datetime import UTC, datetime
 
 from backend.src.infrastructure.database import Base
-from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String, Text
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
+from sqlalchemy.types import JSON
 
 
 class Source(Base):
-    """Source model for database."""
+    """Source model for database (catalog entry)."""
 
     __tablename__ = "sources"
 
@@ -20,8 +31,32 @@ class Source(Base):
     update_frequency_minutes = Column(Integer, default=60)
     is_active = Column(Boolean, default=True)
     last_fetched = Column(DateTime, nullable=True)
+    # Catalog fields (ADR-005, ADR-007)
+    geographic_level = Column(String(20), nullable=True)
+    country_code = Column(String(2), nullable=True)
+    region = Column(String(100), nullable=True)
+    tags = Column(JSON, default=list)
+    is_curated = Column(Boolean, default=False)
+    verified_at = Column(DateTime, nullable=True)
+    # Timestamps
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
-    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    updated_at = Column(
+        DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
+    )
+
+
+class Subscription(Base):
+    """User subscription to a source (ADR-007)."""
+
+    __tablename__ = "subscriptions"
+    __table_args__ = (UniqueConstraint("user_id", "source_id", name="uq_user_source"),)
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, nullable=False, default=1, index=True)
+    source_id = Column(Integer, ForeignKey("sources.id"), nullable=False, index=True)
+    is_active = Column(Boolean, default=True)
+    update_frequency_override = Column(Integer, nullable=True)
+    added_at = Column(DateTime, default=lambda: datetime.now(UTC))
 
 
 class NewsItem(Base):
@@ -41,4 +76,6 @@ class NewsItem(Base):
     relevance_score = Column(Float, nullable=True)
     verification_status = Column(String(20), default="pending")
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
-    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    updated_at = Column(
+        DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
+    )
