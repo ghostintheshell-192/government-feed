@@ -2,6 +2,7 @@
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from backend.src.api import state
 from backend.src.api.routes import admin, ai, cache, catalog, news, scheduler, settings, sources
@@ -14,6 +15,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from shared.logging import get_logger
 
 logger = get_logger(__name__)
+
+
+def _read_version() -> str:
+    """Read version from frontend/package.json (single source of truth)."""
+    import json
+
+    for path in [Path("frontend/package.json"), Path(__file__).parents[4] / "frontend" / "package.json"]:
+        if path.is_file():
+            data = json.loads(path.read_text())
+            return data.get("version", "unknown")
+    return "unknown"
+
+
+APP_VERSION = _read_version()
 
 
 @asynccontextmanager
@@ -48,7 +63,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 app = FastAPI(
     title="Government Feed API",
     description="Aggregator for institutional news and government communications",
-    version="0.2.0",
+    version=APP_VERSION,
     lifespan=lifespan,
 )
 
@@ -75,4 +90,4 @@ app.include_router(admin.router)
 @app.get("/")
 async def root():
     """Health check endpoint."""
-    return {"message": "Government Feed API", "version": "0.2.0", "status": "running"}
+    return {"message": "Government Feed API", "version": APP_VERSION, "status": "running"}

@@ -1,7 +1,7 @@
 {
   "name": "government-feed-frontend",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.5-pre",
   "type": "module",
   "scripts": {
     "dev": "vite",
