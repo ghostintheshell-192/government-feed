@@ -134,6 +134,19 @@ Two new settings keys in `settings.json`:
 - Onboarding flow (deferred to M5)
 - Feed registry / community catalog (separate spec)
 - Geolocation-based country detection (privacy concern)
+- Custom user filters (see Future Evolution below)
+
+## Future Evolution (M4b)
+
+The geographic sidebar is the foundation for a **fully customizable navigation system**:
+
+- **Custom filters**: user creates named filters (e.g., "Middle East Economics", "USA Economics") based on source tags, country, keywords
+- **Groups/categories**: filters can be organized into collapsible groups (e.g., geographic levels under "Geography", custom filters under "Economics")
+- **Drag & drop**: user reorders filters and groups freely
+- **Multi-membership**: a news item can appear under multiple filters (a source can match both "Continental" and "Economics")
+- **Default vs custom**: geographic levels are the default filter set; user adds their own alongside
+
+This transforms the sidebar from 4 fixed badges into a personal navigation workspace. Implementation requires: filter persistence (DB or settings), tagging/categorization system, drag & drop UI, group CRUD.
 
 ## Open Questions
 
