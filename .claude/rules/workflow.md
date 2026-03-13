@@ -10,6 +10,8 @@
 
 **NEVER work on main directly.**
 
+**ALWAYS run git commands from the project root** (`/data/repos/government-feed`). Before staging or committing, verify `pwd` — subdirectories cause path mismatches.
+
 **Typical workflow:**
 
 ```bash
