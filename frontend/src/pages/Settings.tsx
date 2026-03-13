@@ -16,6 +16,7 @@ interface SettingsData {
   summary_max_words: number
   scheduler_enabled: boolean
   news_retention_days: number
+  news_freshness_hours: number
 }
 
 type Theme = 'light' | 'dark' | 'system'
@@ -32,6 +33,7 @@ export default function Settings() {
     summary_max_words: 200,
     scheduler_enabled: true,
     news_retention_days: 30,
+    news_freshness_hours: 24,
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -298,6 +300,29 @@ export default function Settings() {
                 />
                 <p className="text-sm text-muted-foreground">
                   {t('settings.newsRetentionHelp')}
+                </p>
+              </div>
+
+              <Separator />
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  {t('settings.newsFreshness')}
+                </label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={168}
+                  value={settings.news_freshness_hours}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      news_freshness_hours: Number(e.target.value) || 24,
+                    })
+                  }
+                />
+                <p className="text-sm text-muted-foreground">
+                  {t('settings.newsFreshnessHelp')}
                 </p>
               </div>
 

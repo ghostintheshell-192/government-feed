@@ -37,6 +37,7 @@ class SourceResponse(SourceBase):
     id: int
     is_active: bool
     last_fetched: datetime | None
+    geographic_level: str | None = None
     health_status: str = "healthy"
     consecutive_failures: int = 0
     last_health_check: datetime | None = None
@@ -144,6 +145,7 @@ class SettingsUpdate(BaseModel):
     summary_max_words: int | None = Field(None, ge=10, le=1000)
     scheduler_enabled: bool | None = None
     news_retention_days: int | None = Field(None, ge=1, le=365)
+    news_freshness_hours: int | None = Field(None, ge=1, le=168)
     ollama_endpoint: str | None = Field(None, max_length=200)
     ollama_model: str | None = Field(None, max_length=100)
     redis_url: str | None = Field(None, max_length=200)

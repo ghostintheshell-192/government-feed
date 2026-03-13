@@ -21,6 +21,7 @@ export interface Source {
   update_frequency_minutes: number
   is_active: boolean
   last_fetched: string | null
+  geographic_level: 'LOCAL' | 'NATIONAL' | 'CONTINENTAL' | 'GLOBAL' | null
   health_status: 'healthy' | 'degraded' | 'unhealthy' | 'dead'
   consecutive_failures: number
   last_health_check: string | null

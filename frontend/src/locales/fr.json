@@ -60,7 +60,13 @@
     "importAll": "Tout importer",
     "importAllResult": "Importation terminée : {{imported}} articles de {{total}} sources ({{errors}} erreurs).",
     "importingSource": "Importation {{current}}/{{total}} : {{source}}...",
-    "errorImportAll": "Erreur lors de l'importation des flux."
+    "errorImportAll": "Erreur lors de l'importation des flux.",
+    "geoLocal": "Local",
+    "geoNational": "National",
+    "geoContinental": "Continental",
+    "geoGlobal": "Global",
+    "geoAll": "Tous",
+    "newArticles": "nouveaux"
   },
   "newsDetail": {
     "publishedAt": "Publié le",
@@ -102,6 +108,8 @@
     "schedulerHelp": "Lorsqu'actif, les flux sont automatiquement mis à jour toutes les 15 minutes.",
     "newsRetention": "Conservation des actualités (jours)",
     "newsRetentionHelp": "Les actualités plus anciennes que cette période sont automatiquement supprimées. Par défaut : 30 jours",
+    "newsFreshness": "Actualités récentes (heures)",
+    "newsFreshnessHelp": "Les actualités publiées dans cette période sont considérées comme « nouvelles ». Par défaut : 24 heures",
     "dataManagement": "Gestion des données",
     "cacheLabel": "Cache de données",
     "cacheHelp": "Vider le cache pour forcer le rechargement de toutes les données.",

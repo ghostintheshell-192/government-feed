@@ -60,7 +60,13 @@
     "importAll": "Import all",
     "importAllResult": "Import complete: {{imported}} articles from {{total}} sources ({{errors}} errors).",
     "importingSource": "Importing {{current}}/{{total}}: {{source}}...",
-    "errorImportAll": "Error importing feeds."
+    "errorImportAll": "Error importing feeds.",
+    "geoLocal": "Local",
+    "geoNational": "National",
+    "geoContinental": "Continental",
+    "geoGlobal": "Global",
+    "geoAll": "All",
+    "newArticles": "new"
   },
   "newsDetail": {
     "publishedAt": "Published on",
@@ -102,6 +108,8 @@
     "schedulerHelp": "When active, feeds are automatically updated every 15 minutes.",
     "newsRetention": "News retention (days)",
     "newsRetentionHelp": "News older than this period is automatically removed. Default: 30 days",
+    "newsFreshness": "Recent news (hours)",
+    "newsFreshnessHelp": "News published within this period is considered \"new\". Default: 24 hours",
     "dataManagement": "Data Management",
     "cacheLabel": "Data cache",
     "cacheHelp": "Clear the cache to force reload of all data.",
