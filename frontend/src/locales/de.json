@@ -191,7 +191,17 @@
     "importAll": "Alle importieren",
     "importAllResult": "Import abgeschlossen: {{imported}} Artikel von {{total}} Quellen ({{errors}} Fehler).",
     "importingSource": "Importiere {{current}}/{{total}}: {{source}}...",
-    "errorImportAll": "Fehler beim Importieren der Feeds."
+    "errorImportAll": "Fehler beim Importieren der Feeds.",
+    "checkHealth": "Zustand prüfen",
+    "checkingHealth": "Prüfung...",
+    "healthCheckResult": "Prüfung abgeschlossen: {{healthy}}/{{total}} gesund, {{issues}} mit Problemen.",
+    "errorHealthCheck": "Fehler bei der Zustandsprüfung der Feeds.",
+    "lastHealthCheck": "Letzte Prüfung",
+    "health_healthy": "Gesund",
+    "health_degraded": "Beeinträchtigt",
+    "health_unhealthy": "Fehlerhaft",
+    "health_dead": "Tot",
+    "healthTooltip": "{{count}} aufeinanderfolgende Fehler"
   },
   "admin": {
     "overview": "Übersicht",

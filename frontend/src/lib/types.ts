@@ -21,8 +21,21 @@ export interface Source {
   update_frequency_minutes: number
   is_active: boolean
   last_fetched: string | null
+  health_status: 'healthy' | 'degraded' | 'unhealthy' | 'dead'
+  consecutive_failures: number
+  last_health_check: string | null
+  last_healthy_at: string | null
   created_at: string
   updated_at: string
+}
+
+export interface HealthCheckResult {
+  source_id: number
+  source_name: string
+  previous_status: string
+  new_status: string
+  consecutive_failures: number
+  error: string | null
 }
 
 export interface PaginationMeta {

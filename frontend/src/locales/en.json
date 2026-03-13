@@ -191,7 +191,17 @@
     "importAll": "Import all",
     "importAllResult": "Import complete: {{imported}} articles from {{total}} sources ({{errors}} errors).",
     "importingSource": "Importing {{current}}/{{total}}: {{source}}...",
-    "errorImportAll": "Error importing feeds."
+    "errorImportAll": "Error importing feeds.",
+    "checkHealth": "Check health",
+    "checkingHealth": "Checking...",
+    "healthCheckResult": "Check complete: {{healthy}}/{{total}} healthy, {{issues}} with issues.",
+    "errorHealthCheck": "Error checking feed health.",
+    "lastHealthCheck": "Last check",
+    "health_healthy": "Healthy",
+    "health_degraded": "Degraded",
+    "health_unhealthy": "Unhealthy",
+    "health_dead": "Dead",
+    "healthTooltip": "{{count}} consecutive failures"
   },
   "admin": {
     "overview": "Overview",

@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Search, Check, Plus, Download } from 'lucide-react'
+import { Search, Check, Plus, Download, HeartPulse } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -29,6 +29,10 @@ interface Source {
   update_frequency_minutes: number
   is_active: boolean
   last_fetched?: string
+  health_status?: 'healthy' | 'degraded' | 'unhealthy' | 'dead'
+  consecutive_failures?: number
+  last_health_check?: string
+  last_healthy_at?: string
 }
 
 interface SourceFormData {
@@ -96,6 +100,12 @@ export default function Sources() {
   const [processing, setProcessing] = useState<number | null>(null)
   const [subscribing, setSubscribing] = useState<number | null>(null)
   const [validating, setValidating] = useState(false)
+
+  // Health check state
+  const [checkingHealth, setCheckingHealth] = useState(false)
+  const [healthCheckResult, setHealthCheckResult] = useState<{
+    total: number; healthy: number; issues: number
+  } | null>(null)
 
   // Import-all state
   const [importingAll, setImportingAll] = useState(false)
@@ -366,6 +376,23 @@ export default function Sources() {
     }
   }
 
+  const checkHealthAll = async () => {
+    setCheckingHealth(true)
+    setHealthCheckResult(null)
+    try {
+      const res = await fetch('/api/sources/health-check', { method: 'POST' })
+      if (!res.ok) throw new Error(`Error ${res.status}`)
+      const results: { new_status: string }[] = await res.json()
+      const healthy = results.filter(r => r.new_status === 'healthy').length
+      setHealthCheckResult({ total: results.length, healthy, issues: results.length - healthy })
+      await loadSources()
+    } catch {
+      alert(t('sources.errorHealthCheck'))
+    } finally {
+      setCheckingHealth(false)
+    }
+  }
+
   // Subscribed source IDs for marking catalog results
   const subscribedIds = useMemo(() => new Set(sources.map((s) => s.id)), [sources])
 
@@ -385,6 +412,15 @@ export default function Sources() {
             <TabsTrigger value="explore">{t('sources.tabExplore')}</TabsTrigger>
           </TabsList>
           <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={checkHealthAll}
+              disabled={checkingHealth || sources.length === 0}
+            >
+              <HeartPulse className="mr-1.5 h-4 w-4" />
+              {checkingHealth ? t('sources.checkingHealth') : t('sources.checkHealth')}
+            </Button>
             <Button
               size="sm"
               variant="outline"
@@ -420,6 +456,27 @@ export default function Sources() {
               size="icon"
               className="ml-4 h-6 w-6 shrink-0 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
               onClick={() => setImportAllResult(null)}
+            >
+              &times;
+            </Button>
+          </div>
+        )}
+
+        {/* Health check result banner */}
+        {healthCheckResult && (
+          <div className="mb-4 flex items-center justify-between rounded-lg border bg-muted/50 px-4 py-3 text-sm">
+            <span>
+              {t('sources.healthCheckResult', {
+                total: healthCheckResult.total,
+                healthy: healthCheckResult.healthy,
+                issues: healthCheckResult.issues,
+              })}
+            </span>
+            <Button
+              variant="outline"
+              size="icon"
+              className="ml-4 h-6 w-6 shrink-0 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+              onClick={() => setHealthCheckResult(null)}
             >
               &times;
             </Button>
@@ -486,9 +543,23 @@ export default function Sources() {
                           </p>
                         )}
                       </div>
-                      <Badge variant={source.is_active ? 'default' : 'secondary'}>
-                        {source.is_active ? t('sources.active') : t('sources.inactive')}
-                      </Badge>
+                      <div className="flex items-center gap-1.5">
+                        {source.health_status && source.health_status !== 'healthy' && (
+                          <Badge
+                            variant={source.health_status === 'dead' ? 'destructive' : 'secondary'}
+                            title={
+                              source.consecutive_failures
+                                ? t('sources.healthTooltip', { count: source.consecutive_failures })
+                                : undefined
+                            }
+                          >
+                            {t(`sources.health_${source.health_status}`)}
+                          </Badge>
+                        )}
+                        <Badge variant={source.is_active ? 'default' : 'secondary'}>
+                          {source.is_active ? t('sources.active') : t('sources.inactive')}
+                        </Badge>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -512,6 +583,14 @@ export default function Sources() {
                         <p className="mt-0.5">
                           {source.last_fetched
                             ? new Date(source.last_fetched).toLocaleString()
+                            : t('sources.never')}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">{t('sources.lastHealthCheck')}</span>
+                        <p className="mt-0.5">
+                          {source.last_health_check
+                            ? new Date(source.last_health_check).toLocaleString()
                             : t('sources.never')}
                         </p>
                       </div>

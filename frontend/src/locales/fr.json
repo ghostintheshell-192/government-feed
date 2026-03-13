@@ -191,7 +191,17 @@
     "importAll": "Tout importer",
     "importAllResult": "Importation terminée : {{imported}} articles de {{total}} sources ({{errors}} erreurs).",
     "importingSource": "Importation {{current}}/{{total}} : {{source}}...",
-    "errorImportAll": "Erreur lors de l'importation des flux."
+    "errorImportAll": "Erreur lors de l'importation des flux.",
+    "checkHealth": "Vérifier l'état",
+    "checkingHealth": "Vérification...",
+    "healthCheckResult": "Vérification terminée : {{healthy}}/{{total}} en bonne santé, {{issues}} avec des problèmes.",
+    "errorHealthCheck": "Erreur lors de la vérification de l'état des flux.",
+    "lastHealthCheck": "Dernière vérif.",
+    "health_healthy": "En bonne santé",
+    "health_degraded": "Dégradé",
+    "health_unhealthy": "Défaillant",
+    "health_dead": "Mort",
+    "healthTooltip": "{{count}} échecs consécutifs"
   },
   "admin": {
     "overview": "Vue d'ensemble",

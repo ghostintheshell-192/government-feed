@@ -6,6 +6,7 @@ import type {
   CleanupResult,
   FeatureFlags,
   GlobalStats,
+  HealthCheckResult,
   HtmlResidueResult,
   NewsFilters,
   NewsItem,
@@ -120,6 +121,20 @@ export async function fetchNewsContent(
   if (!res.ok) {
     throw new Error(`Failed to fetch content: ${res.status}`)
   }
+  return res.json()
+}
+
+// ==================== HEALTH CHECK API ====================
+
+export async function healthCheckSource(sourceId: number): Promise<HealthCheckResult> {
+  const res = await fetch(`/api/sources/${sourceId}/health-check`, { method: 'POST' })
+  if (!res.ok) throw new Error(`Failed to health check: ${res.status}`)
+  return res.json()
+}
+
+export async function healthCheckAll(): Promise<HealthCheckResult[]> {
+  const res = await fetch('/api/sources/health-check', { method: 'POST' })
+  if (!res.ok) throw new Error(`Failed to bulk health check: ${res.status}`)
   return res.json()
 }
 
