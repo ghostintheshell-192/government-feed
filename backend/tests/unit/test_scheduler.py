@@ -412,190 +412,54 @@ class TestCleanupOldNews:
 
 
 class TestHealthCheckSources:
-    """Tests for _health_check_sources job."""
+    """Tests for _health_check_sources job (delegates to HealthMonitorService)."""
 
-    @patch("backend.src.infrastructure.scheduler.httpx")
+    @patch("backend.src.infrastructure.health_monitor.HealthMonitorService")
     @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
-    def test_checks_active_sources(
+    def test_delegates_to_health_monitor(
         self,
         mock_session_local: MagicMock,
         mock_uow_cls: MagicMock,
-        mock_httpx: MagicMock,
+        mock_monitor_cls: MagicMock,
     ) -> None:
-        """Performs HEAD request on active source URLs."""
+        """Delegates health checking to HealthMonitorService."""
         mock_db = MagicMock()
         mock_session_local.return_value = mock_db
 
-        source = MagicMock()
-        source.id = 1
-        source.name = "Healthy Feed"
-        source.feed_url = "https://example.com/feed.xml"
-
-        mock_uow = MagicMock()
-        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = [1]
-        mock_uow.source_repository.get_all.return_value = [source]
-        mock_uow_cls.return_value = mock_uow
-
-        mock_client = MagicMock()
-        mock_httpx.Client.return_value.__enter__ = MagicMock(return_value=mock_client)
-        mock_httpx.Client.return_value.__exit__ = MagicMock(return_value=False)
+        mock_monitor = MagicMock()
+        mock_monitor.check_all_subscribed.return_value = [
+            {"new_status": "healthy"},
+            {"new_status": "degraded"},
+        ]
+        mock_monitor_cls.return_value = mock_monitor
 
         scheduler = FeedScheduler()
         scheduler._health_check_sources()
 
-        mock_client.head.assert_called_once_with(
-            "https://example.com/feed.xml", timeout=10.0, follow_redirects=True
-        )
+        mock_monitor.check_all_subscribed.assert_called_once_with(user_id=1)
         mock_db.close.assert_called_once()
 
-    @patch("backend.src.infrastructure.scheduler.httpx")
+    @patch("backend.src.infrastructure.health_monitor.HealthMonitorService")
     @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
-    def test_checks_multiple_sources(
+    def test_handles_monitor_exception(
         self,
         mock_session_local: MagicMock,
         mock_uow_cls: MagicMock,
-        mock_httpx: MagicMock,
+        mock_monitor_cls: MagicMock,
     ) -> None:
-        """Checks all active sources."""
+        """Does not crash when HealthMonitorService raises."""
         mock_db = MagicMock()
         mock_session_local.return_value = mock_db
 
-        source_a = MagicMock()
-        source_a.id = 1
-        source_a.name = "Feed A"
-        source_a.feed_url = "https://example.com/a.xml"
-
-        source_b = MagicMock()
-        source_b.id = 2
-        source_b.name = "Feed B"
-        source_b.feed_url = "https://example.com/b.xml"
-
-        mock_uow = MagicMock()
-        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = [1, 2]
-        mock_uow.source_repository.get_all.return_value = [source_a, source_b]
-        mock_uow_cls.return_value = mock_uow
-
-        mock_client = MagicMock()
-        mock_httpx.Client.return_value.__enter__ = MagicMock(return_value=mock_client)
-        mock_httpx.Client.return_value.__exit__ = MagicMock(return_value=False)
+        mock_monitor = MagicMock()
+        mock_monitor.check_all_subscribed.side_effect = Exception("unexpected error")
+        mock_monitor_cls.return_value = mock_monitor
 
         scheduler = FeedScheduler()
         scheduler._health_check_sources()
 
-        assert mock_client.head.call_count == 2
-        mock_db.close.assert_called_once()
-
-    @patch("backend.src.infrastructure.scheduler.httpx")
-    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
-    @patch("backend.src.infrastructure.scheduler.SessionLocal")
-    def test_handles_unhealthy_source(
-        self,
-        mock_session_local: MagicMock,
-        mock_uow_cls: MagicMock,
-        mock_httpx: MagicMock,
-    ) -> None:
-        """Handles connection failure for a source without crashing."""
-        mock_db = MagicMock()
-        mock_session_local.return_value = mock_db
-
-        source = MagicMock()
-        source.id = 1
-        source.name = "Dead Feed"
-        source.feed_url = "https://example.com/dead.xml"
-
-        mock_uow = MagicMock()
-        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = [1]
-        mock_uow.source_repository.get_all.return_value = [source]
-        mock_uow_cls.return_value = mock_uow
-
-        mock_client = MagicMock()
-        mock_client.head.side_effect = Exception("connection refused")
-        mock_httpx.Client.return_value.__enter__ = MagicMock(return_value=mock_client)
-        mock_httpx.Client.return_value.__exit__ = MagicMock(return_value=False)
-
-        scheduler = FeedScheduler()
-        # Should not raise — per-source errors are caught
-        scheduler._health_check_sources()
-        mock_db.close.assert_called_once()
-
-    @patch("backend.src.infrastructure.scheduler.httpx")
-    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
-    @patch("backend.src.infrastructure.scheduler.SessionLocal")
-    def test_continues_after_one_source_fails(
-        self,
-        mock_session_local: MagicMock,
-        mock_uow_cls: MagicMock,
-        mock_httpx: MagicMock,
-    ) -> None:
-        """Continues checking remaining sources after one fails."""
-        mock_db = MagicMock()
-        mock_session_local.return_value = mock_db
-
-        source_bad = MagicMock()
-        source_bad.id = 1
-        source_bad.name = "Bad Feed"
-        source_bad.feed_url = "https://example.com/bad.xml"
-
-        source_good = MagicMock()
-        source_good.id = 2
-        source_good.name = "Good Feed"
-        source_good.feed_url = "https://example.com/good.xml"
-
-        mock_uow = MagicMock()
-        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = [1, 2]
-        mock_uow.source_repository.get_all.return_value = [source_bad, source_good]
-        mock_uow_cls.return_value = mock_uow
-
-        # Each source gets its own Client() context manager call
-        mock_client_bad = MagicMock()
-        mock_client_bad.head.side_effect = Exception("timeout")
-
-        mock_client_good = MagicMock()
-
-        cm_bad = MagicMock()
-        cm_bad.__enter__ = MagicMock(return_value=mock_client_bad)
-        cm_bad.__exit__ = MagicMock(return_value=False)
-
-        cm_good = MagicMock()
-        cm_good.__enter__ = MagicMock(return_value=mock_client_good)
-        cm_good.__exit__ = MagicMock(return_value=False)
-
-        mock_httpx.Client.side_effect = [cm_bad, cm_good]
-
-        scheduler = FeedScheduler()
-        scheduler._health_check_sources()
-
-        # Both sources were checked (second was not skipped)
-        mock_client_bad.head.assert_called_once()
-        mock_client_good.head.assert_called_once_with(
-            "https://example.com/good.xml", timeout=10.0, follow_redirects=True
-        )
-        mock_db.close.assert_called_once()
-
-    @patch("backend.src.infrastructure.scheduler.httpx")
-    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
-    @patch("backend.src.infrastructure.scheduler.SessionLocal")
-    def test_no_sources(
-        self,
-        mock_session_local: MagicMock,
-        mock_uow_cls: MagicMock,
-        mock_httpx: MagicMock,
-    ) -> None:
-        """Does nothing when there are no active sources."""
-        mock_db = MagicMock()
-        mock_session_local.return_value = mock_db
-
-        mock_uow = MagicMock()
-        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = []
-        mock_uow.source_repository.get_all.return_value = []
-        mock_uow_cls.return_value = mock_uow
-
-        scheduler = FeedScheduler()
-        scheduler._health_check_sources()
-
-        mock_httpx.Client.assert_not_called()
         mock_db.close.assert_called_once()
 
     @patch("backend.src.infrastructure.scheduler.UnitOfWork")

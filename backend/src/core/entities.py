@@ -21,6 +21,26 @@ class GeographicLevel(str, Enum):
     GLOBAL = "GLOBAL"
 
 
+class HealthStatus(str, Enum):
+    """Health status of a feed source, based on consecutive failure count."""
+
+    HEALTHY = "healthy"
+    DEGRADED = "degraded"
+    UNHEALTHY = "unhealthy"
+    DEAD = "dead"
+
+    @staticmethod
+    def from_failure_count(count: int) -> "HealthStatus":
+        """Determine health status from consecutive failure count."""
+        if count <= 0:
+            return HealthStatus.HEALTHY
+        if count <= 2:
+            return HealthStatus.DEGRADED
+        if count <= 5:
+            return HealthStatus.UNHEALTHY
+        return HealthStatus.DEAD
+
+
 @dataclass
 class Source:
     """An institutional source of news/communications (catalog entry)."""
@@ -34,6 +54,11 @@ class Source:
     update_frequency_minutes: int = 60
     is_active: bool = True
     last_fetched: datetime | None = None
+    # Health monitoring
+    health_status: str = HealthStatus.HEALTHY
+    consecutive_failures: int = 0
+    last_health_check: datetime | None = None
+    last_healthy_at: datetime | None = None
     # Catalog fields
     geographic_level: str | None = None
     country_code: str | None = None

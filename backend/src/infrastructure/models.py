@@ -31,6 +31,11 @@ class Source(Base):
     update_frequency_minutes = Column(Integer, default=60)
     is_active = Column(Boolean, default=True)
     last_fetched = Column(DateTime, nullable=True)
+    # Health monitoring
+    health_status = Column(String(20), default="healthy", nullable=False)
+    consecutive_failures = Column(Integer, default=0, nullable=False)
+    last_health_check = Column(DateTime, nullable=True)
+    last_healthy_at = Column(DateTime, nullable=True)
     # Catalog fields (ADR-005, ADR-007)
     geographic_level = Column(String(20), nullable=True)
     country_code = Column(String(2), nullable=True)

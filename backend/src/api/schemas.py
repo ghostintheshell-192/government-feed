@@ -37,6 +37,10 @@ class SourceResponse(SourceBase):
     id: int
     is_active: bool
     last_fetched: datetime | None
+    health_status: str = "healthy"
+    consecutive_failures: int = 0
+    last_health_check: datetime | None = None
+    last_healthy_at: datetime | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -87,6 +91,17 @@ class SubscriptionResponse(BaseModel):
     source_id: int
     is_active: bool
     added_at: datetime
+
+
+class HealthCheckResultResponse(BaseModel):
+    """Result of a health check on a single source."""
+
+    source_id: int
+    source_name: str
+    previous_status: str
+    new_status: str
+    consecutive_failures: int
+    error: str | None = None
 
 
 class NewsItemResponse(BaseModel):

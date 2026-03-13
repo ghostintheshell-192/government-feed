@@ -62,6 +62,7 @@ For detailed documentation, see `docs/architecture.md`.
 - `database.py` — Database configuration and session management.
 - `feed_discovery.py` — A discovered feed with metadata.
 - `feed_parser.py` — Service for parsing RSS/Atom feeds.
+- `health_monitor.py` — Checks feed health and updates source status in the database.
 - `models.py` — Source model for database (catalog entry).
 - `resilience.py` — Raised when a call is attempted on an open circuit breaker.
 - `scheduler.py` — Background job scheduler for feed polling, cleanup, and health checks.
