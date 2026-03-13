@@ -144,7 +144,7 @@
     "articles": "articles",
     "feedsTitle": "Flux",
     "noFeeds": "Aucun flux configuré. Ajoutez votre premier flux pour commencer.",
-    "addFeed": "+ Ajouter un flux",
+    "addFeed": "Ajouter un flux",
     "urlLabel": "URL",
     "typeLabel": "Type",
     "frequencyLabel": "Fréquence",

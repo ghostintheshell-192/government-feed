@@ -284,7 +284,7 @@ export default function Feed() {
       </div>
 
       {/* Main content */}
-      <div className="min-w-0 flex-1 pr-4 md:pr-8">
+      <div className="min-w-0 flex-1">
         <div className="mb-4">
           <FilterBar
             filters={filters}

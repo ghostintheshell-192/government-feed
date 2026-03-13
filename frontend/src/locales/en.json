@@ -144,7 +144,7 @@
     "articles": "articles",
     "feedsTitle": "Feeds",
     "noFeeds": "No feeds configured. Add your first feed to get started.",
-    "addFeed": "+ Add Feed",
+    "addFeed": "Add Feed",
     "urlLabel": "URL",
     "typeLabel": "Type",
     "frequencyLabel": "Frequency",
