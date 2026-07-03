@@ -50,12 +50,13 @@ report: null  # Optional: link to archive/analysis/YYYY-MM-DD_report_agent-name.
 
 ## Current Issues by Priority
 
-*Auto-updated: 2026-07-03 22:37*
+*Auto-updated: 2026-07-03 23:09*
 
 **High Priority:** None currently
 
 **Medium Priority:**
 - `missing-foreign-key-constraint.md` - Missing foreign key constraint from news_items to sources
+- `naive-aware-datetime-columns.md` - Naive/aware datetime mismatch between DB columns and code
 - `newscard-summary-hidden-on-expand.md` - NewsCard: AI summary hidden when article content is expanded
 - `source-tagging-unreliable.md` - Source tagging is unreliable
 

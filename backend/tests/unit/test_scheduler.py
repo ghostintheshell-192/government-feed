@@ -138,6 +138,82 @@ class TestPollAllFeeds:
     @patch("backend.src.infrastructure.scheduler.FeedParserService")
     @patch("backend.src.infrastructure.scheduler.UnitOfWork")
     @patch("backend.src.infrastructure.scheduler.SessionLocal")
+    def test_polls_source_with_naive_last_fetched(
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
+        mock_parser_cls: MagicMock,
+    ) -> None:
+        """Handles naive last_fetched (as returned by SQLite) without raising.
+
+        Regression test: SQLAlchemy DateTime columns return offset-naive
+        datetimes, which used to crash the aware-vs-naive subtraction and
+        abort the entire poll cycle.
+        """
+        mock_db = MagicMock()
+        mock_session_local.return_value = mock_db
+
+        source = MagicMock()
+        source.id = 1
+        source.name = "Naive Feed"
+        # Naive datetime, far in the past: due for update
+        source.last_fetched = datetime.now(UTC).replace(tzinfo=None) - timedelta(hours=5)
+        source.update_frequency_minutes = 60
+
+        mock_uow = MagicMock()
+        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = [1]
+        mock_uow.source_repository.get_all.return_value = [source]
+        mock_uow_cls.return_value = mock_uow
+
+        mock_parser = MagicMock()
+        mock_parser.parse_and_import.return_value = 2
+        mock_parser_cls.return_value = mock_parser
+
+        scheduler = FeedScheduler()
+        scheduler._poll_all_feeds()
+
+        mock_parser.parse_and_import.assert_called_once_with(source)
+
+    @patch("backend.src.infrastructure.scheduler.FeedParserService")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
+    @patch("backend.src.infrastructure.scheduler.SessionLocal")
+    def test_broken_source_does_not_abort_cycle(
+        self,
+        mock_session_local: MagicMock,
+        mock_uow_cls: MagicMock,
+        mock_parser_cls: MagicMock,
+    ) -> None:
+        """A source that raises during polling must not stop the others."""
+        mock_db = MagicMock()
+        mock_session_local.return_value = mock_db
+
+        broken = MagicMock()
+        broken.id = 1
+        broken.name = "Broken Feed"
+        broken.last_fetched = None
+        healthy = MagicMock()
+        healthy.id = 2
+        healthy.name = "Healthy Feed"
+        healthy.last_fetched = None
+
+        mock_uow = MagicMock()
+        mock_uow.subscription_repository.get_subscribed_source_ids.return_value = [1, 2]
+        mock_uow.source_repository.get_all.return_value = [broken, healthy]
+        mock_uow_cls.return_value = mock_uow
+
+        mock_parser = MagicMock()
+        mock_parser.parse_and_import.side_effect = [RuntimeError("boom"), 4]
+        mock_parser_cls.return_value = mock_parser
+
+        scheduler = FeedScheduler()
+        scheduler._poll_all_feeds()
+
+        assert mock_parser.parse_and_import.call_count == 2
+        mock_db.close.assert_called_once()
+
+    @patch("backend.src.infrastructure.scheduler.FeedParserService")
+    @patch("backend.src.infrastructure.scheduler.UnitOfWork")
+    @patch("backend.src.infrastructure.scheduler.SessionLocal")
     def test_skips_recently_fetched(
         self,
         mock_session_local: MagicMock,
