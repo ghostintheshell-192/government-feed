@@ -238,6 +238,31 @@ class TestSettingsValidation:
 
     @patch("backend.src.infrastructure.settings_store.save_settings")
     @patch("backend.src.infrastructure.settings_store.load_settings")
+    def test_validates_user_country_format(self, mock_load, mock_save, test_client):
+        """user_country must be ISO 3166-1 alpha-2 (uppercase) or empty."""
+        mock_load.return_value = {}
+        response = test_client.put("/api/settings", json={"user_country": "Italy"})
+        assert response.status_code == 422
+
+        response = test_client.put("/api/settings", json={"user_country": "it"})
+        assert response.status_code == 422
+
+    @patch("backend.src.infrastructure.settings_store.save_settings")
+    @patch("backend.src.infrastructure.settings_store.load_settings")
+    def test_accepts_valid_user_country(self, mock_load, mock_save, test_client):
+        """A valid country code is saved; empty string clears the selection."""
+        mock_load.return_value = {"user_country": ""}
+        response = test_client.put("/api/settings", json={"user_country": "IT"})
+        assert response.status_code == 200
+        assert mock_save.call_args[0][0]["user_country"] == "IT"
+
+        mock_load.return_value = {"user_country": "IT"}
+        response = test_client.put("/api/settings", json={"user_country": ""})
+        assert response.status_code == 200
+        assert mock_save.call_args[0][0]["user_country"] == ""
+
+    @patch("backend.src.infrastructure.settings_store.save_settings")
+    @patch("backend.src.infrastructure.settings_store.load_settings")
     def test_accepts_valid_settings(self, mock_load, mock_save, test_client):
         """Valid settings should be accepted."""
         mock_load.return_value = {"ai_enabled": True}

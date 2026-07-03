@@ -1,21 +1,32 @@
 # Government Feed - Current Status
 
-*Last updated: 2026-03-11*
+*Last updated: 2026-07-03*
 
 ## Project Phase
 
-**Current milestone**: M4a-Feed-Infrastructure
+**Current milestone**: M4a-Feed-Infrastructure — **complete** (release pending)
+**Next milestone**: M4b-Intelligence
 **Previous milestones**: M1 (MVP), M2 (Production), M3 (Frontend), M3.1 (Admin API) — all complete
 
-## M4a Planning
+## M4a — Complete
 
-### Completed (M4a)
+| Item | Outcome |
+|------|---------|
+| Source Catalog & Subscriptions (ADR-007) | Implemented — pivot table, M5-ready `user_id` |
+| Feed Crawler (admin script) | Implemented — 86+ feeds imported |
+| Catalog Browse UI | Implemented — tabs in Feed page (I tuoi feed / Esplora catalogo) |
+| Bulk Fetch All | Implemented — NDJSON streaming, UI in Sources + Dashboard |
+| Feed Health Monitor | Implemented — escalation ladder, badges, bulk check |
+| i18n DE + FR | Implemented — 4 languages, dropdown selector |
+| Geographic Sidebar (starter-packs) | Implemented — server-side filtering, full-width layout |
+| Country selection + freshness settings | Implemented — `user_country` (ISO 3166-1) + `news_freshness_hours` |
+| Admin UI, HTML cleanup, core/model alignment | Implemented (early M4a) |
 
-- Admin UI: sidebar navigation, feed inspector, cleanup, diagnostics
-- Bulk fetch content per source (streaming NDJSON)
-- HTML cleanup: semantic whitelist, preserves structural markup
-- **Core entity/model alignment** — entities match DB models, dependency violation fixed
-- **FeedParserService uses UnitOfWork** — no more raw Session access
+**Deliberately deferred**: geographic badge counters (UX rethink, → M4b custom
+filters; idea in `.memory-bank/ideas/2026-07-03-geographic-badge-counters-ux.md`).
+
+**Carried over (spec ready, not scheduled)**: feed-discovery-automated,
+feed-auto-recovery, feed-admin-tools, document-indexing — in `specs/planned/`.
 
 ### Architecture Decisions (M4a)
 
@@ -23,27 +34,12 @@
 - **ADR-007** (Accepted): Catalog-Subscription model — single Source table + Subscription pivot table
 - **ADR-008** (Proposed): Data locality — catalog vs user content split, deferred to M5
 
-### Planned Specs (M4a)
+### Known follow-ups (small)
 
-| Spec | Priority | Depends on | Status |
-|------|----------|------------|--------|
-| [Source Catalog & Subscriptions](specs/planned/source-catalog-subscriptions.md) | must-have | — | Spec ready |
-| [Catalog Browse UI](specs/planned/catalog-browse-ui.md) | should-have | catalog-subscriptions | Spec ready |
-| [Bulk Fetch All Sources](specs/planned/bulk-fetch-all-sources.md) | should-have | catalog-subscriptions | Spec ready |
-| [Feed Health Monitor](specs/planned/feed-health-monitor.md) | should-have | catalog-subscriptions | Spec ready |
-| [Feed Discovery Automated](specs/planned/feed-discovery-automated.md) | should-have | — | Spec ready |
-| [i18n: DE + FR](specs/planned/i18n-additional-languages.md) | nice-to-have | — | Spec ready |
-| [Document Indexing](specs/planned/document-indexing.md) | nice-to-have | — | Spec ready (tentative M4a) |
-
-### Implementation Order
-
-1. **Source Catalog & Subscriptions** — foundation for everything else
-2. **Feed Crawler** (admin script) — populate catalog with ~1000 sources
-3. **Catalog Browse UI** — search and subscribe to catalog sources
-4. **Bulk Fetch All** — download content for all subscribed sources at once
-5. **Feed Health Monitor** — automated health tracking and recovery
-6. **i18n DE + FR** — anytime, no dependencies
-7. **Starter Packs** — once catalog has enough sources + geographic levels
+- Feed page buttons overflow with DE/FR labels (shorten translations or adjust layout)
+- 55 articles with 0-char content (ECB, CFTC) — run "Scarica contenuti" bulk fetch in Admin
+- Lint cleanup of `backend/tests` (20 pre-existing ruff findings, mostly autofixable)
+- `ruff format` one-off pass on 13 legacy files, then enforce in format-check.sh
 
 ### Backlog (deferred to later milestones)
 

@@ -1,6 +1,6 @@
 # INDEX - Government Feed Development Documentation
 
-*Auto-generated: 2026-07-03 21:10*
+*Auto-generated: 2026-07-03 21:24*
 
 ---
 
@@ -20,9 +20,9 @@
 ### (root)/ (4 files)
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) (3KB, 2026-07-03) **RECENT**
+- [CURRENT-STATUS.md](CURRENT-STATUS.md) (3KB, 2026-07-03) **RECENT**
 - [INDEX.md](INDEX.md) (7KB, 2026-07-03) **RECENT**
 - [README.md](README.md) (3KB, 2026-07-03) **RECENT**
-- [CURRENT-STATUS.md](CURRENT-STATUS.md) (3KB, 2026-03-12)
 
 ### specs/ (1 files)
 
@@ -41,8 +41,12 @@
 - [daily-digest.md](specs/backlog/daily-digest.md) (3KB, 2026-03-09)
 - [data-export.md](specs/backlog/data-export.md) (1KB, 2026-03-09)
 
-### specs/implemented/ (17 files)
+### specs/implemented/ (21 files)
 
+- [bulk-fetch-all-sources.md](specs/implemented/bulk-fetch-all-sources.md) (1KB, 2026-07-03) **RECENT**
+- [catalog-browse-ui.md](specs/implemented/catalog-browse-ui.md) (2KB, 2026-07-03) **RECENT**
+- [feed-health-monitor.md](specs/implemented/feed-health-monitor.md) (4KB, 2026-07-03) **RECENT**
+- [source-catalog-subscriptions.md](specs/implemented/source-catalog-subscriptions.md) (3KB, 2026-07-03) **RECENT**
 - [ai-summarization.md](specs/implemented/ai-summarization.md) (2KB, 2026-03-09)
 - [background-workers.md](specs/implemented/background-workers.md) (2KB, 2026-03-09)
 - [content-deduplication.md](specs/implemented/content-deduplication.md) (1KB, 2026-03-09)
@@ -63,17 +67,13 @@
 
 ### specs/in-progress/ (1 files)
 
-- [feed-health-monitor.md](specs/in-progress/feed-health-monitor.md) (4KB, 2026-03-13)
+- [starter-packs.md](specs/in-progress/starter-packs.md) (8KB, 2026-07-03) **RECENT**
 
-### specs/planned/ (9 files)
+### specs/planned/ (5 files)
 
-- [starter-packs.md](specs/planned/starter-packs.md) (7KB, 2026-03-13)
 - [feed-auto-recovery.md](specs/planned/feed-auto-recovery.md) (3KB, 2026-03-13)
-- [bulk-fetch-all-sources.md](specs/planned/bulk-fetch-all-sources.md) (1KB, 2026-03-12)
-- [catalog-browse-ui.md](specs/planned/catalog-browse-ui.md) (2KB, 2026-03-12)
 - [document-indexing.md](specs/planned/document-indexing.md) (3KB, 2026-03-12)
 - [i18n-additional-languages.md](specs/planned/i18n-additional-languages.md) (<1KB, 2026-03-12)
-- [source-catalog-subscriptions.md](specs/planned/source-catalog-subscriptions.md) (3KB, 2026-03-12)
 - [feed-admin-tools.md](specs/planned/feed-admin-tools.md) (5KB, 2026-03-09)
 - [feed-discovery-automated.md](specs/planned/feed-discovery-automated.md) (8KB, 2026-03-09)
 
@@ -94,16 +94,16 @@
 
 ### reference/decisions/ (10 files)
 
-- [README.md](reference/decisions/README.md) (2KB, 2026-07-03) **RECENT**
-- [005-geographic-levels-navigation.md](reference/decisions/005-geographic-levels-navigation.md) (4KB, 2026-07-03) **RECENT**
-- [006-headless-browser-scraping.md](reference/decisions/006-headless-browser-scraping.md) (2KB, 2026-07-03) **RECENT**
-- [007-catalog-subscription-model.md](reference/decisions/007-catalog-subscription-model.md) (3KB, 2026-07-03) **RECENT**
-- [008-data-locality-split.md](reference/decisions/008-data-locality-split.md) (3KB, 2026-07-03) **RECENT**
-- [_TEMPLATE.md](reference/decisions/_TEMPLATE.md) (1KB, 2026-07-03) **RECENT**
 - [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) (1KB, 2026-07-03) **RECENT**
 - [002-privacy-first-ai.md](reference/decisions/002-privacy-first-ai.md) (1KB, 2026-07-03) **RECENT**
 - [003-content-deduplication.md](reference/decisions/003-content-deduplication.md) (1KB, 2026-07-03) **RECENT**
 - [004-master-detail-layout.md](reference/decisions/004-master-detail-layout.md) (2KB, 2026-07-03) **RECENT**
+- [005-geographic-levels-navigation.md](reference/decisions/005-geographic-levels-navigation.md) (4KB, 2026-07-03) **RECENT**
+- [006-headless-browser-scraping.md](reference/decisions/006-headless-browser-scraping.md) (2KB, 2026-07-03) **RECENT**
+- [007-catalog-subscription-model.md](reference/decisions/007-catalog-subscription-model.md) (3KB, 2026-07-03) **RECENT**
+- [008-data-locality-split.md](reference/decisions/008-data-locality-split.md) (3KB, 2026-07-03) **RECENT**
+- [README.md](reference/decisions/README.md) (2KB, 2026-07-03) **RECENT**
+- [_TEMPLATE.md](reference/decisions/_TEMPLATE.md) (1KB, 2026-07-03) **RECENT**
 
 ### archive/completed/ (6 files)
 
@@ -132,14 +132,14 @@
 ## Recently Modified (last 7 days)
 
 1. [ARCHITECTURE.md](ARCHITECTURE.md) (today)
-2. [README.md](tech-debt/README.md) (today)
-3. [INDEX.md](INDEX.md) (today)
-4. [README.md](reference/decisions/README.md) (today)
-5. [005-geographic-levels-navigation.md](reference/decisions/005-geographic-levels-navigation.md) (today)
-6. [006-headless-browser-scraping.md](reference/decisions/006-headless-browser-scraping.md) (today)
-7. [007-catalog-subscription-model.md](reference/decisions/007-catalog-subscription-model.md) (today)
-8. [008-data-locality-split.md](reference/decisions/008-data-locality-split.md) (today)
-9. [_TEMPLATE.md](reference/decisions/_TEMPLATE.md) (today)
+2. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
+3. [starter-packs.md](specs/in-progress/starter-packs.md) (today)
+4. [bulk-fetch-all-sources.md](specs/implemented/bulk-fetch-all-sources.md) (today)
+5. [catalog-browse-ui.md](specs/implemented/catalog-browse-ui.md) (today)
+6. [feed-health-monitor.md](specs/implemented/feed-health-monitor.md) (today)
+7. [source-catalog-subscriptions.md](specs/implemented/source-catalog-subscriptions.md) (today)
+8. [INDEX.md](INDEX.md) (today)
+9. [README.md](README.md) (today)
 10. [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) (today)
 
 ---

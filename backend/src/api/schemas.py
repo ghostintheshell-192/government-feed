@@ -146,6 +146,8 @@ class SettingsUpdate(BaseModel):
     scheduler_enabled: bool | None = None
     news_retention_days: int | None = Field(None, ge=1, le=365)
     news_freshness_hours: int | None = Field(None, ge=1, le=168)
+    # ISO 3166-1 alpha-2; empty string clears the selection (None means "no update")
+    user_country: str | None = Field(None, max_length=2, pattern="^([A-Z]{2})?$")
     ollama_endpoint: str | None = Field(None, max_length=200)
     ollama_model: str | None = Field(None, max_length=100)
     redis_url: str | None = Field(None, max_length=200)
