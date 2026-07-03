@@ -3,7 +3,6 @@
 from datetime import datetime
 
 import pytest
-
 from backend.src.infrastructure.repositories.news_repository import NewsRepository
 from backend.tests.conftest import sample_news_item, sample_source
 

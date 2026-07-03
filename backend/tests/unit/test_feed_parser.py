@@ -6,7 +6,6 @@ from unittest.mock import MagicMock, patch
 
 import httpx
 import pytest
-
 from backend.src.infrastructure import feed_parser as feed_parser_module
 from backend.src.infrastructure.feed_parser import FeedParserService
 from backend.tests.conftest import sample_source

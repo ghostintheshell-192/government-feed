@@ -3,8 +3,6 @@
 from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from backend.src.infrastructure.scheduler import FeedScheduler
 
 

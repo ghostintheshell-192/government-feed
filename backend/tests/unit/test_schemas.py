@@ -1,14 +1,13 @@
 """Unit tests for Pydantic schemas."""
 
 import pytest
-from pydantic import ValidationError
-
 from backend.src.api.schemas import (
     NewsItemResponse,
     SourceCreate,
     SourceResponse,
     SourceUpdate,
 )
+from pydantic import ValidationError
 
 
 class TestSourceCreate:
