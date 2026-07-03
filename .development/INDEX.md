@@ -76,8 +76,8 @@
 
 ### tech-debt/ (13 files)
 
-- [ruff-version-drift-ci.md](tech-debt/ruff-version-drift-ci.md) (2KB, 2026-07-03) **RECENT**
 - [README.md](tech-debt/README.md) (3KB, 2026-07-03) **RECENT**
+- [ruff-version-drift-ci.md](tech-debt/ruff-version-drift-ci.md) (2KB, 2026-07-03) **RECENT**
 - [source-tagging-unreliable.md](tech-debt/source-tagging-unreliable.md) (2KB, 2026-03-12)
 - [_TEMPLATE.md](tech-debt/_TEMPLATE.md) (1KB, 2026-03-09)
 - [code-review-2026-03-08.md](tech-debt/code-review-2026-03-08.md) (41KB, 2026-03-09)
@@ -130,9 +130,9 @@
 ## Recently Modified (last 7 days)
 
 1. [ARCHITECTURE.md](ARCHITECTURE.md) (today)
-2. [ruff-version-drift-ci.md](tech-debt/ruff-version-drift-ci.md) (today)
+2. [README.md](tech-debt/README.md) (today)
 3. [INDEX.md](INDEX.md) (today)
-4. [README.md](tech-debt/README.md) (today)
+4. [ruff-version-drift-ci.md](tech-debt/ruff-version-drift-ci.md) (today)
 5. [starter-packs.md](specs/implemented/starter-packs.md) (today)
 6. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
 7. [bulk-fetch-all-sources.md](specs/implemented/bulk-fetch-all-sources.md) (today)
