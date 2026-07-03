@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [ develop, main ]
+  pull_request:
+    branches: [ develop, main ]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install backend (editable + dev tools)
+        run: pip install -e "./backend[dev]"
+
+      - name: Lint (ruff)
+        run: .development/automation/format-check.sh
+
+      - name: Type check (mypy)
+        run: mypy backend/src --ignore-missing-imports --no-namespace-packages
+
+      - name: Test
+        run: .development/automation/test.sh backend
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm --prefix frontend ci
+
+      - name: Test
+        run: .development/automation/test.sh frontend
+
+      - name: Build
+        run: .development/automation/build.sh

@@ -18,4 +18,6 @@ When the user makes a request that involves code changes:
 
 ## Agent Exploration
 
-When launching an Explore agent, always instruct it to read `.development/ARCHITECTURE.md` first to orient its search.
+When delegating exploration or analysis to any sub-agent, follow the **Agent
+Delegation Protocol** in `.claude/CLAUDE.md`: instruct the agent to read
+`.development/ARCHITECTURE.md` first to orient its search.

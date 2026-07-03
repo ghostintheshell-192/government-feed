@@ -50,21 +50,23 @@ report: null  # Optional: link to archive/analysis/YYYY-MM-DD_report_agent-name.
 
 ## Current Issues by Priority
 
-*Updated: 2026-03-07*
+*Auto-updated: 2026-07-03 21:10*
 
-**Resolved:**
-- ~~`deprecated-datetime-utcnow.md`~~ — Fixed: replaced with `datetime.now(UTC)`
-- ~~`deprecated-fastapi-pydantic-apis.md`~~ — Fixed: lifespan, ConfigDict, DeclarativeBase
+**High Priority:** None currently
 
 **Medium Priority:**
-- `feedparser-bypasses-uow.md` — FeedParserService bypasses Unit of Work pattern
-- `missing-foreign-key-constraint.md` — No FK from news_items to sources
-- `newscard-summary-hidden-on-expand.md` — AI summary hidden when article content is expanded
+- `missing-foreign-key-constraint.md` - Missing foreign key constraint from news_items to sources
+- `newscard-summary-hidden-on-expand.md` - NewsCard: AI summary hidden when article content is expanded
+- `source-tagging-unreliable.md` - Source tagging is unreliable
 
 **Low Priority:**
-- `pre-commit-grep-regex.md` — grep doesn't support `\s+` regex in pre-commit hook
-- `duplicated-html-stripping.md` — Same HTML stripping logic in 3 services
-- `global-mutable-state-main.md` — Partially resolved (lifespan pattern adopted, globals remain)
+- `code-review-2026-03-08.md` - Code Review Report - Government Feed Backend
+- `dependency-analysis-2026-03-08.md` - Dependency Analysis Report - Government Feed
+- `duplicated-html-stripping.md` - Duplicated HTML stripping logic across services
+- `global-mutable-state-main.md` - Global mutable state in main.py
+- `pre-commit-grep-regex.md` - Pre-commit hook: grep doesn't support \s+ regex
+- `security-audit-2026-03-08.md` - Security Audit Report - Government Feed
+- `security-ssrf-arbitrary-urls.md` - Security Issue: Server-Side Request Forgery (SSRF) — Arbitrary URL Fetching
 
 ## Integration with Reference Documentation
 

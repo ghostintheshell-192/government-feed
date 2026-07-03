@@ -39,11 +39,30 @@ Private development documentation for spec-driven development workflow.
 │   ├── postmortems/       # Post-mortems
 │   └── legacy/            # Old files
 │
-└── scripts/               # Utility scripts
+├── automation/            # Standard entry points (ADR-012 pattern)
+│   ├── bootstrap.sh       # Once-per-clone activation (hooksPath, exec bits)
+│   ├── build.sh           # Build the project (stack knowledge lives here)
+│   ├── test.sh            # Run tests (backend | frontend | all)
+│   ├── format-check.sh    # Verify lint gate (ruff)
+│   ├── format-fix.sh      # Apply lint fixes + formatting
+│   └── docs-update.sh     # Regenerate derived docs
+│
+└── scripts/               # Utility scripts (generators, workflow backends)
     ├── generate-index.py
+    ├── generate-architecture.sh
+    ├── generate-readme-status.py
+    ├── generate-claude-config.sh
+    ├── update-tech-debt-index.py
+    ├── spec-workflow.py
     ├── session-archive.py
     └── archive-resolved-issues.sh
 ```
+
+### Automation entry points
+
+Git hooks and CI are **generic orchestrators**: they contain no stack-specific
+commands. All stack knowledge lives in the entry points under `automation/`.
+Activate hooks once per clone with `bash .development/automation/bootstrap.sh`.
 
 ## Workflow
 

@@ -28,7 +28,7 @@ if [ -z "$STAGED_FILES" ]; then
     exit 0
 fi
 
-echo -e "${BLUE}[05] Archive Resolved Issues${NC}"
+echo -e "${BLUE}[03] Archive Resolved Issues${NC}"
 
 MOVED_COUNT=0
 

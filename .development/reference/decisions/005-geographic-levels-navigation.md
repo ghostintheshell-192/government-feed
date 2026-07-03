@@ -2,7 +2,8 @@
 
 **Date**: 2026-03-08
 **Status**: Accepted
-**Impact**: significant
+**Impact**: high
+**Summary**: Concentric geographic levels (LOCAL -> NATIONAL -> CONTINENTAL -> GLOBAL) are the primary navigation structure for sources.
 
 ## Context
 
