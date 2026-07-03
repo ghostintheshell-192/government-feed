@@ -1,6 +1,6 @@
 # INDEX - Government Feed Development Documentation
 
-*Auto-generated: 2026-07-03 21:55*
+*Auto-generated: 2026-07-03 22:13*
 
 ---
 
@@ -74,8 +74,9 @@
 - [feed-admin-tools.md](specs/planned/feed-admin-tools.md) (5KB, 2026-03-09)
 - [feed-discovery-automated.md](specs/planned/feed-discovery-automated.md) (8KB, 2026-03-09)
 
-### tech-debt/ (12 files)
+### tech-debt/ (13 files)
 
+- [ruff-version-drift-ci.md](tech-debt/ruff-version-drift-ci.md) (2KB, 2026-07-03) **RECENT**
 - [README.md](tech-debt/README.md) (3KB, 2026-07-03) **RECENT**
 - [source-tagging-unreliable.md](tech-debt/source-tagging-unreliable.md) (2KB, 2026-03-12)
 - [_TEMPLATE.md](tech-debt/_TEMPLATE.md) (1KB, 2026-03-09)
@@ -120,7 +121,7 @@
 ### docs/
 
 - [README.md](docs/README.md) (<1KB, 2026-03-09)
-- [roadmap.md](docs/roadmap.md) (5KB, 2026-03-09)
+- [roadmap.md](docs/roadmap.md) (5KB, 2026-07-03) **RECENT**
 - [technical.md](docs/technical.md) (4KB, 2026-07-03) **RECENT**
 - [vision.md](docs/vision.md) (14KB, 2025-10-25)
 
@@ -129,15 +130,15 @@
 ## Recently Modified (last 7 days)
 
 1. [ARCHITECTURE.md](ARCHITECTURE.md) (today)
-2. [INDEX.md](INDEX.md) (today)
-3. [README.md](tech-debt/README.md) (today)
-4. [starter-packs.md](specs/implemented/starter-packs.md) (today)
-5. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
-6. [bulk-fetch-all-sources.md](specs/implemented/bulk-fetch-all-sources.md) (today)
-7. [catalog-browse-ui.md](specs/implemented/catalog-browse-ui.md) (today)
-8. [feed-health-monitor.md](specs/implemented/feed-health-monitor.md) (today)
-9. [source-catalog-subscriptions.md](specs/implemented/source-catalog-subscriptions.md) (today)
-10. [README.md](README.md) (today)
+2. [ruff-version-drift-ci.md](tech-debt/ruff-version-drift-ci.md) (today)
+3. [INDEX.md](INDEX.md) (today)
+4. [README.md](tech-debt/README.md) (today)
+5. [starter-packs.md](specs/implemented/starter-packs.md) (today)
+6. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
+7. [bulk-fetch-all-sources.md](specs/implemented/bulk-fetch-all-sources.md) (today)
+8. [catalog-browse-ui.md](specs/implemented/catalog-browse-ui.md) (today)
+9. [feed-health-monitor.md](specs/implemented/feed-health-monitor.md) (today)
+10. [source-catalog-subscriptions.md](specs/implemented/source-catalog-subscriptions.md) (today)
 
 ---
 

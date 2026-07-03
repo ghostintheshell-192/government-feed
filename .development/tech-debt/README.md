@@ -50,7 +50,7 @@ report: null  # Optional: link to archive/analysis/YYYY-MM-DD_report_agent-name.
 
 ## Current Issues by Priority
 
-*Auto-updated: 2026-07-03 21:55*
+*Auto-updated: 2026-07-03 22:13*
 
 **High Priority:** None currently
 
@@ -65,6 +65,7 @@ report: null  # Optional: link to archive/analysis/YYYY-MM-DD_report_agent-name.
 - `duplicated-html-stripping.md` - Duplicated HTML stripping logic across services
 - `global-mutable-state-main.md` - Global mutable state in main.py
 - `pre-commit-grep-regex.md` - Pre-commit hook: grep doesn't support \s+ regex
+- `ruff-version-drift-ci.md` - Tool version drift between local venv and CI (ruff, mypy)
 - `security-audit-2026-03-08.md` - Security Audit Report - Government Feed
 - `security-ssrf-arbitrary-urls.md` - Security Issue: Server-Side Request Forgery (SSRF) — Arbitrary URL Fetching
 
