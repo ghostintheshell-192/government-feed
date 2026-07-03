@@ -8,11 +8,11 @@ that are structurally compatible (duck typing).
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from hashlib import sha256
 
 
-class GeographicLevel(str, Enum):
+class GeographicLevel(StrEnum):
     """Geographic scope of an institutional source."""
 
     LOCAL = "LOCAL"
@@ -21,7 +21,7 @@ class GeographicLevel(str, Enum):
     GLOBAL = "GLOBAL"
 
 
-class HealthStatus(str, Enum):
+class HealthStatus(StrEnum):
     """Health status of a feed source, based on consecutive failure count."""
 
     HEALTHY = "healthy"
