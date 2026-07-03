@@ -1,6 +1,6 @@
 # INDEX - Government Feed Development Documentation
 
-*Auto-generated: 2026-07-03 23:09*
+*Auto-generated: 2026-07-03 23:56*
 
 ---
 
@@ -76,8 +76,8 @@
 
 ### tech-debt/ (14 files)
 
-- [naive-aware-datetime-columns.md](tech-debt/naive-aware-datetime-columns.md) (3KB, 2026-07-03) **RECENT**
 - [README.md](tech-debt/README.md) (3KB, 2026-07-03) **RECENT**
+- [naive-aware-datetime-columns.md](tech-debt/naive-aware-datetime-columns.md) (3KB, 2026-07-03) **RECENT**
 - [ruff-version-drift-ci.md](tech-debt/ruff-version-drift-ci.md) (2KB, 2026-07-03) **RECENT**
 - [source-tagging-unreliable.md](tech-debt/source-tagging-unreliable.md) (2KB, 2026-03-12)
 - [_TEMPLATE.md](tech-debt/_TEMPLATE.md) (1KB, 2026-03-09)
@@ -104,9 +104,10 @@
 - [README.md](reference/decisions/README.md) (2KB, 2026-07-03) **RECENT**
 - [_TEMPLATE.md](reference/decisions/_TEMPLATE.md) (1KB, 2026-07-03) **RECENT**
 
-### reference/technical/ (1 files)
+### reference/technical/ (2 files)
 
 - [m4b-intelligence-design-brief.md](reference/technical/m4b-intelligence-design-brief.md) (10KB, 2026-07-03) **RECENT**
+- [relevance-model-notes.md](reference/technical/relevance-model-notes.md) (4KB, 2026-07-03) **RECENT**
 
 ### archive/completed/ (6 files)
 
@@ -135,15 +136,15 @@
 ## Recently Modified (last 7 days)
 
 1. [ARCHITECTURE.md](ARCHITECTURE.md) (today)
-2. [naive-aware-datetime-columns.md](tech-debt/naive-aware-datetime-columns.md) (today)
-3. [INDEX.md](INDEX.md) (today)
-4. [m4b-intelligence-design-brief.md](reference/technical/m4b-intelligence-design-brief.md) (today)
+2. [m4b-intelligence-design-brief.md](reference/technical/m4b-intelligence-design-brief.md) (today)
+3. [relevance-model-notes.md](reference/technical/relevance-model-notes.md) (today)
+4. [INDEX.md](INDEX.md) (today)
 5. [README.md](tech-debt/README.md) (today)
-6. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
-7. [README.md](README.md) (today)
-8. [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) (today)
-9. [002-privacy-first-ai.md](reference/decisions/002-privacy-first-ai.md) (today)
-10. [003-content-deduplication.md](reference/decisions/003-content-deduplication.md) (today)
+6. [naive-aware-datetime-columns.md](tech-debt/naive-aware-datetime-columns.md) (today)
+7. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
+8. [README.md](README.md) (today)
+9. [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) (today)
+10. [002-privacy-first-ai.md](reference/decisions/002-privacy-first-ai.md) (today)
 
 ---
 
