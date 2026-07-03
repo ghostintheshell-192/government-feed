@@ -41,6 +41,25 @@ feed-auto-recovery, feed-admin-tools, document-indexing — in `specs/planned/`.
 - Lint cleanup of `backend/tests` (20 pre-existing ruff findings, mostly autofixable)
 - `ruff format` one-off pass on 13 legacy files, then enforce in format-check.sh
 
+## M4b — Planning (specs ready)
+
+Design foundation (read in this order before implementing):
+[design brief](reference/technical/m4b-intelligence-design-brief.md) →
+[relevance model notes](reference/technical/relevance-model-notes.md) →
+[prior art](reference/technical/axes-classification-prior-art.md).
+
+| Spec | Priority | Depends on | Status |
+|------|----------|------------|--------|
+| [Eval Harness](specs/planned/eval-harness.md) | must-have | — | Spec ready |
+| [Categorization Baseline (M4b.1)](specs/planned/categorization-baseline.md) | must-have | eval-harness | Spec ready |
+| [Categorization Model (M4b.2)](specs/planned/categorization-model.md) | should-have | baseline | Spec ready |
+| [Axes & Cadence (M4b.3)](specs/planned/axes-and-cadence.md) | should-have | harness + baseline | Spec ready |
+| [Feed Discovery / Track 0](specs/planned/feed-discovery-automated.md) | must-have | — (parallel) | Spec rewritten (enumeration-first) |
+
+**Pre-implementation gate**: apply the UTCDateTime TypeDecorator fix
+(`tech-debt/naive-aware-datetime-columns.md`) before the `enrichments`
+migration lands.
+
 ### Backlog (deferred to later milestones)
 
 See `specs/backlog/` — includes data export, daily digest, notifications, feed registry, config import/export.
