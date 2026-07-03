@@ -131,11 +131,11 @@ When analyzing tech-debt, bugs, or investigating issues:
 ## Quick Commands
 
 ```bash
-# Backend - run
-cd backend && uvicorn backend.src.api.main:app --reload
+# Backend - run (from project root — imports resolve as backend.src.*)
+uvicorn backend.src.api.main:app --reload
 
 # Frontend - run
-cd frontend && pnpm dev
+cd frontend && npm run dev
 
 # Tests (entry point — stack knowledge lives inside the script)
 .development/automation/test.sh            # all
