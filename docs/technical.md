@@ -77,8 +77,8 @@
 ### Development
 
 ```bash
-# Backend
-cd backend && uvicorn backend.src.api.main:app --reload
+# Backend (from project root)
+uvicorn backend.src.api.main:app --reload
 
 # Frontend
 cd frontend && npm run dev

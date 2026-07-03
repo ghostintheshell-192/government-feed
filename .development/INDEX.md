@@ -1,6 +1,6 @@
 # INDEX - Government Feed Development Documentation
 
-*Auto-generated: 2026-07-03 21:28*
+*Auto-generated: 2026-07-03 21:40*
 
 ---
 
@@ -121,7 +121,7 @@
 
 - [README.md](docs/README.md) (<1KB, 2026-03-09)
 - [roadmap.md](docs/roadmap.md) (5KB, 2026-03-09)
-- [technical.md](docs/technical.md) (4KB, 2026-03-09)
+- [technical.md](docs/technical.md) (4KB, 2026-07-03) **RECENT**
 - [vision.md](docs/vision.md) (14KB, 2025-10-25)
 
 ---
@@ -129,8 +129,8 @@
 ## Recently Modified (last 7 days)
 
 1. [ARCHITECTURE.md](ARCHITECTURE.md) (today)
-2. [README.md](tech-debt/README.md) (today)
-3. [INDEX.md](INDEX.md) (today)
+2. [INDEX.md](INDEX.md) (today)
+3. [README.md](tech-debt/README.md) (today)
 4. [starter-packs.md](specs/implemented/starter-packs.md) (today)
 5. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
 6. [bulk-fetch-all-sources.md](specs/implemented/bulk-fetch-all-sources.md) (today)
