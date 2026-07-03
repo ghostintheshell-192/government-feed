@@ -85,12 +85,35 @@ behavior modeling, adapts to any value system) vs universal importance
   axes are a second classifier sharing the same harness (M4b.3 becomes
   "axes + cadence" rather than "scoring").
 
-## 5. Still open
+## 5. Taxonomy seed (§7.2 — answered 2026-07-04)
 
-- §7.2 taxonomy seed: brief proposed legislation, economy & finance,
-  health, environment, security & defense, justice, infrastructure,
-  education, foreign affairs (+ candidates: science & research, energy,
-  labor & welfare, migration, digital). Awaiting Valentina's cut.
+Valentina's eight (her stated preferences, listed first):
+
+1. Sicurezza & difesa
+2. Economia & finanza
+3. Istruzione
+4. Affari esteri
+5. Scienza & ricerca
+6. Energia
+7. Lavoro & welfare
+8. Digitale
+
+Completed to twelve with the categories institutional output makes
+unavoidable (gazettes, health agencies, environmental agencies, courts):
+
+9. Salute
+10. Ambiente
+11. Legislazione
+12. Giustizia
+
+Infrastructure is folded into Economia & finanza for now. This is **seed
+v0**: flat, multi-label, and subject to the golden-set reality check (§5 of
+the design brief — the golden set will reveal which categories actually
+occur; merge or split *then*, on evidence).
+
+## 6. Still open
+
 - Whether the fact↔opinion classifier needs its own golden subset with
   institutional edge cases (a minister's speech is an *act* — performative
-  — even though it is made of opinions).
+  — even though it is made of opinions; "whatever it takes" was an event,
+  not an opinion).

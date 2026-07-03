@@ -157,10 +157,11 @@ Concrete minimal apparatus (an afternoon, not a research project):
 
 ## 7. Questions only Valentina can answer
 
-> **Update 2026-07-03**: §7.1 and §7.3 are answered — see
+> **Update 2026-07-04**: all three answered — see
 > [relevance-model-notes.md](relevance-model-notes.md) (fact-vs-opinion axis,
-> telegiornale cadence criterion, epistemics/topics split). §7.2 (taxonomy
-> seed) remains open.
+> telegiornale cadence criterion, epistemics/topics split, taxonomy seed v0:
+> Valentina's eight + four institutional inevitables). Nothing in this
+> section blocks M4b any longer.
 
 These are not blockers to start (the wedge doesn't need them), but relevance
 work is blocked on the first one, and writing answers down — even
@@ -179,21 +180,40 @@ provisional — will save future sessions from guessing:
 
 ## 8. Suggested sequencing
 
+*(Revised 2026-07-04 after the relevance conversation — see
+[relevance-model-notes.md](relevance-model-notes.md).)*
+
+- **Track 0 (parallel, ongoing) — Catalog critical mass**: robust categories
+  need corpus breadth (105 sources, 6 subscribed, zero GLOBAL/LOCAL as of
+  2026-07-03 is not it). Grow by *enumerating institutions, not searching
+  for feeds*: Wikidata/SPARQL as the entity index + the existing URL-based
+  feed discovery on each official website; national government directories;
+  official gazettes; central banks and statistical offices. This reframes
+  the carried-over `feed-discovery-automated` spec (text search demoted to
+  last resort). Runs alongside every M4b phase.
 - **M4b.1 — Baseline categorization**: source-metadata + keyword rules,
-  flat taxonomy, labels visible on cards + sidebar filter integration,
-  golden set + eval harness built alongside. *Done when: the sidebar
-  filters by category and the eval number exists.*
+  taxonomy seed v0 (twelve flat multi-label categories, notes §5), labels
+  visible on cards + sidebar filter integration, golden set + eval harness
+  built alongside. Golden set is labeled on categories **and** on the
+  relevance axes, with Valentina's four anchor examples as the first
+  entries. *Done when: the sidebar filters by category and the eval number
+  exists.*
 - **M4b.2 — Model-assisted categorization**: LLM (or embedding classifier)
   only on items where the baseline is unsure; must beat baseline on the
   golden set to ship. Enrichment table, batch job, coverage in Admin.
   *Done when: measured lift over baseline, silent-failure metrics live.*
-- **M4b.3 — Relevance from signals**: read/save/dismiss signals + category
-  weights → ranking, only after §7 question 1 is answered. *Done when: the
-  default feed ordering is measurably more useful to Valentina than
-  chronological — she is the metric.*
-- **Later / conditional**: trends (needs corpus volume), clustering of
-  related items (useful for the verification substrate), sentiment
-  (probably never — see §2).
+- **M4b.3 — Axes & cadence** (formerly "relevance from signals" — no longer
+  blocked, and decomposed): classify nature (fact↔opinion), perishability,
+  consequence per item; cadence policy (push / standard / ambient) from the
+  perishability × consequence matrix; enrichment latency stratified by the
+  same signal (fast path at poll time via cheap document-type heuristics,
+  nightly batch for the rest). Read/save/dismiss signals become a
+  tie-breaker and an eval input, not the foundation — no behavioral
+  profiling (notes §3). *Done when: the default ordering is measurably more
+  useful to Valentina than chronological — she is the metric.*
+- **Later / conditional**: trends (needs the corpus volume Track 0 is
+  building), clustering of related items (useful for the verification
+  substrate), sentiment (probably never — see §2).
 
 ---
 

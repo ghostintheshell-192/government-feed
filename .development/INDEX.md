@@ -1,6 +1,6 @@
 # INDEX - Government Feed Development Documentation
 
-*Auto-generated: 2026-07-03 23:56*
+*Auto-generated: 2026-07-04 00:04*
 
 ---
 
@@ -19,7 +19,7 @@
 
 ### (root)/ (4 files)
 
-- [ARCHITECTURE.md](ARCHITECTURE.md) (3KB, 2026-07-03) **RECENT**
+- [ARCHITECTURE.md](ARCHITECTURE.md) (3KB, 2026-07-04) **RECENT**
 - [INDEX.md](INDEX.md) (8KB, 2026-07-03) **RECENT**
 - [CURRENT-STATUS.md](CURRENT-STATUS.md) (3KB, 2026-07-03) **RECENT**
 - [README.md](README.md) (3KB, 2026-07-03) **RECENT**
@@ -106,8 +106,8 @@
 
 ### reference/technical/ (2 files)
 
-- [m4b-intelligence-design-brief.md](reference/technical/m4b-intelligence-design-brief.md) (10KB, 2026-07-03) **RECENT**
-- [relevance-model-notes.md](reference/technical/relevance-model-notes.md) (4KB, 2026-07-03) **RECENT**
+- [m4b-intelligence-design-brief.md](reference/technical/m4b-intelligence-design-brief.md) (12KB, 2026-07-04) **RECENT**
+- [relevance-model-notes.md](reference/technical/relevance-model-notes.md) (5KB, 2026-07-04) **RECENT**
 
 ### archive/completed/ (6 files)
 
