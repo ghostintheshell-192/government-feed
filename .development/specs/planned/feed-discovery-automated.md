@@ -1,227 +1,140 @@
-# Automated Feed Discovery
+# Automated Feed Discovery — Enumerate Institutions, Not Search for Feeds
 
 **Status**: planned
-**Milestone**: M4a-Feed-Infrastructure
+**Milestone**: M4b-Intelligence (Track 0 — catalog critical mass, runs in parallel)
 **Priority**: must-have
-**Depends on**: [source-management](../implemented/source-management.md), [error-resilience](../implemented/error-resilience.md)
+**Depends on**: [source-management](../implemented/source-management.md), [source-catalog-subscriptions](../implemented/source-catalog-subscriptions.md), [error-resilience](../implemented/error-resilience.md)
+**Related docs**: [M4b design brief](../../reference/technical/m4b-intelligence-design-brief.md) §8 Track 0
+
+> **Rewritten 2026-07-04.** The original spec made text search (Exa/Brave)
+> the primary mechanism. This version inverts the strategy: **institutions
+> are enumerable; feeds are not.** Authoritative registries give us the
+> entity list; our existing URL-based discovery does the rest. Text search
+> is demoted to last resort. Catalog state motivating this: 105 sources,
+> zero GLOBAL, zero LOCAL, 2 were untagged — both breadth and metadata
+> quality must scale together.
 
 ## Summary
 
-Replace the broken DuckDuckGo text search in `FeedDiscoveryService` with a multi-provider search system (Exa primary, Brave Search fallback), enabling both user-initiated feed discovery and system-initiated auto-recovery for dead feeds.
+Grow the catalog from ~100 to thousands of institutional sources by
+enumerating institutions from structured registries (Wikidata first,
+official government directories second), running the existing URL-based
+feed discovery against each institution's official website, validating and
+importing into the catalog **with geographic metadata attached at the
+source** — fixing the tagging-quality debt at its root instead of after
+the fact.
 
-## User Stories
+## Why enumeration-first (argued)
 
-- As a user, I want to search for institutional feeds by topic/keyword and get validated results
-- As a user, I want the system to automatically find replacement URLs when feeds break
-- As a user, I want to add discovered feeds to my sources with one click
-- As an operator, I want to configure which search providers are active without code changes
+- **The entity list already exists.** Wikidata models government agencies,
+  ministries, central banks, statistical offices, courts, and international
+  organizations with `official website` properties and country/instance-of
+  relations. One SPARQL query per country/class yields hundreds of
+  candidates *with metadata we need anyway* (country, institution type).
+- **Our best tool is already built.** URL-based discovery
+  (`_discover_from_url`: HTML link tags + common paths + feedparser
+  validation) works well — it lacked only a systematic list of URLs to
+  visit. Enumeration supplies exactly that.
+- **Metadata comes free and fixes a known debt.** `source-tagging-unreliable`
+  (39/103 untagged) exists because tagging happened after import, by hand.
+  Wikidata's country + institution class map directly to `country_code` and
+  `geographic_level` (international org → GLOBAL/CONTINENTAL; national
+  ministry → NATIONAL; regional agency → LOCAL) at import time. This also
+  fills the empty GLOBAL and LOCAL levels the sidebar currently shows.
+- **Privacy posture improves**: queries to the public Wikidata endpoint are
+  about institutions, not user interests; text-search providers (which see
+  query intent) become optional instead of central.
+- Categorization robustness (M4b) needs corpus breadth — brief §8 Track 0.
 
-## Context
+## Design
 
-The current `FeedDiscoveryService` has two modes:
+### Pipeline
 
-1. **URL-based discovery** (`_discover_from_url`) — works well, parses HTML for feed links + tries common paths
-2. **Text search** (`_search_sites` via DuckDuckGo) — broken, returns no results
+```text
+1. ENUMERATE   Wikidata SPARQL per (country × institution class)
+               + curated directory seed lists (data/feed-sources/registries/)
+               → candidates: {name, official_url, country, class, wikidata_id}
+2. DISCOVER    existing FeedDiscoveryService._discover_from_url(official_url)
+               (bounded concurrency, resilience patterns already in place)
+3. VALIDATE    feedparser dry-run + HTTP check (existing validation path)
+4. MAP         wikidata class/country → source_type, geographic_level,
+               country_code, tags (mapping table in data/, editable)
+5. IMPORT      into catalog (NOT auto-subscribed — catalog/subscription
+               split per ADR-007 means growth never spams the user's feed)
+               provenance stored: wikidata_id, registry, discovered_at
+6. REPORT      NDJSON streaming progress (existing pattern), summary:
+               found / no-feed / dead / already-known per registry
+```
 
-This spec replaces mode 2 with a provider-based search architecture and adds batch validation capabilities. Mode 1 remains unchanged.
+### Enumeration sources, in priority order
+
+1. **Wikidata SPARQL** — government agencies, ministries, central banks,
+   statistical offices, supreme/constitutional courts, international
+   organizations; start with project languages' countries (IT, DE, FR, CH,
+   AT, BE, NL, EU institutions) + GLOBAL class (UN system, IMF, World Bank,
+   OECD, WTO, BIS, international courts)
+2. **Curated registry seeds** (checked-in JSON/OPML under
+   `data/feed-sources/registries/`): gov.uk organisations list, admin.ch,
+   EU agencies list, official gazettes index — high-value lists that
+   Wikidata may lag on
+3. **Text search providers (Exa/Brave)** — LAST RESORT, user-initiated only
+   (`POST /api/discover` with a query), for institutions the registries
+   miss. Provider architecture, secrets management (env vars, never logged,
+   `.env.example`), quota tracking and graceful fallback as specified in the
+   previous revision of this spec — that design carries over unchanged for
+   this mode.
+
+### Execution model
+
+- Admin script first (`scripts/enumerate_institutions.py`), same pattern as
+  the existing feed crawler; Admin UI trigger with streaming progress later
+- Idempotent: candidates deduped by normalized official_url and feed_url
+  against the catalog; re-runs only add news
+- Politeness: bounded concurrency, per-domain rate limiting, standard
+  browser UA (existing scraper conventions), respect robots.txt for
+  crawled directory pages
 
 ## Requirements
 
 ### Functional
 
-- [ ] Provider-based search architecture with pluggable backends
-- [ ] Exa Search as primary provider (neural search, best for institutional content)
-- [ ] Brave Search as fallback provider (generous free tier, 1000 queries/month)
-- [ ] Automatic fallback: if primary fails or is over quota → try next provider
-- [ ] Search query construction: accept keyword/topic, produce optimized queries per provider
-- [ ] Result pipeline: search → extract candidate URLs → discover feeds from each URL → validate → rank
-- [ ] Batch validation: given N candidate URLs, validate all concurrently (bounded concurrency)
-- [ ] Deduplication: skip URLs already in the user's sources
-- [ ] Return structured results: feed URL, title, type (RSS/Atom), entry count, source site
-- [ ] Rate limiting: respect provider quotas (track usage, stop before exceeding limits)
-- [ ] REST API endpoint for user-initiated discovery: `POST /api/discover`
+- [ ] SPARQL enumeration for ≥8 countries + GLOBAL/CONTINENTAL classes
+- [ ] Registry seed-list loader (JSON/OPML) + ≥2 curated lists checked in
+- [ ] Discovery+validation reuse with bounded concurrency
+- [ ] Metadata mapping table (wikidata class → source fields) as data file
+- [ ] Catalog import with provenance fields; never auto-subscribes
+- [ ] NDJSON progress + final report; failures listed, not silent
+- [ ] Search-provider mode preserved as user-initiated endpoint (optional,
+  disabled when no API key — existing availability rules)
 
 ### Non-Functional
 
-- Performance: Discovery results returned within 30 seconds for typical queries
-- Resilience: Provider failures are handled gracefully with fallback
-- Security: API keys never in code, never in logs, never in API responses
-- Cost: Minimize search API calls (cache results, batch efficiently)
-
-## Technical Design
-
-### Secrets Management
-
-API keys are managed as environment variables, loaded via the existing settings infrastructure:
-
-```text
-# .env (local development — in .gitignore, NEVER committed)
-EXA_API_KEY=exa-...
-BRAVE_SEARCH_API_KEY=BSA...
-
-# Production: set via deployment environment (systemd env, Docker secrets, etc.)
-```
-
-**Rules:**
-
-1. `.env` is in `.gitignore` — verified at implementation time
-2. Keys loaded via `os.environ` or pydantic `BaseSettings` — never hardcoded
-3. Keys never logged — log `"Exa search OK"`, not `"Exa search with key exa-xxx"`
-4. Keys never exposed in API responses — discovery endpoint returns feeds, not provider details
-5. Provider availability determined at startup: if key is missing, provider is disabled (not an error)
-6. A `.env.example` file documents required variables with placeholder values
-
-### Provider Architecture
-
-```python
-class SearchProvider(ABC):
-    """Abstract search provider interface."""
-
-    @abstractmethod
-    async def search(self, query: str, max_results: int = 5) -> list[str]:
-        """Search and return candidate site URLs."""
-        ...
-
-    @abstractmethod
-    def is_available(self) -> bool:
-        """Check if provider is configured and within quota."""
-        ...
-
-class ExaSearchProvider(SearchProvider):
-    """Exa neural search — best for institutional/government content."""
-    # Uses EXA_API_KEY from environment
-
-class BraveSearchProvider(SearchProvider):
-    """Brave Web Search — fallback with generous free tier."""
-    # Uses BRAVE_SEARCH_API_KEY from environment
-```
-
-### Discovery Pipeline
-
-```text
-User query: "European Central Bank monetary policy"
-  │
-  ├─ 1. SearchProvider.search(query) → candidate URLs
-  │     [ecb.europa.eu, ecb.europa.eu/press, ...]
-  │
-  ├─ 2. FeedDiscoveryService._discover_from_url(url) for each candidate
-  │     (existing logic: HTML link tags + common paths + direct feed check)
-  │
-  ├─ 3. Validate with feedparser → DiscoveredFeed objects
-  │
-  ├─ 4. Deduplicate against existing sources
-  │
-  └─ 5. Return ranked results (by entry_count, feed_type preference)
-```
-
-### Integration with Health Monitor
-
-The Health Monitor calls discovery in "recovery mode":
-
-```python
-# Recovery mode — search is more targeted
-async def recover_feed(self, source: Source) -> DiscoveredFeed | None:
-    """Attempt to find a replacement URL for a dead feed."""
-    # Build recovery query from source metadata
-    domain = urlparse(source.feed_url).netloc
-    query = f"{source.name} RSS feed site:{domain}"
-
-    # Try discovery with fallback chain
-    feeds, _ = await self.discover(query)
-
-    # Return best match (if any)
-    return feeds[0] if feeds else None
-```
-
-### Modified FeedDiscoveryService
-
-```python
-class FeedDiscoveryService:
-    def __init__(self, timeout: float = 15.0) -> None:
-        self._timeout = timeout
-        self._providers = self._init_providers()  # auto-detect available providers
-
-    def _init_providers(self) -> list[SearchProvider]:
-        """Initialize available search providers based on configured API keys."""
-        providers: list[SearchProvider] = []
-        if ExaSearchProvider.is_configured():
-            providers.append(ExaSearchProvider())
-        if BraveSearchProvider.is_configured():
-            providers.append(BraveSearchProvider())
-        if not providers:
-            logger.warning("No search providers configured — text search disabled")
-        return providers
-
-    async def discover(self, query: str) -> tuple[list[DiscoveredFeed], list[str]]:
-        # URL mode — unchanged
-        if query.startswith("http"):
-            return await self._discover_from_url(query), [query]
-
-        # Text mode — provider chain with fallback
-        for provider in self._providers:
-            if not provider.is_available():
-                continue
-            try:
-                candidate_urls = await provider.search(query)
-                if candidate_urls:
-                    return await self._discover_from_candidates(candidate_urls)
-            except Exception as e:
-                logger.warning("Provider %s failed: %s", provider.__class__.__name__, e)
-                continue
-
-        logger.warning("All search providers exhausted for query: %s", query)
-        return [], []
-```
-
-### REST API
-
-```text
-POST /api/discover
-Body: { "query": "European Central Bank monetary policy" }
-Response: {
-  "feeds": [
-    {
-      "url": "https://www.ecb.europa.eu/rss/press.html",
-      "title": "ECB Press Releases",
-      "feed_type": "RSS",
-      "site_url": "https://www.ecb.europa.eu",
-      "entry_count": 25
-    },
-    ...
-  ],
-  "providers_used": ["exa"],  // which providers were called (no keys exposed)
-  "search_available": true     // false if no providers configured
-}
-```
-
-### File Structure
-
-```text
-backend/src/infrastructure/
-├── feed_discovery.py          # Existing — refactored with provider support
-├── search_providers/          # New package
-│   ├── __init__.py
-│   ├── base.py                # SearchProvider ABC
-│   ├── exa_provider.py        # Exa implementation
-│   └── brave_provider.py      # Brave Search implementation
-```
+- Full enumeration run for one country completes unattended (resumable on
+  interruption; state by registry+entity id)
+- Catalog quality gate: imported sources must carry geographic_level and
+  country_code (the two-empty-sources incident cannot recur by construction)
+- No user data leaves the machine; only institution-related queries to
+  public endpoints
 
 ## Acceptance Criteria
 
-- [ ] Text search works via Exa when API key is configured
-- [ ] Brave Search works as fallback when Exa fails or is unavailable
-- [ ] System starts without errors even if no API keys are configured (search disabled gracefully)
-- [ ] API keys are loaded from environment only, never hardcoded or logged
-- [ ] `.env.example` documents all required/optional keys
-- [ ] `.env` is in `.gitignore`
-- [ ] Discovery results are validated (only real RSS/Atom feeds returned)
-- [ ] Results are deduplicated against existing sources
-- [ ] `POST /api/discover` endpoint returns structured results
-- [ ] Provider failures produce structured log entries (without exposing keys)
-- [ ] Recovery mode works for the Health Monitor use case
+- [ ] Catalog grows by ≥300 validated sources across ≥8 countries
+- [ ] GLOBAL and LOCAL levels are populated (sidebar shows all 4 levels
+  with real content available to subscribe)
+- [ ] 100% of newly imported sources have geographic_level + country_code
+- [ ] Re-running the script is a no-op on unchanged registries
+- [ ] Health monitor covers new sources automatically (subscribed ones)
+
+## Out of Scope
+
+- Auto-recovery of dead feeds ([feed-auto-recovery](feed-auto-recovery.md))
+- Community feed registry (backlog — the public-contribution evolution)
+- Auto-subscription or starter-pack bundling of the new catalog entries
 
 ## Open Questions
 
-- Should we cache discovery results (e.g., same query within 24h returns cached)?
-- Maximum concurrent URL validations — 5? 10? (to avoid overwhelming target sites)
-- Should the API endpoint require authentication when multi-user is implemented?
+- Wikidata completeness varies by country — measure hit-rate per country in
+  the first run and decide where curated lists must compensate
+- Some institutions expose feeds only per-section (e.g. per-ministry
+  newsroom paths): extend common-path list with institutional patterns
+  (`/press/rss`, `/newsroom/feed`, `/aktuelles/rss`) as data, not code

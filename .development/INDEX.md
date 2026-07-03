@@ -1,6 +1,6 @@
 # INDEX - Government Feed Development Documentation
 
-*Auto-generated: 2026-07-04 00:35*
+*Auto-generated: 2026-07-04 00:46*
 
 ---
 
@@ -20,8 +20,8 @@
 ### (root)/ (4 files)
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) (3KB, 2026-07-04) **RECENT**
+- [CURRENT-STATUS.md](CURRENT-STATUS.md) (4KB, 2026-07-04) **RECENT**
 - [INDEX.md](INDEX.md) (8KB, 2026-07-04) **RECENT**
-- [CURRENT-STATUS.md](CURRENT-STATUS.md) (3KB, 2026-07-03) **RECENT**
 - [README.md](README.md) (3KB, 2026-07-03) **RECENT**
 
 ### specs/ (1 files)
@@ -66,13 +66,17 @@
 - [structured-logging.md](specs/implemented/structured-logging.md) (1KB, 2026-03-09)
 - [testing-suite.md](specs/implemented/testing-suite.md) (2KB, 2026-03-09)
 
-### specs/planned/ (5 files)
+### specs/planned/ (9 files)
 
+- [feed-discovery-automated.md](specs/planned/feed-discovery-automated.md) (7KB, 2026-07-04) **RECENT**
+- [axes-and-cadence.md](specs/planned/axes-and-cadence.md) (6KB, 2026-07-04) **RECENT**
+- [categorization-model.md](specs/planned/categorization-model.md) (5KB, 2026-07-04) **RECENT**
+- [categorization-baseline.md](specs/planned/categorization-baseline.md) (6KB, 2026-07-04) **RECENT**
+- [eval-harness.md](specs/planned/eval-harness.md) (5KB, 2026-07-04) **RECENT**
 - [feed-auto-recovery.md](specs/planned/feed-auto-recovery.md) (3KB, 2026-07-03) **RECENT**
 - [document-indexing.md](specs/planned/document-indexing.md) (3KB, 2026-03-12)
 - [i18n-additional-languages.md](specs/planned/i18n-additional-languages.md) (<1KB, 2026-03-12)
 - [feed-admin-tools.md](specs/planned/feed-admin-tools.md) (5KB, 2026-03-09)
-- [feed-discovery-automated.md](specs/planned/feed-discovery-automated.md) (8KB, 2026-03-09)
 
 ### tech-debt/ (14 files)
 
@@ -137,15 +141,15 @@
 ## Recently Modified (last 7 days)
 
 1. [ARCHITECTURE.md](ARCHITECTURE.md) (today)
-2. [axes-classification-prior-art.md](reference/technical/axes-classification-prior-art.md) (today)
-3. [INDEX.md](INDEX.md) (today)
-4. [m4b-intelligence-design-brief.md](reference/technical/m4b-intelligence-design-brief.md) (today)
-5. [relevance-model-notes.md](reference/technical/relevance-model-notes.md) (today)
-6. [README.md](tech-debt/README.md) (today)
-7. [naive-aware-datetime-columns.md](tech-debt/naive-aware-datetime-columns.md) (today)
-8. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
-9. [README.md](README.md) (today)
-10. [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) (today)
+2. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
+3. [feed-discovery-automated.md](specs/planned/feed-discovery-automated.md) (today)
+4. [axes-and-cadence.md](specs/planned/axes-and-cadence.md) (today)
+5. [categorization-model.md](specs/planned/categorization-model.md) (today)
+6. [categorization-baseline.md](specs/planned/categorization-baseline.md) (today)
+7. [eval-harness.md](specs/planned/eval-harness.md) (today)
+8. [INDEX.md](INDEX.md) (today)
+9. [axes-classification-prior-art.md](reference/technical/axes-classification-prior-art.md) (today)
+10. [README.md](tech-debt/README.md) (today)
 
 ---
 
