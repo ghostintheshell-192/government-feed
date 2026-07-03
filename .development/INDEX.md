@@ -1,6 +1,6 @@
 # INDEX - Government Feed Development Documentation
 
-*Auto-generated: 2026-07-03 22:13*
+*Auto-generated: 2026-07-03 22:37*
 
 ---
 
@@ -20,8 +20,8 @@
 ### (root)/ (4 files)
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) (3KB, 2026-07-03) **RECENT**
-- [INDEX.md](INDEX.md) (7KB, 2026-07-03) **RECENT**
 - [CURRENT-STATUS.md](CURRENT-STATUS.md) (3KB, 2026-07-03) **RECENT**
+- [INDEX.md](INDEX.md) (7KB, 2026-07-03) **RECENT**
 - [README.md](README.md) (3KB, 2026-07-03) **RECENT**
 
 ### specs/ (1 files)
@@ -43,11 +43,11 @@
 
 ### specs/implemented/ (22 files)
 
-- [starter-packs.md](specs/implemented/starter-packs.md) (8KB, 2026-07-03) **RECENT**
 - [bulk-fetch-all-sources.md](specs/implemented/bulk-fetch-all-sources.md) (1KB, 2026-07-03) **RECENT**
 - [catalog-browse-ui.md](specs/implemented/catalog-browse-ui.md) (2KB, 2026-07-03) **RECENT**
 - [feed-health-monitor.md](specs/implemented/feed-health-monitor.md) (4KB, 2026-07-03) **RECENT**
 - [source-catalog-subscriptions.md](specs/implemented/source-catalog-subscriptions.md) (3KB, 2026-07-03) **RECENT**
+- [starter-packs.md](specs/implemented/starter-packs.md) (8KB, 2026-07-03) **RECENT**
 - [ai-summarization.md](specs/implemented/ai-summarization.md) (2KB, 2026-03-09)
 - [background-workers.md](specs/implemented/background-workers.md) (2KB, 2026-03-09)
 - [content-deduplication.md](specs/implemented/content-deduplication.md) (1KB, 2026-03-09)
@@ -68,7 +68,7 @@
 
 ### specs/planned/ (5 files)
 
-- [feed-auto-recovery.md](specs/planned/feed-auto-recovery.md) (3KB, 2026-03-13)
+- [feed-auto-recovery.md](specs/planned/feed-auto-recovery.md) (3KB, 2026-07-03) **RECENT**
 - [document-indexing.md](specs/planned/document-indexing.md) (3KB, 2026-03-12)
 - [i18n-additional-languages.md](specs/planned/i18n-additional-languages.md) (<1KB, 2026-03-12)
 - [feed-admin-tools.md](specs/planned/feed-admin-tools.md) (5KB, 2026-03-09)
@@ -103,6 +103,10 @@
 - [README.md](reference/decisions/README.md) (2KB, 2026-07-03) **RECENT**
 - [_TEMPLATE.md](reference/decisions/_TEMPLATE.md) (1KB, 2026-07-03) **RECENT**
 
+### reference/technical/ (1 files)
+
+- [m4b-intelligence-design-brief.md](reference/technical/m4b-intelligence-design-brief.md) (10KB, 2026-07-03) **RECENT**
+
 ### archive/completed/ (6 files)
 
 - [2026-03-11_core-entity-model-misalignment.md](archive/completed/2026-03-11_core-entity-model-misalignment.md) (4KB, 2026-03-12)
@@ -130,15 +134,15 @@
 ## Recently Modified (last 7 days)
 
 1. [ARCHITECTURE.md](ARCHITECTURE.md) (today)
-2. [README.md](tech-debt/README.md) (today)
-3. [INDEX.md](INDEX.md) (today)
-4. [ruff-version-drift-ci.md](tech-debt/ruff-version-drift-ci.md) (today)
-5. [starter-packs.md](specs/implemented/starter-packs.md) (today)
-6. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
-7. [bulk-fetch-all-sources.md](specs/implemented/bulk-fetch-all-sources.md) (today)
-8. [catalog-browse-ui.md](specs/implemented/catalog-browse-ui.md) (today)
-9. [feed-health-monitor.md](specs/implemented/feed-health-monitor.md) (today)
-10. [source-catalog-subscriptions.md](specs/implemented/source-catalog-subscriptions.md) (today)
+2. [m4b-intelligence-design-brief.md](reference/technical/m4b-intelligence-design-brief.md) (today)
+3. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
+4. [INDEX.md](INDEX.md) (today)
+5. [README.md](README.md) (today)
+6. [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) (today)
+7. [002-privacy-first-ai.md](reference/decisions/002-privacy-first-ai.md) (today)
+8. [003-content-deduplication.md](reference/decisions/003-content-deduplication.md) (today)
+9. [004-master-detail-layout.md](reference/decisions/004-master-detail-layout.md) (today)
+10. [005-geographic-levels-navigation.md](reference/decisions/005-geographic-levels-navigation.md) (today)
 
 ---
 
