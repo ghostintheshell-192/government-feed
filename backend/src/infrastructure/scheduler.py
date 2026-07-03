@@ -82,15 +82,24 @@ class FeedScheduler:
                 if s.id in set(subscribed_ids)
             ]
             for source in sources:
-                if source.last_fetched is not None:
-                    elapsed = (datetime.now(UTC) - source.last_fetched).total_seconds() / 60
-                    if elapsed < source.update_frequency_minutes:
-                        continue
-                parser = FeedParserService(uow)
-                count = parser.parse_and_import(source)
-                self._logger.info(
-                    "Polled source %s: %d new items", source.name, count
-                )
+                try:
+                    if source.last_fetched is not None:
+                        last_fetched = source.last_fetched
+                        # SQLite DateTime columns return naive datetimes;
+                        # stored values are UTC by convention.
+                        if last_fetched.tzinfo is None:
+                            last_fetched = last_fetched.replace(tzinfo=UTC)
+                        elapsed = (datetime.now(UTC) - last_fetched).total_seconds() / 60
+                        if elapsed < source.update_frequency_minutes:
+                            continue
+                    parser = FeedParserService(uow)
+                    count = parser.parse_and_import(source)
+                    self._logger.info(
+                        "Polled source %s: %d new items", source.name, count
+                    )
+                except Exception:
+                    # One broken source must not abort the whole poll cycle.
+                    self._logger.exception("Error polling source %s", source.name)
         except Exception:
             self._logger.exception("Error polling feeds")
         finally:

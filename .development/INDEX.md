@@ -1,6 +1,6 @@
 # INDEX - Government Feed Development Documentation
 
-*Auto-generated: 2026-07-03 22:37*
+*Auto-generated: 2026-07-03 23:09*
 
 ---
 
@@ -20,8 +20,8 @@
 ### (root)/ (4 files)
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) (3KB, 2026-07-03) **RECENT**
+- [INDEX.md](INDEX.md) (8KB, 2026-07-03) **RECENT**
 - [CURRENT-STATUS.md](CURRENT-STATUS.md) (3KB, 2026-07-03) **RECENT**
-- [INDEX.md](INDEX.md) (7KB, 2026-07-03) **RECENT**
 - [README.md](README.md) (3KB, 2026-07-03) **RECENT**
 
 ### specs/ (1 files)
@@ -74,8 +74,9 @@
 - [feed-admin-tools.md](specs/planned/feed-admin-tools.md) (5KB, 2026-03-09)
 - [feed-discovery-automated.md](specs/planned/feed-discovery-automated.md) (8KB, 2026-03-09)
 
-### tech-debt/ (13 files)
+### tech-debt/ (14 files)
 
+- [naive-aware-datetime-columns.md](tech-debt/naive-aware-datetime-columns.md) (3KB, 2026-07-03) **RECENT**
 - [README.md](tech-debt/README.md) (3KB, 2026-07-03) **RECENT**
 - [ruff-version-drift-ci.md](tech-debt/ruff-version-drift-ci.md) (2KB, 2026-07-03) **RECENT**
 - [source-tagging-unreliable.md](tech-debt/source-tagging-unreliable.md) (2KB, 2026-03-12)
@@ -134,15 +135,15 @@
 ## Recently Modified (last 7 days)
 
 1. [ARCHITECTURE.md](ARCHITECTURE.md) (today)
-2. [m4b-intelligence-design-brief.md](reference/technical/m4b-intelligence-design-brief.md) (today)
-3. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
-4. [INDEX.md](INDEX.md) (today)
-5. [README.md](README.md) (today)
-6. [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) (today)
-7. [002-privacy-first-ai.md](reference/decisions/002-privacy-first-ai.md) (today)
-8. [003-content-deduplication.md](reference/decisions/003-content-deduplication.md) (today)
-9. [004-master-detail-layout.md](reference/decisions/004-master-detail-layout.md) (today)
-10. [005-geographic-levels-navigation.md](reference/decisions/005-geographic-levels-navigation.md) (today)
+2. [naive-aware-datetime-columns.md](tech-debt/naive-aware-datetime-columns.md) (today)
+3. [INDEX.md](INDEX.md) (today)
+4. [m4b-intelligence-design-brief.md](reference/technical/m4b-intelligence-design-brief.md) (today)
+5. [README.md](tech-debt/README.md) (today)
+6. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
+7. [README.md](README.md) (today)
+8. [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) (today)
+9. [002-privacy-first-ai.md](reference/decisions/002-privacy-first-ai.md) (today)
+10. [003-content-deduplication.md](reference/decisions/003-content-deduplication.md) (today)
 
 ---
 
