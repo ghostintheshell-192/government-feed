@@ -1,6 +1,6 @@
 # INDEX - Government Feed Development Documentation
 
-*Auto-generated: 2026-07-03 21:25*
+*Auto-generated: 2026-07-03 21:28*
 
 ---
 
@@ -20,8 +20,8 @@
 ### (root)/ (4 files)
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) (3KB, 2026-07-03) **RECENT**
-- [CURRENT-STATUS.md](CURRENT-STATUS.md) (3KB, 2026-07-03) **RECENT**
 - [INDEX.md](INDEX.md) (7KB, 2026-07-03) **RECENT**
+- [CURRENT-STATUS.md](CURRENT-STATUS.md) (3KB, 2026-07-03) **RECENT**
 - [README.md](README.md) (3KB, 2026-07-03) **RECENT**
 
 ### specs/ (1 files)
@@ -129,14 +129,14 @@
 ## Recently Modified (last 7 days)
 
 1. [ARCHITECTURE.md](ARCHITECTURE.md) (today)
-2. [starter-packs.md](specs/implemented/starter-packs.md) (today)
-3. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
-4. [INDEX.md](INDEX.md) (today)
-5. [bulk-fetch-all-sources.md](specs/implemented/bulk-fetch-all-sources.md) (today)
-6. [catalog-browse-ui.md](specs/implemented/catalog-browse-ui.md) (today)
-7. [feed-health-monitor.md](specs/implemented/feed-health-monitor.md) (today)
-8. [source-catalog-subscriptions.md](specs/implemented/source-catalog-subscriptions.md) (today)
-9. [README.md](tech-debt/README.md) (today)
+2. [README.md](tech-debt/README.md) (today)
+3. [INDEX.md](INDEX.md) (today)
+4. [starter-packs.md](specs/implemented/starter-packs.md) (today)
+5. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
+6. [bulk-fetch-all-sources.md](specs/implemented/bulk-fetch-all-sources.md) (today)
+7. [catalog-browse-ui.md](specs/implemented/catalog-browse-ui.md) (today)
+8. [feed-health-monitor.md](specs/implemented/feed-health-monitor.md) (today)
+9. [source-catalog-subscriptions.md](specs/implemented/source-catalog-subscriptions.md) (today)
 10. [README.md](README.md) (today)
 
 ---

@@ -1,6 +1,5 @@
 """Unit tests for SubscriptionRepository."""
 
-import pytest
 
 from backend.src.infrastructure.repositories.subscription_repository import (
     SubscriptionRepository,

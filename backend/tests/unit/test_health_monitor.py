@@ -4,9 +4,9 @@ from unittest.mock import MagicMock, patch
 
 import httpx
 import pytest
-
 from backend.src.core.entities import HealthStatus
-from backend.src.infrastructure.health_monitor import HealthCheckError, HealthMonitorService
+from backend.src.infrastructure.health_monitor import HealthMonitorService
+
 from tests.conftest import sample_source, sample_subscription
 
 

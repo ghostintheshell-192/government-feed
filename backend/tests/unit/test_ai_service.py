@@ -4,7 +4,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
 import pytest
-
 from backend.src.infrastructure import ai_service
 from backend.src.infrastructure.ai_service import OllamaService
 
@@ -92,7 +91,7 @@ class TestSummarize:
         long_content = "x" * 3000
 
         with patch("backend.src.infrastructure.ai_service.httpx.AsyncClient", return_value=mock_client):
-            result = await service.summarize(long_content)
+            await service.summarize(long_content)
 
         # Verify the content was truncated in the request
         call_args = mock_client.post.call_args

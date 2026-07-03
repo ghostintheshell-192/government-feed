@@ -6,10 +6,7 @@ Tests the full flow: HTTP request → FastAPI routing → HealthMonitorService �
 from unittest.mock import MagicMock, patch
 
 import httpx
-
-from backend.src.infrastructure.models import Subscription
 from backend.tests.conftest import sample_source, sample_subscription
-
 
 # Minimal valid RSS for mocking successful fetches
 VALID_RSS = """<?xml version="1.0" encoding="UTF-8"?>

@@ -1,7 +1,6 @@
 """Unit tests for SourceRepository."""
 
 import pytest
-
 from backend.src.infrastructure.repositories.source_repository import SourceRepository
 from backend.tests.conftest import sample_source
 
