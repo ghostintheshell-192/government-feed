@@ -157,6 +157,11 @@ Concrete minimal apparatus (an afternoon, not a research project):
 
 ## 7. Questions only Valentina can answer
 
+> **Update 2026-07-03**: §7.1 and §7.3 are answered — see
+> [relevance-model-notes.md](relevance-model-notes.md) (fact-vs-opinion axis,
+> telegiornale cadence criterion, epistemics/topics split). §7.2 (taxonomy
+> seed) remains open.
+
 These are not blockers to start (the wedge doesn't need them), but relevance
 work is blocked on the first one, and writing answers down — even
 provisional — will save future sessions from guessing:
