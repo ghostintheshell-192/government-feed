@@ -7,11 +7,16 @@ set -euo pipefail
 SCOPE="${1:-all}"
 
 run_backend() {
-    if [[ ! -x .venv/bin/pytest ]]; then
-        echo "test: .venv/bin/pytest missing — pip install -e './backend[dev]'"
+    # Prefer the project venv; fall back to PATH (CI installs into system env).
+    if [[ -x .venv/bin/pytest ]]; then
+        PYTEST=.venv/bin/pytest
+    elif command -v pytest >/dev/null 2>&1; then
+        PYTEST=pytest
+    else
+        echo "test: pytest not available — pip install -e './backend[dev]'"
         exit 1
     fi
-    PYTHONPATH=. .venv/bin/pytest backend/tests/
+    PYTHONPATH=. "$PYTEST" backend/tests/
 }
 
 run_frontend() {

@@ -1,6 +1,6 @@
 # INDEX - Government Feed Development Documentation
 
-*Auto-generated: 2026-07-03 20:58*
+*Auto-generated: 2026-07-03 21:10*
 
 ---
 
@@ -20,7 +20,7 @@
 ### (root)/ (4 files)
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) (3KB, 2026-07-03) **RECENT**
-- [INDEX.md](INDEX.md) (6KB, 2026-07-03) **RECENT**
+- [INDEX.md](INDEX.md) (7KB, 2026-07-03) **RECENT**
 - [README.md](README.md) (3KB, 2026-07-03) **RECENT**
 - [CURRENT-STATUS.md](CURRENT-STATUS.md) (3KB, 2026-03-12)
 
@@ -132,15 +132,15 @@
 ## Recently Modified (last 7 days)
 
 1. [ARCHITECTURE.md](ARCHITECTURE.md) (today)
-2. [README.md](reference/decisions/README.md) (today)
-3. [005-geographic-levels-navigation.md](reference/decisions/005-geographic-levels-navigation.md) (today)
-4. [006-headless-browser-scraping.md](reference/decisions/006-headless-browser-scraping.md) (today)
-5. [007-catalog-subscription-model.md](reference/decisions/007-catalog-subscription-model.md) (today)
-6. [008-data-locality-split.md](reference/decisions/008-data-locality-split.md) (today)
-7. [_TEMPLATE.md](reference/decisions/_TEMPLATE.md) (today)
-8. [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) (today)
-9. [002-privacy-first-ai.md](reference/decisions/002-privacy-first-ai.md) (today)
-10. [003-content-deduplication.md](reference/decisions/003-content-deduplication.md) (today)
+2. [README.md](tech-debt/README.md) (today)
+3. [INDEX.md](INDEX.md) (today)
+4. [README.md](reference/decisions/README.md) (today)
+5. [005-geographic-levels-navigation.md](reference/decisions/005-geographic-levels-navigation.md) (today)
+6. [006-headless-browser-scraping.md](reference/decisions/006-headless-browser-scraping.md) (today)
+7. [007-catalog-subscription-model.md](reference/decisions/007-catalog-subscription-model.md) (today)
+8. [008-data-locality-split.md](reference/decisions/008-data-locality-split.md) (today)
+9. [_TEMPLATE.md](reference/decisions/_TEMPLATE.md) (today)
+10. [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) (today)
 
 ---
 
