@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
+import { getCountryOptions } from '@/lib/countries'
 import { useTheme, TEMPLATES } from '@/lib/theme-provider'
 
 interface SettingsData {
@@ -17,6 +18,7 @@ interface SettingsData {
   scheduler_enabled: boolean
   news_retention_days: number
   news_freshness_hours: number
+  user_country: string
 }
 
 type Theme = 'light' | 'dark' | 'system'
@@ -24,7 +26,7 @@ type Theme = 'light' | 'dark' | 'system'
 export default function Settings() {
   const queryClient = useQueryClient()
   const { theme, setTheme, template, setTemplate } = useTheme()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const [settings, setSettings] = useState<SettingsData>({
     ollama_endpoint: 'http://localhost:11434',
@@ -34,6 +36,7 @@ export default function Settings() {
     scheduler_enabled: true,
     news_retention_days: 30,
     news_freshness_hours: 24,
+    user_country: '',
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -79,6 +82,11 @@ export default function Settings() {
     queryClient.clear()
     alert(t('settings.successClearCache'))
   }
+
+  const countryOptions = useMemo(
+    () => getCountryOptions(i18n.language),
+    [i18n.language]
+  )
 
   const themeOptions: { value: Theme; label: string }[] = [
     { value: 'light', label: t('settings.themeLight') },
@@ -323,6 +331,48 @@ export default function Settings() {
                 />
                 <p className="text-sm text-muted-foreground">
                   {t('settings.newsFreshnessHelp')}
+                </p>
+              </div>
+
+              <Button onClick={saveSettings} disabled={saving}>
+                {saving ? t('settings.saving') : t('settings.saveSettings')}
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Localization */}
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>{t('settings.localization')}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {loading ? (
+            <Skeleton className="h-10 w-full" />
+          ) : error ? null : (
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <label htmlFor="user-country" className="text-sm font-medium">
+                  {t('settings.userCountry')}
+                </label>
+                <select
+                  id="user-country"
+                  className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+                  value={settings.user_country}
+                  onChange={(e) =>
+                    setSettings({ ...settings, user_country: e.target.value })
+                  }
+                >
+                  <option value="">{t('settings.userCountryNone')}</option>
+                  {countryOptions.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-sm text-muted-foreground">
+                  {t('settings.userCountryHelp')}
                 </p>
               </div>
 

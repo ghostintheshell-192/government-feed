@@ -1,6 +1,6 @@
 # Catalog Browse & Search UI
 
-**Status**: planned
+**Status**: implemented
 **Milestone**: M4a-Feed-Infrastructure
 **Priority**: should-have
 **Depends on**: [source-catalog-subscriptions](source-catalog-subscriptions.md)

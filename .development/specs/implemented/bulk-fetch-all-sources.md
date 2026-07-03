@@ -1,6 +1,6 @@
 # Bulk Fetch Content for All Sources
 
-**Status**: planned
+**Status**: implemented
 **Milestone**: M4a-Feed-Infrastructure
 **Priority**: should-have
 **Depends on**: [source-catalog-subscriptions](source-catalog-subscriptions.md)

@@ -1,6 +1,6 @@
 # Starter Packs — Geographic Navigation
 
-**Status**: planned
+**Status**: implemented
 **Milestone**: M4a-Feed-Infrastructure
 **Priority**: should-have
 **Depends on**: catalog-subscriptions (complete), geographic levels on Source (complete)
@@ -76,14 +76,14 @@ No onboarding flow for now — just the Settings dropdown. Onboarding deferred t
 
 ### Functional
 
-- [ ] Dashboard sidebar with 4 geographic level badges
-- [ ] Badge counters showing "new" article count per level
-- [ ] Toggle filtering: click badge to include/exclude that level
-- [ ] Full-width dashboard layout (sidebar + content area)
-- [ ] Settings: "new articles" threshold (hours, default 24)
-- [ ] Settings: country selection dropdown
-- [ ] Existing filters (search, source, date) work on top of geographic selection
-- [ ] i18n for all 4 languages (badge labels, settings labels)
+- [x] Dashboard sidebar with 4 geographic level badges
+- [ ] ~~Badge counters showing "new" article count per level~~ — **deferred to M4b** (see Implementation Notes)
+- [x] Toggle filtering: click badge to include/exclude that level
+- [x] Full-width dashboard layout (sidebar + content area)
+- [x] Settings: "new articles" threshold (hours, default 24)
+- [x] Settings: country selection dropdown
+- [x] Existing filters (search, source, date) work on top of geographic selection
+- [x] i18n for all 4 languages (badge labels, settings labels)
 
 ### Non-Functional
 
@@ -118,16 +118,30 @@ Two new settings keys in `settings.json`:
 
 ## Acceptance Criteria
 
-- [ ] Dashboard shows 4 geographic badges in sidebar with article counts
-- [ ] Clicking badges filters news by geographic level
-- [ ] Multiple badges can be active simultaneously
-- [ ] Default state shows all news (all badges active)
-- [ ] "New" threshold configurable in settings
-- [ ] Country selectable in settings
-- [ ] Badge counts update when news is fetched/imported
-- [ ] Layout is full-width with sidebar
-- [ ] Works in all 4 languages
-- [ ] Responsive: horizontal badges on mobile
+- [x] Dashboard shows 4 geographic badges in sidebar (counts deferred, see below)
+- [x] Clicking badges filters news by geographic level
+- [x] Multiple badges can be active simultaneously
+- [x] Default state shows all news (all badges active)
+- [x] "New" threshold configurable in settings
+- [x] Country selectable in settings
+- [ ] ~~Badge counts update when news is fetched/imported~~ — deferred to M4b
+- [x] Layout is full-width with sidebar
+- [x] Works in all 4 languages
+- [x] Responsive: horizontal badges on mobile
+
+## Implementation Notes
+
+- **Badge counters deliberately deferred to M4b**: a first implementation was
+  removed during `feature/geographic-sidebar` — raw counts confused more than
+  they helped ("new" vs "total" ambiguity). The `news_freshness_hours` backend
+  support is in place; the counters return with a rethought UX, likely as part
+  of the M4b custom-filters evolution. Captured in
+  `.memory-bank/ideas/2026-07-03-geographic-badge-counters-ux.md`.
+- **Country selection** (`user_country`, ISO 3166-1 alpha-2) is stored in
+  `settings.json` and exposed in Settings via a dropdown whose country names
+  are localized at runtime with `Intl.DisplayNames` (no translation table
+  shipped). Empty string = no country. Catalog highlighting by country is
+  M4b scope.
 
 ## Out of Scope
 
@@ -150,6 +164,11 @@ This transforms the sidebar from 4 fixed badges into a personal navigation works
 
 ## Open Questions
 
-- Should badges show total article count or only "new" count?
-- Should there be a visual distinction between "0 new but has sources" vs "0 new, no sources at this level"?
-- On mobile, should the horizontal badges be scrollable or always all visible?
+All resolved at implementation time:
+
+- *Total vs "new" count on badges?* → Deferred with the counters themselves
+  (M4b); the question is part of the UX rethink.
+- *Visual distinction "0 new but has sources" vs "no sources at this level"?*
+  → Deferred with the counters (M4b).
+- *Mobile: scrollable or always-visible badges?* → Always visible, horizontal
+  row above the content (implemented).

@@ -1,6 +1,6 @@
 # Source Catalog & Subscriptions
 
-**Status**: planned
+**Status**: implemented
 **Milestone**: M4a-Feed-Infrastructure
 **Priority**: must-have
 **Depends on**: (none — this is the foundation for other M4a features)

@@ -1,6 +1,6 @@
 # Feed Health Monitor
 
-**Status**: in-progress
+**Status**: implemented
 **Milestone**: M4a-Feed-Infrastructure
 **Priority**: must-have
 **Depends on**: [background-workers](../implemented/background-workers.md), [error-resilience](../implemented/error-resilience.md)
