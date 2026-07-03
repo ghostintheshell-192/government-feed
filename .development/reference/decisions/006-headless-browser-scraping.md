@@ -2,7 +2,8 @@
 
 **Date**: 2026-03-10
 **Status**: Deferred
-**Impact**: moderate
+**Impact**: medium
+**Summary**: Headless-browser scraping for WAF-protected sources is deferred to M5+; the scraper uses realistic browser headers and degrades gracefully to RSS snippet content.
 
 ## Context
 

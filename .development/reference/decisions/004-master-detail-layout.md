@@ -2,7 +2,8 @@
 
 **Date**: 2026-03-08
 **Status**: Proposed
-**Impact**: significant
+**Impact**: high
+**Summary**: Proposed responsive master-detail dashboard layout: side-by-side list and detail panel on desktop, separate detail page on mobile.
 
 ## Context
 

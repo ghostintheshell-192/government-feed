@@ -2,7 +2,8 @@
 
 **Date**: 2026-03-11
 **Status**: Accepted
-**Impact**: significant
+**Impact**: high
+**Summary**: Single Source table acts as the global catalog with a subscriptions pivot table linking users to sources — no data duplication between catalog and user selection.
 
 ## Context
 

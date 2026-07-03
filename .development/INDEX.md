@@ -1,6 +1,6 @@
 # INDEX - Government Feed Development Documentation
 
-*Auto-generated: 2026-07-03 20:22*
+*Auto-generated: 2026-07-03 20:58*
 
 ---
 
@@ -92,17 +92,18 @@
 - [security-audit-2026-03-08.md](tech-debt/security-audit-2026-03-08.md) (33KB, 2026-03-09)
 - [security-ssrf-arbitrary-urls.md](tech-debt/security-ssrf-arbitrary-urls.md) (10KB, 2026-03-09)
 
-### reference/decisions/ (9 files)
+### reference/decisions/ (10 files)
 
-- [005-geographic-levels-navigation.md](reference/decisions/005-geographic-levels-navigation.md) (4KB, 2026-03-12)
-- [006-headless-browser-scraping.md](reference/decisions/006-headless-browser-scraping.md) (2KB, 2026-03-12)
-- [007-catalog-subscription-model.md](reference/decisions/007-catalog-subscription-model.md) (3KB, 2026-03-12)
-- [008-data-locality-split.md](reference/decisions/008-data-locality-split.md) (3KB, 2026-03-12)
-- [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) (1KB, 2026-03-09)
-- [002-privacy-first-ai.md](reference/decisions/002-privacy-first-ai.md) (1KB, 2026-03-09)
-- [003-content-deduplication.md](reference/decisions/003-content-deduplication.md) (1KB, 2026-03-09)
-- [004-master-detail-layout.md](reference/decisions/004-master-detail-layout.md) (2KB, 2026-03-09)
-- [README.md](reference/decisions/README.md) (<1KB, 2026-03-09)
+- [README.md](reference/decisions/README.md) (2KB, 2026-07-03) **RECENT**
+- [005-geographic-levels-navigation.md](reference/decisions/005-geographic-levels-navigation.md) (4KB, 2026-07-03) **RECENT**
+- [006-headless-browser-scraping.md](reference/decisions/006-headless-browser-scraping.md) (2KB, 2026-07-03) **RECENT**
+- [007-catalog-subscription-model.md](reference/decisions/007-catalog-subscription-model.md) (3KB, 2026-07-03) **RECENT**
+- [008-data-locality-split.md](reference/decisions/008-data-locality-split.md) (3KB, 2026-07-03) **RECENT**
+- [_TEMPLATE.md](reference/decisions/_TEMPLATE.md) (1KB, 2026-07-03) **RECENT**
+- [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) (1KB, 2026-07-03) **RECENT**
+- [002-privacy-first-ai.md](reference/decisions/002-privacy-first-ai.md) (1KB, 2026-07-03) **RECENT**
+- [003-content-deduplication.md](reference/decisions/003-content-deduplication.md) (1KB, 2026-07-03) **RECENT**
+- [004-master-detail-layout.md](reference/decisions/004-master-detail-layout.md) (2KB, 2026-07-03) **RECENT**
 
 ### archive/completed/ (6 files)
 
@@ -131,9 +132,15 @@
 ## Recently Modified (last 7 days)
 
 1. [ARCHITECTURE.md](ARCHITECTURE.md) (today)
-2. [README.md](tech-debt/README.md) (today)
-3. [INDEX.md](INDEX.md) (today)
-4. [README.md](README.md) (today)
+2. [README.md](reference/decisions/README.md) (today)
+3. [005-geographic-levels-navigation.md](reference/decisions/005-geographic-levels-navigation.md) (today)
+4. [006-headless-browser-scraping.md](reference/decisions/006-headless-browser-scraping.md) (today)
+5. [007-catalog-subscription-model.md](reference/decisions/007-catalog-subscription-model.md) (today)
+6. [008-data-locality-split.md](reference/decisions/008-data-locality-split.md) (today)
+7. [_TEMPLATE.md](reference/decisions/_TEMPLATE.md) (today)
+8. [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) (today)
+9. [002-privacy-first-ai.md](reference/decisions/002-privacy-first-ai.md) (today)
+10. [003-content-deduplication.md](reference/decisions/003-content-deduplication.md) (today)
 
 ---
 

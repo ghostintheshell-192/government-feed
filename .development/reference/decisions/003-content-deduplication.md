@@ -3,6 +3,7 @@
 **Date**: 2025-10-25
 **Status**: Active
 **Impact**: critical
+**Summary**: News items are deduplicated via SHA256 hash of title|content|source|date, enforced by a unique index on content_hash.
 
 ## Context
 
