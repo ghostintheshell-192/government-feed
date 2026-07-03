@@ -72,7 +72,7 @@ export function NewsCard({
       className="cursor-pointer transition-shadow hover:shadow-md"
       onClick={handleClick}
     >
-      <CardHeader className="pb-3">
+      <CardHeader className="px-8 pb-3">
         <div className="flex items-start gap-3">
           {!isRead && (
             <span className="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-blue-500" />
@@ -99,7 +99,7 @@ export function NewsCard({
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-0">
+      <CardContent className="px-8 pt-0">
         {searchPreview ? (
           <p className="text-justify text-sm leading-relaxed text-muted-foreground">
             {highlightMatches(searchPreview, searchTerm)}

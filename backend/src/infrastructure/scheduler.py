@@ -2,7 +2,6 @@
 
 from datetime import UTC, datetime, timedelta
 
-import httpx
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from backend.src.infrastructure.database import SessionLocal
@@ -117,25 +116,21 @@ class FeedScheduler:
             db.close()
 
     def _health_check_sources(self) -> None:
-        """Check connectivity to all subscribed feed sources."""
+        """Run stateful health checks on all subscribed sources."""
+        from backend.src.infrastructure.health_monitor import HealthMonitorService
+
         db = SessionLocal()
         try:
             uow = UnitOfWork(db)
-            subscribed_ids = set(
-                uow.subscription_repository.get_subscribed_source_ids(user_id=1)
+            monitor = HealthMonitorService(uow)
+            results = monitor.check_all_subscribed(user_id=1)
+
+            healthy = sum(1 for r in results if r["new_status"] == "healthy")
+            degraded = sum(1 for r in results if r["new_status"] != "healthy")
+            self._logger.info(
+                "Health check complete: %d healthy, %d degraded/unhealthy/dead",
+                healthy, degraded,
             )
-            sources = [s for s in uow.source_repository.get_all() if s.id in subscribed_ids]
-            for source in sources:
-                try:
-                    with httpx.Client() as client:
-                        client.head(source.feed_url, timeout=10.0, follow_redirects=True)
-                    self._logger.debug("Health check OK: %s", source.name)
-                except Exception:
-                    self._logger.warning(
-                        "Health check failed for source: %s (%s)",
-                        source.name,
-                        source.feed_url,
-                    )
         except Exception:
             self._logger.exception("Error during health check")
         finally:

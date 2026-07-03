@@ -2,7 +2,8 @@
 
 **Date**: 2026-03-12
 **Status**: Proposed
-**Impact**: significant
+**Impact**: high
+**Summary**: Deferred to M5: split storage into a stable catalog DB (sources, subscriptions) and an ephemeral user content DB (news items, read state).
 **Target milestone**: M5
 
 ## Context

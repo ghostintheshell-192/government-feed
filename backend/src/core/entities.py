@@ -8,17 +8,37 @@ that are structurally compatible (duck typing).
 
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from hashlib import sha256
 
 
-class GeographicLevel(str, Enum):
+class GeographicLevel(StrEnum):
     """Geographic scope of an institutional source."""
 
     LOCAL = "LOCAL"
     NATIONAL = "NATIONAL"
     CONTINENTAL = "CONTINENTAL"
     GLOBAL = "GLOBAL"
+
+
+class HealthStatus(StrEnum):
+    """Health status of a feed source, based on consecutive failure count."""
+
+    HEALTHY = "healthy"
+    DEGRADED = "degraded"
+    UNHEALTHY = "unhealthy"
+    DEAD = "dead"
+
+    @staticmethod
+    def from_failure_count(count: int) -> "HealthStatus":
+        """Determine health status from consecutive failure count."""
+        if count <= 0:
+            return HealthStatus.HEALTHY
+        if count <= 2:
+            return HealthStatus.DEGRADED
+        if count <= 5:
+            return HealthStatus.UNHEALTHY
+        return HealthStatus.DEAD
 
 
 @dataclass
@@ -34,6 +54,11 @@ class Source:
     update_frequency_minutes: int = 60
     is_active: bool = True
     last_fetched: datetime | None = None
+    # Health monitoring
+    health_status: str = HealthStatus.HEALTHY
+    consecutive_failures: int = 0
+    last_health_check: datetime | None = None
+    last_healthy_at: datetime | None = None
     # Catalog fields
     geographic_level: str | None = None
     country_code: str | None = None

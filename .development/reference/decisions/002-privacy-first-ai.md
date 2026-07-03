@@ -3,6 +3,7 @@
 **Date**: 2025-10-25
 **Status**: Active
 **Impact**: critical
+**Summary**: All AI processing happens locally via Ollama — no content is ever sent to external cloud AI services.
 
 ## Context
 

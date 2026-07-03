@@ -3,6 +3,7 @@
 **Date**: 2025-10-25
 **Status**: Active
 **Impact**: critical
+**Summary**: Clean Architecture with inward-pointing dependencies (API -> Infrastructure -> Core); Core defines interfaces and knows nothing about outer layers.
 
 ## Context
 

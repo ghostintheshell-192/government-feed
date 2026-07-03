@@ -73,8 +73,8 @@ cd backend && pip install -e ".[dev]" && cd ..
 # Frontend
 cd frontend && npm install && cd ..
 
-# Git hooks (security checks, tests on push)
-git config core.hooksPath .githooks
+# Project automation: git hooks (branch protection, security, derived docs)
+bash .development/automation/bootstrap.sh
 
 # Services (Redis + Ollama)
 docker-compose up -d
@@ -86,8 +86,8 @@ docker exec government-feed-ollama ollama pull deepseek-r1:7b
 ### Running
 
 ```bash
-# Backend (from project root, with venv active)
-cd backend && uvicorn backend.src.api.main:app --reload
+# Backend — MUST run from the project root (imports resolve as backend.src.*)
+uvicorn backend.src.api.main:app --reload
 
 # Frontend (separate terminal)
 cd frontend && npm run dev
@@ -103,8 +103,9 @@ cd frontend && npm run dev
 # Health check
 curl http://localhost:8000/
 
-# Run tests
-cd backend && ../.venv/bin/python -m pytest tests/ -v
+# Run tests (from project root)
+PYTHONPATH=. .venv/bin/pytest backend/tests/ -v
+# or: .development/automation/test.sh backend
 
 # Lint + type check
 .venv/bin/ruff check backend/src

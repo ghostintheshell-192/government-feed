@@ -262,6 +262,34 @@ async def import_all_feeds(uow: UnitOfWork = Depends(get_unit_of_work)):
     return StreamingResponse(generate(), media_type="application/x-ndjson")
 
 
+@router.post("/{source_id}/health-check", response_model=schemas.HealthCheckResultResponse)
+async def health_check_source(
+    source_id: int, uow: UnitOfWork = Depends(get_unit_of_work),
+):
+    """Run a health check on a single source."""
+    from backend.src.infrastructure.health_monitor import HealthMonitorService
+
+    source = uow.source_repository.get_by_id(source_id)
+    if not source:
+        raise HTTPException(status_code=404, detail="Source not found")
+
+    monitor = HealthMonitorService(uow)
+    result = monitor.check_source(source_id)
+    logger.info("Health check for source %d: %s → %s", source_id, result["previous_status"], result["new_status"])
+    return result
+
+
+@router.post("/health-check", response_model=list[schemas.HealthCheckResultResponse])
+async def health_check_all(uow: UnitOfWork = Depends(get_unit_of_work)):
+    """Run health checks on all subscribed active sources."""
+    from backend.src.infrastructure.health_monitor import HealthMonitorService
+
+    monitor = HealthMonitorService(uow)
+    results = monitor.check_all_subscribed(_USER_ID)
+    logger.info("Bulk health check completed: %d sources checked", len(results))
+    return results
+
+
 @router.post("/{source_id}/process")
 async def process_feed(source_id: int, uow: UnitOfWork = Depends(get_unit_of_work)):
     """Process feed and import news."""

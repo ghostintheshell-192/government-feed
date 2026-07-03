@@ -12,6 +12,8 @@ DEFAULT_SETTINGS = {
     "summary_max_words": 200,
     "scheduler_enabled": True,
     "news_retention_days": 30,
+    "news_freshness_hours": 24,
+    "user_country": "",
     "redis_url": "redis://localhost:6379",
 }
 

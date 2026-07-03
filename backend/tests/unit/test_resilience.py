@@ -1,10 +1,8 @@
 """Unit tests for resilience module (CircuitBreaker + retry decorators)."""
 
 import time
-from unittest.mock import patch
 
 import pytest
-
 from backend.src.infrastructure.resilience import (
     CircuitBreaker,
     CircuitBreakerOpenError,

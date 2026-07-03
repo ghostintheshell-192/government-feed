@@ -3,12 +3,11 @@
 from datetime import datetime
 
 import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
-
 from backend.src.infrastructure.database import Base, get_db
 from backend.src.infrastructure.models import NewsItem, Source, Subscription
 from backend.src.infrastructure.unit_of_work import UnitOfWork
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 
 @pytest.fixture(scope="session")
@@ -31,8 +30,8 @@ def db_session(db_engine, db_tables):
     """Provide a transactional database session that rolls back after each test."""
     connection = db_engine.connect()
     transaction = connection.begin()
-    TestSession = sessionmaker(bind=connection)
-    session = TestSession()
+    session_factory = sessionmaker(bind=connection)
+    session = session_factory()
 
     yield session
 
@@ -50,9 +49,8 @@ def uow(db_session):
 @pytest.fixture
 def test_client(db_session):
     """Create a FastAPI TestClient with overridden database dependency."""
-    from fastapi.testclient import TestClient
-
     from backend.src.api.main import app
+    from fastapi.testclient import TestClient
 
     def override_get_db():
         yield db_session

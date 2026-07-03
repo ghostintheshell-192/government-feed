@@ -107,12 +107,21 @@ function IssueSection({
   )
 }
 
-function ActionFeedback({ result }: { result: string | null }) {
+function ActionFeedback({ result, onDismiss }: { result: string | null; onDismiss?: () => void }) {
   if (!result) return null
   return (
-    <p className="mt-2 rounded-md border bg-muted/50 px-3 py-2 text-sm">
-      {result}
-    </p>
+    <div className="mt-2 flex items-center justify-between rounded-md border bg-muted/50 px-3 py-2 text-sm">
+      <span>{result}</span>
+      {onDismiss && (
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="ml-2 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+        >
+          &times;
+        </button>
+      )}
+    </div>
   )
 }
 
@@ -624,7 +633,7 @@ export default function Admin() {
               {t('admin.bulkFetch')}
             </Button>
           </div>
-          <ActionFeedback result={actionResult} />
+          <ActionFeedback result={actionResult} onDismiss={() => setActionResult(null)} />
           {fetchProgress && (
             <ProgressBar
               current={fetchProgress.current}
@@ -700,7 +709,7 @@ export default function Admin() {
               {t('admin.delete')}
             </Button>
           </div>
-          <ActionFeedback result={patternResult} />
+          <ActionFeedback result={patternResult} onDismiss={() => setPatternResult(null)} />
         </div>
 
         {/* Quick cleanup */}
@@ -716,7 +725,7 @@ export default function Admin() {
               <Code className="mr-1 h-3 w-3" />
               {t('admin.fixHtmlResidue')}
             </Button>
-            <ActionFeedback result={htmlResult} />
+            <ActionFeedback result={htmlResult} onDismiss={() => setHtmlResult(null)} />
           </div>
           <div className="flex-1">
             <Button
@@ -729,7 +738,7 @@ export default function Admin() {
               <AlertTriangle className="mr-1 h-3 w-3" />
               {t('admin.cleanupOrphans')}
             </Button>
-            <ActionFeedback result={orphanResult} />
+            <ActionFeedback result={orphanResult} onDismiss={() => setOrphanResult(null)} />
           </div>
         </div>
       </div>
