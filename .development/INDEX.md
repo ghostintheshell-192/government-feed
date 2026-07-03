@@ -1,6 +1,6 @@
 # INDEX - Government Feed Development Documentation
 
-*Auto-generated: 2026-07-04 00:04*
+*Auto-generated: 2026-07-04 00:35*
 
 ---
 
@@ -20,7 +20,7 @@
 ### (root)/ (4 files)
 
 - [ARCHITECTURE.md](ARCHITECTURE.md) (3KB, 2026-07-04) **RECENT**
-- [INDEX.md](INDEX.md) (8KB, 2026-07-03) **RECENT**
+- [INDEX.md](INDEX.md) (8KB, 2026-07-04) **RECENT**
 - [CURRENT-STATUS.md](CURRENT-STATUS.md) (3KB, 2026-07-03) **RECENT**
 - [README.md](README.md) (3KB, 2026-07-03) **RECENT**
 
@@ -76,7 +76,7 @@
 
 ### tech-debt/ (14 files)
 
-- [README.md](tech-debt/README.md) (3KB, 2026-07-03) **RECENT**
+- [README.md](tech-debt/README.md) (3KB, 2026-07-04) **RECENT**
 - [naive-aware-datetime-columns.md](tech-debt/naive-aware-datetime-columns.md) (3KB, 2026-07-03) **RECENT**
 - [ruff-version-drift-ci.md](tech-debt/ruff-version-drift-ci.md) (2KB, 2026-07-03) **RECENT**
 - [source-tagging-unreliable.md](tech-debt/source-tagging-unreliable.md) (2KB, 2026-03-12)
@@ -104,8 +104,9 @@
 - [README.md](reference/decisions/README.md) (2KB, 2026-07-03) **RECENT**
 - [_TEMPLATE.md](reference/decisions/_TEMPLATE.md) (1KB, 2026-07-03) **RECENT**
 
-### reference/technical/ (2 files)
+### reference/technical/ (3 files)
 
+- [axes-classification-prior-art.md](reference/technical/axes-classification-prior-art.md) (8KB, 2026-07-04) **RECENT**
 - [m4b-intelligence-design-brief.md](reference/technical/m4b-intelligence-design-brief.md) (12KB, 2026-07-04) **RECENT**
 - [relevance-model-notes.md](reference/technical/relevance-model-notes.md) (5KB, 2026-07-04) **RECENT**
 
@@ -136,15 +137,15 @@
 ## Recently Modified (last 7 days)
 
 1. [ARCHITECTURE.md](ARCHITECTURE.md) (today)
-2. [m4b-intelligence-design-brief.md](reference/technical/m4b-intelligence-design-brief.md) (today)
-3. [relevance-model-notes.md](reference/technical/relevance-model-notes.md) (today)
-4. [INDEX.md](INDEX.md) (today)
-5. [README.md](tech-debt/README.md) (today)
-6. [naive-aware-datetime-columns.md](tech-debt/naive-aware-datetime-columns.md) (today)
-7. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
-8. [README.md](README.md) (today)
-9. [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) (today)
-10. [002-privacy-first-ai.md](reference/decisions/002-privacy-first-ai.md) (today)
+2. [axes-classification-prior-art.md](reference/technical/axes-classification-prior-art.md) (today)
+3. [INDEX.md](INDEX.md) (today)
+4. [m4b-intelligence-design-brief.md](reference/technical/m4b-intelligence-design-brief.md) (today)
+5. [relevance-model-notes.md](reference/technical/relevance-model-notes.md) (today)
+6. [README.md](tech-debt/README.md) (today)
+7. [naive-aware-datetime-columns.md](tech-debt/naive-aware-datetime-columns.md) (today)
+8. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
+9. [README.md](README.md) (today)
+10. [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) (today)
 
 ---
 
