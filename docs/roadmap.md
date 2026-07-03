@@ -2,15 +2,19 @@
 
 ## Milestone Overview
 
-| Milestone | Status | Description |
-|-----------|--------|-------------|
-| **M1 — MVP Backend** | Complete | Core API, feed parsing, AI summarization, repository pattern |
-| **M2 — Production-Ready** | Complete | Testing (177 tests), background workers, Redis caching, error resilience |
-| **M3 — Frontend** | In progress | Dashboard, news detail, sources management, dark mode, feed discovery |
-| **M3.1 — Admin API** | Planned | Feed inspector, content cleanup, quality report, DB diagnostics |
-| **M4a — Feed Infrastructure** | Planned | Health monitoring, automated discovery, admin UI, starter packs, export |
-| **M4b — Intelligence** | Planned | AI categorization, relevance scoring, trend detection, sentiment analysis |
-| **M5 — Scaling & Multi-User** | Planned | Authentication, multi-tenancy, PostgreSQL, cloud deployment |
+| Milestone | Status | Release | Description |
+|-----------|--------|---------|-------------|
+| **M1 — MVP Backend** | Complete | v0.1.0 | Core API, feed parsing, AI summarization, repository pattern |
+| **M2 — Production-Ready** | Complete | — | Testing, background workers, Redis caching, error resilience |
+| **M3 — Frontend** | Complete | — | Dashboard, news detail, sources management, dark mode, feed discovery |
+| **M3.1 — Admin API** | Complete | v0.2.0 | Feed inspector, content cleanup, quality report, DB diagnostics |
+| **M4a — Feed Infrastructure** | Complete | v0.4.0 | Health monitoring, catalog + subscriptions, admin UI, geographic sidebar, i18n |
+| **M4b — Intelligence** | Next up | | AI categorization, relevance scoring, trend detection, sentiment analysis |
+| **M5 — Scaling & Multi-User** | Planned | | Authentication, multi-tenancy, PostgreSQL, cloud deployment |
+
+**Versioning**: minor bump (`0.x.0`) when a milestone closes, patch/`-pre`
+bumps for work in between. `v1.0.0` when M5 makes the tool production-ready
+for multi-user deployment.
 
 For current status details, see [`.development/CURRENT-STATUS.md`](../.development/CURRENT-STATUS.md).
 
@@ -55,7 +59,12 @@ See: [`specs/planned/feed-admin-tools.md`](../.development/specs/planned/feed-ad
 
 Robust, autonomous feed management — no AI/ML required.
 
-**Prerequisite**: Core entity/model refactoring ([tech-debt](../.development/tech-debt/core-entity-model-misalignment.md))
+**Status: Complete** (2026-07-03). Delivered: catalog + subscriptions
+(ADR-007), feed crawler, health monitor with escalation ladder, geographic
+sidebar (ADR-005), country selection, i18n DE+FR, admin UI, bulk fetch.
+Carried over to later milestones: automated discovery, auto-recovery,
+export & notifications (specs in `specs/planned/` and `specs/backlog/`).
+See [`CURRENT-STATUS.md`](../.development/CURRENT-STATUS.md) for details.
 
 ### Admin UI
 
