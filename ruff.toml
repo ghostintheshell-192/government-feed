@@ -1,0 +1,17 @@
+# Project-wide ruff configuration.
+#
+# Why this exists at the repo root (not only in backend/pyproject.toml):
+# `format-check.sh` and CI lint `backend/{src,tests}`, `shared`, and `scripts`.
+# A [tool.ruff] table living only in backend/pyproject.toml governs backend/
+# alone; files under shared/ and scripts/ fall outside it and were being linted
+# under ruff's *built-in defaults*. Those defaults drifted across ruff releases
+# (0.16 promoted BLE001 into the default set), turning unchanged code red in CI.
+# A root config makes the whole tree obey the same, chosen rule set.
+#
+# Keep this in sync with backend/pyproject.toml's [tool.ruff] section.
+line-length = 100
+target-version = "py313"
+
+[lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+ignore = ["E501"]

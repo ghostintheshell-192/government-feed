@@ -89,6 +89,7 @@ docs/migration-status-report.md
 # Cache
 cache/
 .cache/
+.ruff_cache/
 
 # Redis
 dump.rdb
