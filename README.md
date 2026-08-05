@@ -6,6 +6,30 @@ Government sources (central banks, ministries, regulatory agencies) publish info
 
 **Key principles**: privacy-first (all AI processing runs locally via Ollama), no cloud dependencies, fully open source.
 
+## What this tool will not do
+
+Government Feed shows you evidence so that *you* judge it. It does not build a
+profile of anyone — and that cuts both ways:
+
+- **It does not profile you.** What you read is not used to decide what you
+  see next. There is no behavioural tracking and no engagement optimization:
+  you choose your sources and your topics explicitly, and that is the only
+  preference the system knows about.
+- **It does not profile news outlets.** When press coverage is shown next to
+  the primary document it refers to, that is a per-item, verifiable fact with
+  links you can check. The tool computes no bias score, no reliability
+  ranking, no verdict about any publisher.
+
+Where the system does form an opinion, it is only ever about the **form** of a
+piece of information — is this a fact or an opinion, is it urgent or
+evergreen — never about which position is right.
+
+The reason is not caution. A tool built to reduce your dependence on someone
+else's judgement has no business substituting its own.
+
+See [ADR-009](.development/reference/decisions/009-no-profiling-readers-or-publishers.md)
+for the full decision and its consequences.
+
 ## Current Status
 
 <!-- AUTO:STATUS -->
