@@ -1,6 +1,6 @@
 # INDEX - Government Feed Development Documentation
 
-*Auto-generated: 2026-08-05 17:38*
+*Auto-generated: 2026-08-05 19:46*
 
 ---
 
@@ -142,11 +142,11 @@
 ## Recently Modified (last 7 days)
 
 1. [ARCHITECTURE.md](ARCHITECTURE.md) (today)
-2. [README.md](tech-debt\README.md) (today)
-3. [INDEX.md](INDEX.md) (today)
-4. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
+2. [INDEX.md](INDEX.md) (today)
+3. [README.md](tech-debt\README.md) (today)
+4. [press-coverage-cross-referencing.md](specs\planned\press-coverage-cross-referencing.md) (today)
 5. [009-no-profiling-readers-or-publishers.md](reference\decisions\009-no-profiling-readers-or-publishers.md) (today)
-6. [press-coverage-cross-referencing.md](specs\planned\press-coverage-cross-referencing.md) (today)
+6. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
 
 ---
 
