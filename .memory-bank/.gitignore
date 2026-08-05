@@ -5,3 +5,8 @@ sessions/
 *.md
 !README.md
 !_archive-*.md
+
+# Ideas ARE tracked: unlike handoffs, they are project artifacts — captured
+# threads that may become specs or ADRs, and whose provenance is worth
+# sharing and carrying across machines.
+!ideas/*.md
