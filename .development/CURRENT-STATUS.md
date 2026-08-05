@@ -55,6 +55,14 @@ Design foundation (read in this order before implementing):
 | [Categorization Model (M4b.2)](specs/planned/categorization-model.md) | should-have | baseline | Spec ready |
 | [Axes & Cadence (M4b.3)](specs/planned/axes-and-cadence.md) | should-have | harness + baseline | Spec ready |
 | [Feed Discovery / Track 0](specs/planned/feed-discovery-automated.md) | must-have | — (parallel) | Spec rewritten (enumeration-first) |
+| [Press Coverage & Cross-Referencing](specs/planned/press-coverage-cross-referencing.md) | should-have | Phase 1: none / Phase 2: baseline + harness | Spec rewritten 2026-08-05 (was `backlog/daily-digest.md`) |
+
+**Press coverage, Phase 1** (media sources in the catalog via RSS) has no M4b
+dependency and can ship at any time — it is also a cheap source of hard cases
+for the golden set (journalistic text exercises the fact↔opinion axis that
+institutional corpora barely touch). The ethical boundary for Phase 2 is
+[ADR-009](reference/decisions/009-no-profiling-readers-or-publishers.md)
+(no profiling — neither readers nor publishers).
 
 **Pre-implementation gate**: apply the UTCDateTime TypeDecorator fix
 (`tech-debt/naive-aware-datetime-columns.md`) before the `enrichments`
@@ -62,7 +70,9 @@ migration lands.
 
 ### Backlog (deferred to later milestones)
 
-See `specs/backlog/` — includes data export, daily digest, notifications, feed registry, config import/export.
+See `specs/backlog/` — includes data export, notifications, feed registry, config import/export.
+(`daily-digest.md` left the backlog on 2026-08-05: rewritten and promoted to
+`specs/planned/press-coverage-cross-referencing.md`.)
 
 ## Previous Milestones (complete)
 

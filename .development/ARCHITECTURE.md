@@ -24,6 +24,7 @@ For detailed documentation, see `docs/architecture.md`.
 - [ADR-006: Headless Browser Scraping](reference/decisions/006-headless-browser-scraping.md)
 - [ADR-007: Catalog Subscription Model](reference/decisions/007-catalog-subscription-model.md)
 - [ADR-008: Data Locality Split](reference/decisions/008-data-locality-split.md)
+- [ADR-009: No Profiling Readers Or Publishers](reference/decisions/009-no-profiling-readers-or-publishers.md)
 
 ## Project Tree
 
