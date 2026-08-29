@@ -1,6 +1,7 @@
 # INDEX - Government Feed Development Documentation
 
-*Auto-generated: 2026-08-29 18:16*
+*A map of what exists and what each document is for.*
+*For when and why something changed, ask git.*
 
 ---
 
@@ -19,110 +20,110 @@
 
 ### (root)/ (4 files)
 
-- [ARCHITECTURE.md](ARCHITECTURE.md) (3KB, 2026-08-29) **RECENT**
-- [INDEX.md](INDEX.md) (8KB, 2026-08-29) **RECENT**
-- [CURRENT-STATUS.md](CURRENT-STATUS.md) (5KB, 2026-08-29) **RECENT**
-- [README.md](README.md) (3KB, 2026-07-03)
+- [ARCHITECTURE.md](ARCHITECTURE.md) — Architecture Reference
+- [CURRENT-STATUS.md](CURRENT-STATUS.md) — Government Feed - Current Status
+- [INDEX.md](INDEX.md) — INDEX - Government Feed Development Documentation
+- [README.md](README.md) — .development/ - Development Documentation
 
 ### specs/ (1 files)
 
-- [README.md](specs/README.md) (1KB, 2026-03-09)
+- [README.md](specs/README.md) — Feature Specifications
 
 ### specs/backlog/ (9 files)
 
-- [feed-registry.md](specs/backlog/feed-registry.md) (2KB, 2026-03-09)
-- [import-export-config.md](specs/backlog/import-export-config.md) (1KB, 2026-03-09)
-- [multi-user-auth.md](specs/backlog/multi-user-auth.md) (2KB, 2026-03-09)
-- [notifications.md](specs/backlog/notifications.md) (2KB, 2026-03-09)
-- [relevance-scoring.md](specs/backlog/relevance-scoring.md) (2KB, 2026-03-09)
-- [trend-detection.md](specs/backlog/trend-detection.md) (1KB, 2026-03-09)
-- [ui-preferences.md](specs/backlog/ui-preferences.md) (1KB, 2026-03-09)
-- [ai-categorization.md](specs/backlog/ai-categorization.md) (1KB, 2026-03-09)
-- [data-export.md](specs/backlog/data-export.md) (1KB, 2026-03-09)
+- [ai-categorization.md](specs/backlog/ai-categorization.md) — AI Categorization
+- [data-export.md](specs/backlog/data-export.md) — Data Export
+- [feed-registry.md](specs/backlog/feed-registry.md) — Feed Registry
+- [import-export-config.md](specs/backlog/import-export-config.md) — Import/Export Configuration
+- [multi-user-auth.md](specs/backlog/multi-user-auth.md) — Multi-User Authentication
+- [notifications.md](specs/backlog/notifications.md) — Notifications
+- [relevance-scoring.md](specs/backlog/relevance-scoring.md) — Relevance Scoring
+- [trend-detection.md](specs/backlog/trend-detection.md) — Trend Detection
+- [ui-preferences.md](specs/backlog/ui-preferences.md) — UI Preferences
 
 ### specs/implemented/ (22 files)
 
-- [bulk-fetch-all-sources.md](specs/implemented/bulk-fetch-all-sources.md) (1KB, 2026-07-03)
-- [catalog-browse-ui.md](specs/implemented/catalog-browse-ui.md) (2KB, 2026-07-03)
-- [feed-health-monitor.md](specs/implemented/feed-health-monitor.md) (4KB, 2026-07-03)
-- [source-catalog-subscriptions.md](specs/implemented/source-catalog-subscriptions.md) (3KB, 2026-07-03)
-- [starter-packs.md](specs/implemented/starter-packs.md) (8KB, 2026-07-03)
-- [ai-summarization.md](specs/implemented/ai-summarization.md) (2KB, 2026-03-09)
-- [background-workers.md](specs/implemented/background-workers.md) (2KB, 2026-03-09)
-- [content-deduplication.md](specs/implemented/content-deduplication.md) (1KB, 2026-03-09)
-- [dashboard-news-browsing.md](specs/implemented/dashboard-news-browsing.md) (1KB, 2026-03-09)
-- [database-migrations.md](specs/implemented/database-migrations.md) (1KB, 2026-03-09)
-- [error-resilience.md](specs/implemented/error-resilience.md) (2KB, 2026-03-09)
-- [feed-parsing.md](specs/implemented/feed-parsing.md) (1KB, 2026-03-09)
-- [frontend-base.md](specs/implemented/frontend-base.md) (1KB, 2026-03-09)
-- [news-detail-view.md](specs/implemented/news-detail-view.md) (1KB, 2026-03-09)
-- [redis-caching.md](specs/implemented/redis-caching.md) (2KB, 2026-03-09)
-- [repository-pattern.md](specs/implemented/repository-pattern.md) (1KB, 2026-03-09)
-- [rest-api.md](specs/implemented/rest-api.md) (2KB, 2026-03-09)
-- [search-discovery.md](specs/implemented/search-discovery.md) (1KB, 2026-03-09)
-- [settings-management.md](specs/implemented/settings-management.md) (1KB, 2026-03-09)
-- [source-management.md](specs/implemented/source-management.md) (2KB, 2026-03-09)
-- [structured-logging.md](specs/implemented/structured-logging.md) (1KB, 2026-03-09)
-- [testing-suite.md](specs/implemented/testing-suite.md) (2KB, 2026-03-09)
+- [ai-summarization.md](specs/implemented/ai-summarization.md) — AI Summarization
+- [background-workers.md](specs/implemented/background-workers.md) — Background Workers
+- [bulk-fetch-all-sources.md](specs/implemented/bulk-fetch-all-sources.md) — Bulk Fetch Content for All Sources
+- [catalog-browse-ui.md](specs/implemented/catalog-browse-ui.md) — Catalog Browse & Search UI
+- [content-deduplication.md](specs/implemented/content-deduplication.md) — Content Deduplication
+- [dashboard-news-browsing.md](specs/implemented/dashboard-news-browsing.md) — Dashboard & News Browsing
+- [database-migrations.md](specs/implemented/database-migrations.md) — Database Migrations
+- [error-resilience.md](specs/implemented/error-resilience.md) — Error Resilience
+- [feed-health-monitor.md](specs/implemented/feed-health-monitor.md) — Feed Health Monitor
+- [feed-parsing.md](specs/implemented/feed-parsing.md) — Feed Parsing
+- [frontend-base.md](specs/implemented/frontend-base.md) — Frontend Base
+- [news-detail-view.md](specs/implemented/news-detail-view.md) — News Detail View
+- [redis-caching.md](specs/implemented/redis-caching.md) — Redis Caching
+- [repository-pattern.md](specs/implemented/repository-pattern.md) — Repository Pattern
+- [rest-api.md](specs/implemented/rest-api.md) — REST API
+- [search-discovery.md](specs/implemented/search-discovery.md) — Search & Discovery
+- [settings-management.md](specs/implemented/settings-management.md) — Settings Management
+- [source-catalog-subscriptions.md](specs/implemented/source-catalog-subscriptions.md) — Source Catalog & Subscriptions
+- [source-management.md](specs/implemented/source-management.md) — Source Management
+- [starter-packs.md](specs/implemented/starter-packs.md) — Starter Packs — Geographic Navigation
+- [structured-logging.md](specs/implemented/structured-logging.md) — Structured Logging
+- [testing-suite.md](specs/implemented/testing-suite.md) — Testing Suite
 
 ### specs/planned/ (10 files)
 
-- [press-coverage-cross-referencing.md](specs/planned/press-coverage-cross-referencing.md) (9KB, 2026-08-29) **RECENT**
-- [axes-and-cadence.md](specs/planned/axes-and-cadence.md) (6KB, 2026-08-29) **RECENT**
-- [categorization-baseline.md](specs/planned/categorization-baseline.md) (6KB, 2026-08-29) **RECENT**
-- [categorization-model.md](specs/planned/categorization-model.md) (5KB, 2026-08-29) **RECENT**
-- [eval-harness.md](specs/planned/eval-harness.md) (5KB, 2026-08-29) **RECENT**
-- [feed-discovery-automated.md](specs/planned/feed-discovery-automated.md) (7KB, 2026-08-29) **RECENT**
-- [feed-auto-recovery.md](specs/planned/feed-auto-recovery.md) (3KB, 2026-07-03)
-- [document-indexing.md](specs/planned/document-indexing.md) (3KB, 2026-03-12)
-- [i18n-additional-languages.md](specs/planned/i18n-additional-languages.md) (<1KB, 2026-03-12)
-- [feed-admin-tools.md](specs/planned/feed-admin-tools.md) (5KB, 2026-03-09)
+- [axes-and-cadence.md](specs/planned/axes-and-cadence.md) — Axes & Cadence (M4b.3) — Epistemics Classification and Telegiornale Ordering
+- [categorization-baseline.md](specs/planned/categorization-baseline.md) — Categorization Baseline (M4b.1) — Rules, Enrichment Storage, Sidebar Filters
+- [categorization-model.md](specs/planned/categorization-model.md) — Categorization Model (M4b.2) — Embeddings Classifier for the Unsure Cases
+- [document-indexing.md](specs/planned/document-indexing.md) — Document Indexing
+- [eval-harness.md](specs/planned/eval-harness.md) — Evaluation Harness — Golden Set & Regression Metrics
+- [feed-admin-tools.md](specs/planned/feed-admin-tools.md) — Feed Administration Tools
+- [feed-auto-recovery.md](specs/planned/feed-auto-recovery.md) — Feed Auto-Recovery
+- [feed-discovery-automated.md](specs/planned/feed-discovery-automated.md) — Automated Feed Discovery — Enumerate Institutions, Not Search for Feeds
+- [i18n-additional-languages.md](specs/planned/i18n-additional-languages.md) — i18n: Add German and French
+- [press-coverage-cross-referencing.md](specs/planned/press-coverage-cross-referencing.md) — Press Coverage — Media Sources and Cross-Referencing
 
 ### tech-debt/ (14 files)
 
-- [README.md](tech-debt/README.md) (3KB, 2026-08-29) **RECENT**
-- [naive-aware-datetime-columns.md](tech-debt/naive-aware-datetime-columns.md) (3KB, 2026-08-29) **RECENT**
-- [ruff-version-drift-ci.md](tech-debt/ruff-version-drift-ci.md) (2KB, 2026-07-03)
-- [source-tagging-unreliable.md](tech-debt/source-tagging-unreliable.md) (2KB, 2026-03-12)
-- [_TEMPLATE.md](tech-debt/_TEMPLATE.md) (1KB, 2026-03-09)
-- [code-review-2026-03-08.md](tech-debt/code-review-2026-03-08.md) (41KB, 2026-03-09)
-- [dependency-analysis-2026-03-08.md](tech-debt/dependency-analysis-2026-03-08.md) (14KB, 2026-03-09)
-- [duplicated-html-stripping.md](tech-debt/duplicated-html-stripping.md) (<1KB, 2026-03-09)
-- [global-mutable-state-main.md](tech-debt/global-mutable-state-main.md) (1KB, 2026-03-09)
-- [missing-foreign-key-constraint.md](tech-debt/missing-foreign-key-constraint.md) (1KB, 2026-03-09)
-- [newscard-summary-hidden-on-expand.md](tech-debt/newscard-summary-hidden-on-expand.md) (1KB, 2026-03-09)
-- [pre-commit-grep-regex.md](tech-debt/pre-commit-grep-regex.md) (1KB, 2026-03-09)
-- [security-audit-2026-03-08.md](tech-debt/security-audit-2026-03-08.md) (33KB, 2026-03-09)
-- [security-ssrf-arbitrary-urls.md](tech-debt/security-ssrf-arbitrary-urls.md) (10KB, 2026-03-09)
+- [README.md](tech-debt/README.md) — Tech Debt Issues
+- [_TEMPLATE.md](tech-debt/_TEMPLATE.md) — [Issue Title]
+- [code-review-2026-03-08.md](tech-debt/code-review-2026-03-08.md) — Code Review Report - Government Feed Backend
+- [dependency-analysis-2026-03-08.md](tech-debt/dependency-analysis-2026-03-08.md) — Dependency Analysis Report - Government Feed
+- [duplicated-html-stripping.md](tech-debt/duplicated-html-stripping.md) — Duplicated HTML stripping logic across services
+- [global-mutable-state-main.md](tech-debt/global-mutable-state-main.md) — Global mutable state in main.py
+- [missing-foreign-key-constraint.md](tech-debt/missing-foreign-key-constraint.md) — Missing foreign key constraint from news_items to sources
+- [naive-aware-datetime-columns.md](tech-debt/naive-aware-datetime-columns.md) — Naive/aware datetime mismatch between DB columns and code
+- [newscard-summary-hidden-on-expand.md](tech-debt/newscard-summary-hidden-on-expand.md) — NewsCard: AI summary hidden when article content is expanded
+- [pre-commit-grep-regex.md](tech-debt/pre-commit-grep-regex.md) — Pre-commit hook: grep doesn't support \s+ regex
+- [ruff-version-drift-ci.md](tech-debt/ruff-version-drift-ci.md) — Tool version drift between local venv and CI (ruff, mypy)
+- [security-audit-2026-03-08.md](tech-debt/security-audit-2026-03-08.md) — Security Audit Report - Government Feed
+- [security-ssrf-arbitrary-urls.md](tech-debt/security-ssrf-arbitrary-urls.md) — Security Issue: Server-Side Request Forgery (SSRF) — Arbitrary URL Fetching
+- [source-tagging-unreliable.md](tech-debt/source-tagging-unreliable.md) — Source tagging is unreliable
 
 ### reference/decisions/ (11 files)
 
-- [009-no-profiling-readers-or-publishers.md](reference/decisions/009-no-profiling-readers-or-publishers.md) (5KB, 2026-08-29) **RECENT**
-- [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) (1KB, 2026-07-03)
-- [002-privacy-first-ai.md](reference/decisions/002-privacy-first-ai.md) (1KB, 2026-07-03)
-- [003-content-deduplication.md](reference/decisions/003-content-deduplication.md) (1KB, 2026-07-03)
-- [004-master-detail-layout.md](reference/decisions/004-master-detail-layout.md) (2KB, 2026-07-03)
-- [005-geographic-levels-navigation.md](reference/decisions/005-geographic-levels-navigation.md) (4KB, 2026-07-03)
-- [006-headless-browser-scraping.md](reference/decisions/006-headless-browser-scraping.md) (2KB, 2026-07-03)
-- [007-catalog-subscription-model.md](reference/decisions/007-catalog-subscription-model.md) (3KB, 2026-07-03)
-- [008-data-locality-split.md](reference/decisions/008-data-locality-split.md) (3KB, 2026-07-03)
-- [README.md](reference/decisions/README.md) (2KB, 2026-07-03)
-- [_TEMPLATE.md](reference/decisions/_TEMPLATE.md) (1KB, 2026-07-03)
+- [001-clean-architecture.md](reference/decisions/001-clean-architecture.md) — ADR-001: Clean Architecture
+- [002-privacy-first-ai.md](reference/decisions/002-privacy-first-ai.md) — ADR-002: Privacy-First AI Processing
+- [003-content-deduplication.md](reference/decisions/003-content-deduplication.md) — ADR-003: Content Deduplication via SHA256
+- [004-master-detail-layout.md](reference/decisions/004-master-detail-layout.md) — ADR-004: Master-Detail Panel Layout for Dashboard
+- [005-geographic-levels-navigation.md](reference/decisions/005-geographic-levels-navigation.md) — ADR-005: Geographic Levels as Primary Navigation Structure
+- [006-headless-browser-scraping.md](reference/decisions/006-headless-browser-scraping.md) — ADR-006: Headless Browser for Anti-Bot Protected Sources
+- [007-catalog-subscription-model.md](reference/decisions/007-catalog-subscription-model.md) — ADR-007: Catalog-Subscription Model for Source Management
+- [008-data-locality-split.md](reference/decisions/008-data-locality-split.md) — ADR-008: Data Locality — Catalog vs User Content
+- [009-no-profiling-readers-or-publishers.md](reference/decisions/009-no-profiling-readers-or-publishers.md) — ADR-009: No Profiling — Neither Readers Nor Publishers
+- [README.md](reference/decisions/README.md) — Decision Log
+- [_TEMPLATE.md](reference/decisions/_TEMPLATE.md) — ADR-NNN: <concise decision title>
 
 ### reference/technical/ (3 files)
 
-- [axes-classification-prior-art.md](reference/technical/axes-classification-prior-art.md) (8KB, 2026-08-29) **RECENT**
-- [m4b-intelligence-design-brief.md](reference/technical/m4b-intelligence-design-brief.md) (12KB, 2026-08-29) **RECENT**
-- [relevance-model-notes.md](reference/technical/relevance-model-notes.md) (5KB, 2026-08-29) **RECENT**
+- [axes-classification-prior-art.md](reference/technical/axes-classification-prior-art.md) — Axes Classification — Prior Art & Feasibility
+- [m4b-intelligence-design-brief.md](reference/technical/m4b-intelligence-design-brief.md) — M4b Intelligence — Design Brief
+- [relevance-model-notes.md](reference/technical/relevance-model-notes.md) — Relevance Model — Founding Notes
 
 ### archive/completed/ (6 files)
 
-- [2026-03-11_core-entity-model-misalignment.md](archive/completed/2026-03-11_core-entity-model-misalignment.md) (4KB, 2026-03-12)
-- [2026-03-11_feedparser-bypasses-uow.md](archive/completed/2026-03-11_feedparser-bypasses-uow.md) (2KB, 2026-03-12)
-- [2026-03-08_deprecated-datetime-utcnow.md](archive/completed/2026-03-08_deprecated-datetime-utcnow.md) (1KB, 2026-03-09)
-- [2026-03-08_deprecated-fastapi-pydantic-apis.md](archive/completed/2026-03-08_deprecated-fastapi-pydantic-apis.md) (1KB, 2026-03-09)
-- [2026-03-08_security-unvalidated-settings-endpoint.md](archive/completed/2026-03-08_security-unvalidated-settings-endpoint.md) (3KB, 2026-03-09)
-- [2026-03-08_security-xxe-feed-parser.md](archive/completed/2026-03-08_security-xxe-feed-parser.md) (10KB, 2026-03-09)
+- [2026-03-08_deprecated-datetime-utcnow.md](archive/completed/2026-03-08_deprecated-datetime-utcnow.md) — Deprecated datetime.utcnow() usage throughout codebase
+- [2026-03-08_deprecated-fastapi-pydantic-apis.md](archive/completed/2026-03-08_deprecated-fastapi-pydantic-apis.md) — Deprecated FastAPI and Pydantic APIs
+- [2026-03-08_security-unvalidated-settings-endpoint.md](archive/completed/2026-03-08_security-unvalidated-settings-endpoint.md) — Security Issue: Unvalidated Settings Endpoint — Arbitrary Configuration Injection
+- [2026-03-08_security-xxe-feed-parser.md](archive/completed/2026-03-08_security-xxe-feed-parser.md) — Security Issue: XXE (XML External Entity) Vulnerability in Feed Parser
+- [2026-03-11_core-entity-model-misalignment.md](archive/completed/2026-03-11_core-entity-model-misalignment.md) — Core Entity / Infrastructure Model Misalignment
+- [2026-03-11_feedparser-bypasses-uow.md](archive/completed/2026-03-11_feedparser-bypasses-uow.md) — FeedParserService bypasses Unit of Work pattern
 
 ---
 
@@ -132,25 +133,10 @@
 
 ### docs/
 
-- [README.md](../docs/README.md) (<1KB, 2026-03-09)
-- [roadmap.md](../docs/roadmap.md) (5KB, 2026-07-03)
-- [technical.md](../docs/technical.md) (4KB, 2026-07-03)
-- [vision.md](../docs/vision.md) (14KB, 2025-10-25)
-
----
-
-## Recently Modified (last 7 days)
-
-1. [ARCHITECTURE.md](ARCHITECTURE.md) (today)
-2. [INDEX.md](INDEX.md) (today)
-3. [CURRENT-STATUS.md](CURRENT-STATUS.md) (today)
-4. [009-no-profiling-readers-or-publishers.md](reference/decisions/009-no-profiling-readers-or-publishers.md) (today)
-5. [press-coverage-cross-referencing.md](specs/planned/press-coverage-cross-referencing.md) (today)
-6. [README.md](tech-debt/README.md) (today)
-7. [axes-classification-prior-art.md](reference/technical/axes-classification-prior-art.md) (today)
-8. [m4b-intelligence-design-brief.md](reference/technical/m4b-intelligence-design-brief.md) (today)
-9. [relevance-model-notes.md](reference/technical/relevance-model-notes.md) (today)
-10. [axes-and-cadence.md](specs/planned/axes-and-cadence.md) (today)
+- [README.md](../docs/README.md) — Government Feed - Documentation
+- [roadmap.md](../docs/roadmap.md) — Government Feed - Roadmap
+- [technical.md](../docs/technical.md) — Government Feed - Technical Documentation
+- [vision.md](../docs/vision.md) — Government Feed - Documento di Visione
 
 ---
 
